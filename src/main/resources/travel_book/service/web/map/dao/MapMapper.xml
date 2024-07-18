@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="travel_book.service.web.map.dao.MapMapper">
+
+    <insert id="saveLocation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO LOCATION_STORAGE (MEMBER_ID, LATITUDE, LONGITUDE, NAME, SQ, CDT)
+            VALUES (#{memberId}, #{lat}, #{lng}, #{name}, #{sq}, now())
+    </insert>
+
+
+    <select id="LocationFindById" resultType="travel_book.service.web.map.dto.LocationModel">
+        SELECT MEMBER_ID, LATITUDE AS lat, LONGITUDE AS lng, SQ
+            FROM LOCATION_STORAGE
+         WHERE MEMBER_ID = #{memberId}
+    </select>
+
+</mapper>

@@ -1,0 +1,56 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.0'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'travel_book'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//JdbcTemplate 추가
+	//implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	
+	//MyBatis 추가	-> 스프링 부트에 맞게 추가해줘야함
+	//implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+	//MyBatis 스프링 부트 3.0 추가
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+
+	//JPA, 스프링 데이터 JPA 추가		=> 여기에 jdbc에 관한걸 포함하고 있어서 지워도 된다
+//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+
+	//H2 데이터베이스 추가
+	runtimeOnly 'com.h2database:h2'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
+	//테스트에서 lombok 사용하기 위해 추가
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="travel_book.service.domain.repository.mybatis.MemberMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO MEMBER (MAIL, NAME, USER_ID, PASSWORD, PHONE, CDT)
+            VALUES (#{mail}, #{name}, #{userId}, #{password}, #{phone}, now())
+    </insert>
+
+    <update id="update">
+        UPDATE MEMBER
+            SET MAIL = #{updateParam.mail},
+                NAME     = #{updateParam.name},
+                PASSWORD  = #{updateParam.password},
+                PHONE  = #{updateParam.phone}
+         WHERE ID = #{updateParam.id}
+    </update>
+
+    <select id="findByMail" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+        SELECT ID, MAIL, NAME, PASSWORD, PHONE, CDT
+            FROM MEMBER
+         WHERE MAIL = #{mail}
+    </select>
+
+    <select id="findAll" resultType="Member">
+        SELECT ID, MAIL, NAME, PASSWORD, PHONE, CDT
+            FROM MEMBER
+         <where>
+             <if test="mail != null and mail !=''">
+                 AND MAIL LIKE CONCAT('%', #{mail}, '%')
+             </if>
+             <!--
+             <if test="userId != null and userId !=''">
+                 AND MAIL LIKE CONCAT('%', #{userId}, '%')
+             </if>
+             -->
+             <if test="name != null and name !=''">     <!-- 검색 조건 선택하는 쪽에서 두개 같이만 안넘겨주면 콤보박스로 사용 like 문법 오류 안남-->
+                 AND NAME LIKE CONCAT('%', #{name}, '%')
+                 <!--
+                 <! [CDATA[
+                 and price <= #{maxPrice}
+                 ]]>
+                 -->
+             </if>
+         </where>
+    </select>
+
+    <select id="memberInfoFindByUser" resultType="Member">
+        SELECT ID, USER_ID, NAME
+            FROM MEMBER
+         WHERE USER_ID = #{userId}
+    </select>
+
+
+</mapper>

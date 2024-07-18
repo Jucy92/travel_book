@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>지도 예제</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+        .search-container {
+            margin-top: 10px;
+        }
+        .coordinates {
+            margin-top: 10px;
+        }
+        .locations {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>지도 예제</h2>
+    <div class="search-container">
+        <label for="search">장소 검색:</label>
+        <input type="text" id="search" onkeypress="handleKeyPress(event)" />
+        <button id="searchButton" onclick="searchLocation()">검색</button>
+    </div>
+    <div id="map"></div>
+    <div class="coordinates">
+        <label for="latitude">위도:</label>
+        <input type="text" id="latitude" readonly />
+        <label for="longitude">경도:</label>
+        <input type="text" id="longitude" readonly />
+    </div>
+    <button id="saveButton" onclick="saveLocations()" style="display:none;">저장</button>
+    <div class="locations">
+        <h3>선택된 위치들:</h3>
+        <ul id="locationList"></ul>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([37.5665, 126.9780], 13); // 초기 좌표 (서울)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var markers = []; // 마커들을 저장할 배열
+        var availableIndices = []; // 삭제 시 사용 가능한 시리얼 번호를 저장할 배열
+        var locationCounter = 1; // 위치 시리얼 번호를 저장하기 위한 변수
+        var currentLat, currentLng; // 현재 선택된 위치를 저장하기 위한 변수
+        var polyline = L.polyline([], { color: 'red' }).addTo(map); // Polyline 추가
+        var locations = []; // 위치 정보를 저장할 배열
+
+        function onMapClick(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+            addMarker(lat, lng, `위치 ${getNextLocationId()}`);
+        }
+
+        function onMapRightClick(e) {
+            if (markers.length > 0) {
+                // 가장 최근에 추가된 마커 제거
+                var lastMarker = markers.pop();
+                var removedLocation = locations.pop();
+                map.removeLayer(lastMarker);
+
+                // 시리얼 번호를 사용 가능한 번호로 다시 추가
+                availableIndices.push(removedLocation.sq);
+
+                // 위치 목록 업데이트
+                updateLocationList();
+
+                // Polyline 업데이트
+                var latlngs = polyline.getLatLngs();
+                latlngs.pop();
+                polyline.setLatLngs(latlngs);
+            }
+        }
+
+        function getNextLocationId() {
+            if (availableIndices.length > 0) {
+                return availableIndices.shift();
+            } else {
+                return locationCounter++;
+            }
+        }
+
+        function searchLocation() {
+            var searchQuery = document.getElementById('search').value;
+            if (searchQuery) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            var lat = parseFloat(data[0].lat);
+                            var lng = parseFloat(data[0].lon);
+                            addMarker(lat, lng, searchQuery);
+                        } else {
+                            alert("검색 결과가 없습니다.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert("검색어를 입력하세요.");
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('searchButton').click();
+            }
+        }
+
+        function addMarker(lat, lng, name) {
+            currentLat = lat;
+            currentLng = lng;
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+            var locationId = getNextLocationId(); // 사용 가능한 시리얼 번호 또는 새로운 시리얼 번호 가져오기
+
+            // 숫자 마커 생성
+            var markerHtml = `<div style="background-color: white; border: 1px solid black; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">${locationId}</div>`;
+            var markerIcon = L.divIcon({
+                html: markerHtml,
+                className: 'number-icon'
+            });
+
+            var marker = L.marker([lat, lng], { icon: markerIcon }).addTo(map)
+                .bindPopup("위치: " + name + "<br>위도: " + lat.toFixed(5) + ", 경도: " + lng.toFixed(5) + "<br>시리얼 번호: " + locationId)
+                .openPopup();
+
+            markers.push(marker); // 마커 배열에 추가
+
+            // Polyline에 좌표 추가
+            polyline.addLatLng([lat, lng]);
+
+            // 위치 정보를 배열에 저장
+            locations.push({ sq: locationId, lat: lat, lng: lng, name: name });
+
+            // 위치 목록을 업데이트
+            updateLocationList();
+
+            document.getElementById('saveButton').style.display = 'block'; // 저장 버튼 표시
+        }
+
+        function updateLocationList() {
+            var locationList = document.getElementById('locationList');
+            locationList.innerHTML = ''; // 기존 목록을 초기화
+
+            locations.forEach(function(location) {
+                var li = document.createElement('li');
+                li.textContent = `ID: ${location.sq}, 이름: ${location.name}, 위도: ${location.lat.toFixed(5)}, 경도: ${location.lng.toFixed(5)}`;
+                locationList.appendChild(li);
+            });
+        }
+
+        function saveLocations() {
+            console.log("저장된 위치들:", locations);
+
+            fetch('/map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(locations),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert('위치들이 저장되었습니다!');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('위치 저장 중 오류가 발생했습니다.');
+            });
+        }
+
+        map.on('click', onMapClick);
+        map.on('contextmenu', onMapRightClick);
+    </script>
+</body>
+</html>

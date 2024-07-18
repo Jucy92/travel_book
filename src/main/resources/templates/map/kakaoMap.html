@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>카카오 맵 API 예제</title>
+    <link th:href="@{/css/styles.css}"
+          href="../css/styles.css" rel="stylesheet">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2&libraries=services,clusterer,drawing"></script>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="controls">
+        <input type="text" id="keyword" placeholder="검색어를 입력하세요" onkeypress="return searchEnter(event)">
+        <button onclick="searchPlaces()">검색</button>
+        <button onclick="getCurrentLocation()">현위치</button>
+    </div>
+    <div class="route-controls">
+        <button onclick="saveRoutes()">경로 저장</button>
+        <button class="reset" onclick="resetRoutes()">초기화</button>
+    </div>
+    <div class="user-controls">
+        <input type="text" id="userId" placeholder="사용자 아이디를 입력하세요">
+        <button onclick="retrieveRoutes()">사용자 검색</button>
+    </div>
+    <div id="placesList"></div>
+    <div class="popup" id="popup">
+        <ul id="popupList"></ul>
+        <button onclick="closePopup()">닫기</button>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var map = new kakao.maps.Map(document.getElementById('map'), {
+            center: new kakao.maps.LatLng(37.639047490510386, 127.03179199346403),
+            level: 3
+        });
+
+        var markers = [];
+        var routes = [];
+        var polylines = [];
+        var seq = 1; // 시퀀스 번호 초기값
+
+        // 현재 위치를 받아와서 지도에 표시하는 함수
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    var locPosition = new kakao.maps.LatLng(lat, lng);
+                    map.setCenter(locPosition);
+                    addMarker(locPosition, 'current');
+                }, function(error) {
+                    alert('현재 위치를 가져올 수 없습니다.');
+                });
+            } else {
+                alert('Geolocation을 사용할 수 없는 브라우저입니다.');
+            }
+        }
+
+        // 맵 클릭 이벤트
+        kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+            var latlng = mouseEvent.latLng;
+            var geocoder = new kakao.maps.services.Geocoder();
+
+            geocoder.coord2Address(latlng.getLng(), latlng.getLat(), function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    var name = result[0].address.address_name;
+                    routes.push({lat: latlng.getLat(), lng: latlng.getLng(), name: name});
+                    addMarker(latlng, seq++);
+                    alert('위치 저장: ' + name);
+                    if (routes.length > 1) {
+                        drawRoute();
+                    }
+                }
+            });
+        });
+
+        function searchEnter(event) {
+            if (event.keyCode === 13) {
+                searchPlaces();
+                return false; // prevent form submission
+            }
+            return true;
+        }
+
+        function searchPlaces() {
+            var keyword = document.getElementById('keyword').value;
+            if (!keyword.trim()) {
+                alert('키워드를 입력해주세요!');
+                return;
+            }
+
+            var ps = new kakao.maps.services.Places();
+            ps.keywordSearch(keyword, function(data, status, pagination) {
+                if (status === kakao.maps.services.Status.OK) {
+                    if (data.length > 1) {
+                        displayPopup(data);
+                    } else {
+                        moveToLocation(data[0]);
+                    }
+                } else {
+                    alert('검색 결과가 없습니다.');
+                }
+            });
+        }
+
+        function displayPopup(places) {
+            var popup = document.getElementById('popup');
+            var popupList = document.getElementById('popupList');
+            popupList.innerHTML = '';
+
+            places.forEach(place => {
+                var listItem = document.createElement('li');
+                listItem.innerHTML = `${place.place_name} (${place.address_name})`;
+                listItem.onclick = function() {
+                    moveToLocation(place);
+                    closePopup();
+                };
+                popupList.appendChild(listItem);
+            });
+
+            popup.style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        function moveToLocation(place) {
+            var position = new kakao.maps.LatLng(place.y, place.x);
+            map.setCenter(position);
+
+            addMarker(position, seq++);
+
+            routes.push({lat: place.y, lng: place.x, name: place.place_name});
+            if (routes.length > 1) {
+                drawRoute();
+            }
+        }
+
+        function addMarker(position, num) {
+            var imageSrc = (num === 'current') ? 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png' :
+                                                'https://t1.daumcdn.net/mapjsapi/images/marker.png';
+
+            var imageSize = new kakao.maps.Size(24, 35);
+            var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, {
+                offset: new kakao.maps.Point(13, 35),
+                alt: 'Marker Image'
+            });
+
+            var marker = new kakao.maps.Marker({
+                position: position,
+                image: markerImage,
+                map: map
+            });
+
+            markers.push(marker);
+        }
+
+        function drawRoute() {
+            var len = routes.length;
+            if (len < 2) return;
+
+            var start = new kakao.maps.LatLng(routes[len - 2].lat, routes[len - 2].lng);
+            var end = new kakao.maps.LatLng(routes[len - 1].lat, routes[len - 1].lng);
+
+            var polyline = new kakao.maps.Polyline({
+                path: [start, end],
+                strokeWeight: 5,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeStyle: 'solid'
+            });
+
+            polyline.setMap(map);
+            polylines.push(polyline);
+        }
+
+        function saveRoutes() {
+            if (routes.length === 0) {
+                alert('저장할 경로가 없습니다.');
+                return;
+            }
+
+            routes.forEach((route, index) => {
+                route.sq = index + 1;
+            });
+
+            console.log('저장된 경로:', routes);
+            alert('저장된 경로:', routes);
+
+            // URL에 JSON 데이터 전송
+            fetch('/map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(routes)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('성공:', data);
+                alert('경로가 저장되었습니다.');
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('경로 저장 중 오류가 발생했습니다.');
+            });
+
+        }
+
+        function resetRoutes() {
+            seq = 1; // 시퀀스 초기화
+            routes = [];
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            polylines.forEach(polyline => polyline.setMap(null));
+            polylines = [];
+            alert('경로가 초기화되었습니다.');
+        }
+
+
+        function retrieveRoutes() {
+            var userId = document.getElementById('userId').value;
+            if (!userId.trim()) {
+                alert('사용자 아이디를 입력해주세요!');
+                return;
+            }
+
+            fetch(`/map/retrieve/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    routes = data;
+                    resetMap();
+                    displaySavedRoutes();
+                    alert('저장된 경로를 가져왔습니다.');
+                } else {
+                    alert('저장된 경로가 없습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('경로 가져오기 중 오류가 발생했습니다.');
+            });
+        }
+
+        function displaySavedRoutes() {
+            routes.forEach((route, index) => {
+                var position = new kakao.maps.LatLng(route.lat, route.lng);
+                addMarker(position, index + 1);
+            });
+
+            for (var i = 1; i < routes.length; i++) {
+                var start = new kakao.maps.LatLng(routes[i - 1].lat, routes[i - 1].lng);
+                var end = new kakao.maps.LatLng(routes[i].lat, routes[i].lng);
+
+                var polyline = new kakao.maps.Polyline({
+                    path: [start, end],
+                    strokeWeight: 5,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeStyle: 'solid'
+                });
+
+                polyline.setMap(map);
+                polylines.push(polyline);
+            }
+
+            var lastPosition = new kakao.maps.LatLng(routes[routes.length - 1].lat, routes[routes.length - 1].lng);
+            map.setCenter(lastPosition);
+        }
+
+        function resetMap() {
+            seq = 1;
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            polylines.forEach(polyline => polyline.setMap(null));
+            polylines = [];
+        }
+
+        /*]]>*/
+    </script>
+</body>
+</html>
