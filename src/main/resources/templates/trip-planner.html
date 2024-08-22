@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .calendar {
+            display: inline-block;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .day {
+            display: inline-block;
+            width: 14.28%;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .selected {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="max-width: 600px">
+    <div class="py-5 text-center">
+        <h2>여행 계획 세우기</h2>
+    </div>
+    <div class="calendar" id="calendar">
+        <!-- 여기에 자바스크립트로 생성된 달력이 표시됩니다 -->
+    </div>
+    <div class="text-center mt-4">
+        <button class="btn btn-primary" onclick="confirmSelection()">확인</button>
+    </div>
+</div> <!-- /container -->
+
+<script>
+    const today = new Date();
+    let startDate = null;
+    let endDate = null;
+
+    function createCalendar(year, month) {
+        const calendar = document.getElementById('calendar');
+        calendar.innerHTML = '';
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            calendar.innerHTML += '<div class="day"></div>';
+        }
+
+        for (let date = 1; date <= lastDate; date++) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'day';
+            dayElement.textContent = date;
+            dayElement.onclick = () => selectDate(new Date(year, month, date));
+            calendar.appendChild(dayElement);
+        }
+    }
+
+    function selectDate(date) {
+        if (!startDate || endDate) {
+            startDate = date;
+            endDate = null;
+            clearSelection();
+            highlightDate(startDate);
+        } else if (date < startDate) {
+            startDate = date;
+            clearSelection();
+            highlightDate(startDate);
+        } else {
+            endDate = date;
+            highlightDateRange(startDate, endDate);
+        }
+    }
+
+    function clearSelection() {
+        document.querySelectorAll('.day').forEach(day => {
+            day.classList.remove('selected');
+        });
+    }
+
+    function highlightDate(date) {
+        const dayElements = document.querySelectorAll('.day');
+        dayElements[date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay() - 1].classList.add('selected');
+    }
+
+    function highlightDateRange(start, end) {
+        const dayElements = document.querySelectorAll('.day');
+        for (let date = start.getDate(); date <= end.getDate(); date++) {
+            dayElements[date + new Date(start.getFullYear(), start.getMonth(), 1).getDay() - 1].classList.add('selected');
+        }
+    }
+
+    function confirmSelection() {
+        if (startDate && endDate) {
+            alert(`선택된 기간: ${startDate.toDateString()} - ${endDate.toDateString()}`);
+        } else {
+            alert('시작일과 종료일을 선택하세요.');
+        }
+    }
+
+    createCalendar(today.getFullYear(), today.getMonth());
+</script>
+</body>
+</html>
