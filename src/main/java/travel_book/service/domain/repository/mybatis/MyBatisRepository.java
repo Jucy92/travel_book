@@ -9,7 +9,7 @@ import travel_book.service.domain.repository.MemberSearchCond;
 import java.util.List;
 import java.util.Optional;
 
-//@Repository
+@Repository
 @RequiredArgsConstructor
 public class MyBatisRepository implements MemberRepository {
 
@@ -28,6 +28,10 @@ public class MyBatisRepository implements MemberRepository {
     @Override
     public Optional<Member> findByMail(String mail) {
         return memberMapper.findByMail(mail);
+    }
+
+    public Optional<Member> findByUserId(String userId) {
+        return memberMapper.findByUserId(userId);
     }
 
     @Override

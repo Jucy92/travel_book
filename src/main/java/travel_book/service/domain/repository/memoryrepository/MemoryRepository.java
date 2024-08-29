@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-@Repository       // config 파일 만들어서 설정 파일 불러오게 해주거나, 해당 빈 등록 주석처리 하면 컨테이너에 등록 안됨 => 여기서는 config 파일 만들어서 진행
+//@Repository       // config 파일 만들어서 설정 파일 불러오게 해주거나, 해당 빈 등록 주석처리 하면 컨테이너에 등록 안됨 => 여기서는 config 파일 만들어서 진행
 @Slf4j
 public class MemoryRepository implements MemberRepository {
 
@@ -57,6 +57,12 @@ public class MemoryRepository implements MemberRepository {
                 .filter(m -> m.getMail().equals(mail))
                 .findFirst();
     }
+
+    @Override
+    public Optional<Member> findByUserId(String userId) {
+        return Optional.empty();
+    }
+
     @Override
     public List<Member> findAll() {                         // 메모리에서 Map<key, member> 로 해버리니깐 key 값을 화면에 안넣고 리스트를 찾을 방법이 없음
         log.info("findAll 호출 - store.values = [{}]", store.values());

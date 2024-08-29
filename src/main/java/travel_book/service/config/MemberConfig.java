@@ -2,6 +2,7 @@ package travel_book.service.config;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import travel_book.service.domain.login.serivce.LoginService;
@@ -10,9 +11,10 @@ import travel_book.service.domain.repository.memoryrepository.MemoryRepository;
 import travel_book.service.domain.repository.mybatis.MemberMapper;
 import travel_book.service.domain.repository.mybatis.MyBatisRepository;
 
-@Configuration
+//@Configuration
 @RequiredArgsConstructor
 public class MemberConfig {
+
     private final MemberMapper memberMapper;
 
 

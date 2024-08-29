@@ -3,9 +3,25 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="travel_book.service.web.map.dao.MapMapper">
 
-    <insert id="saveLocation" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO LOCATION_STORAGE (MEMBER_ID, LATITUDE, LONGITUDE, NAME, SQ, CDT)
-            VALUES (#{memberId}, #{lat}, #{lng}, #{name}, #{sq}, now())
+    <insert id="saveLocation" useGeneratedKeys="true" keyProperty="travelId">
+        INSERT INTO LOCATION_STORAGE (USER_ID, LATITUDE, LONGITUDE, ADDRESS_NAME, SQ, CDT)
+            VALUES (#{userId}, #{lat}, #{lng}, #{addressName}, #{sq}, now())
+    </insert>
+    <insert id="saveStorageM" useGeneratedKeys="true" keyProperty="travelId">
+        INSERT INTO LOCATION_STORAGE_M (USER_ID, TITLE, TRIP_START, TRIP_END, RMKS, CDT)
+            VALUES (#{userId}, #{title}, #{tripStart}, #{tripEnd}, #{rmksM}, now())
+    </insert>
+    <insert id="saveStorageD">
+        INSERT INTO LOCATION_STORAGE_D (TRAVEL_ID, TRAVEL_SQ, LATITUDE, LONGITUDE,
+                    HOUR00, HOUR01, HOUR02, HOUR03, HOUR04, HOUR05, HOUR06, HOUR07,
+                    HOUR08, HOUR09, HOUR10, HOUR11, HOUR12, HOUR13, HOUR14, HOUR15,
+                    HOUR16, HOUR17, HOUR18, HOUR19, HOUR20, HOUR21, HOUR22, HOUR23,
+                    DAY_TRIP, RMKS, CDT)
+            VALUES (#{travelId}, #{travelSq}, #{lat}, #{lng},
+                    #{hour00}, #{hour01}, #{hour02}, #{hour03}, #{hour04}, #{hour05}, #{hour06}, #{hour07},
+                    #{hour08}, #{hour09}, #{hour10}, #{hour11}, #{hour12}, #{hour13}, #{hour14}, #{hour15},
+                    #{hour16}, #{hour17}, #{hour18}, #{hour19}, #{hour20}, #{hour21}, #{hour22}, #{hour23},
+                    #{dayTrip}, #{rmksD}, now())
     </insert>
 
 
@@ -13,6 +29,11 @@
         SELECT MEMBER_ID, LATITUDE AS lat, LONGITUDE AS lng, SQ
             FROM LOCATION_STORAGE
          WHERE MEMBER_ID = #{memberId}
+    </select>
+    <select id="storageMFindByUserId" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+        SELECT TITLE, TRIP_START, TRIP_END
+            FROM LOCATION_STORAGE_M
+         WHERE USER_ID = #{userId}
     </select>
 
 </mapper>

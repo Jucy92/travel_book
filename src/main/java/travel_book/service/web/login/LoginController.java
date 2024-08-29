@@ -42,8 +42,9 @@ public class LoginController {
             log.info("login error =[{}]", bindingResult);
             return "login/loginForm";
         }
-        log.info("loginModel.getMail() = [{}], loginModel.getPassword() = [{}]", loginModel.getMail(), loginModel.getPassword());
-        Member loginMember = loginService.login(loginModel.getMail(), loginModel.getPassword());
+//        log.info("loginModel.getMail() = [{}], loginModel.getPassword() = [{}]", loginModel.getMail(), loginModel.getPassword());
+        //Member loginMember = loginService.login(loginModel.getMail(), loginModel.getPassword());  // 이메일 로그인 -> 아이디 로그인으로 변경
+        Member loginMember = loginService.login(loginModel.getUserId(), loginModel.getPassword());
         log.info("loginMember = [{}]", loginMember);
 
         if (loginMember == null) {

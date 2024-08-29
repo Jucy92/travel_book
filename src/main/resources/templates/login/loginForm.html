@@ -25,11 +25,17 @@
                th:text="${err}">전체 오류 메시지</p>
         </div>
         <div>
+            <label for="loginId">아이디</label>
+            <input type="text" id="loginId" th:field="*{userId}" class="form-control" placeholder="아이디를 입력하세요"
+                   th:errorclass="field-error">
+            <div class="field-error" th:errors="*{userId}" />
+        </div>
+        <!--<div>       이메일 로그인에서 아이디로 변경
             <label for="loginId">이메일 주소</label>
             <input type="text" id="loginId" th:field="*{mail}" class="form-control" placeholder="xxx@gmail.com"
                    th:errorclass="field-error">
             <div class="field-error" th:errors="*{mail}" />
-        </div>
+        </div>-->
         <div>
             <label for="password">비밀번호</label>
             <input type="password" id="password" th:field="*{password}"

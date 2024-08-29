@@ -5,10 +5,11 @@
     <title>카카오 맵 API 예제</title>
     <link th:href="@{/css/styles.css}"
           href="../css/styles.css" rel="stylesheet">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2&libraries=services,clusterer,drawing"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2&libraries=services,clusterer,drawing,Directions"></script>
 </head>
+<!DOCTYPE html>
 <body>
-    <div id="map"></div>
+    <div id="map" style="width:100%;height:350px;"></div>
     <div class="controls">
         <input type="text" id="keyword" placeholder="검색어를 입력하세요" onkeypress="return searchEnter(event)">
         <button onclick="searchPlaces()">검색</button>
@@ -65,11 +66,11 @@
             geocoder.coord2Address(latlng.getLng(), latlng.getLat(), function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     var name = result[0].address.address_name;
-                    routes.push({lat: latlng.getLat(), lng: latlng.getLng(), addressName: name});
+                    routes.push({lat: latlng.getLat(), lng: latlng.getLng(), name: name});
                     addMarker(latlng, seq++);
                     alert('위치 저장: ' + name);
                     if (routes.length > 1) {
-                        drawRoute();
+                        drawWalkingRoute(routes[routes.length - 2], routes[routes.length - 1]);
                     }
                 }
             });
@@ -132,9 +133,9 @@
 
             addMarker(position, seq++);
 
-            routes.push({lat: place.y, lng: place.x, addressName: place.place_name});
+            routes.push({lat: place.y, lng: place.x, name: place.place_name});
             if (routes.length > 1) {
-                drawRoute();
+                drawWalkingRoute(routes[routes.length - 2], routes[routes.length - 1]);
             }
         }
 
@@ -157,23 +158,30 @@
             markers.push(marker);
         }
 
-        function drawRoute() {
-            var len = routes.length;
-            if (len < 2) return;
+        function drawWalkingRoute(start, end) {
+            fetch(`/map/route?startLat=${start.lat}&startLng=${start.lng}&endLat=${end.lat}&endLng=${end.lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    var path = [];
+                    data.routes[0].sections[0].roads[0].path.forEach(coord => {
+                        path.push(new kakao.maps.LatLng(coord.y, coord.x));
+                    });
 
-            var start = new kakao.maps.LatLng(routes[len - 2].lat, routes[len - 2].lng);
-            var end = new kakao.maps.LatLng(routes[len - 1].lat, routes[len - 1].lng);
+                    var polyline = new kakao.maps.Polyline({
+                        path: path,
+                        strokeWeight: 5,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid'
+                    });
 
-            var polyline = new kakao.maps.Polyline({
-                path: [start, end],
-                strokeWeight: 5,
-                strokeColor: '#FF0000',
-                strokeOpacity: 0.8,
-                strokeStyle: 'solid'
-            });
-
-            polyline.setMap(map);
-            polylines.push(polyline);
+                    polyline.setMap(map);
+                    polylines.push(polyline);
+                })
+                .catch(error => {
+                    console.error('오류:', error);
+                    alert('경로 검색 중 오류가 발생했습니다.');
+                });
         }
 
         function saveRoutes() {
@@ -187,7 +195,6 @@
             });
 
             console.log('저장된 경로:', routes);
-            alert('저장된 경로:', routes);
 
             // URL에 JSON 데이터 전송
             fetch('/map', {
@@ -197,7 +204,7 @@
                 },
                 body: JSON.stringify(routes)
             })
-            .then(response => response.json()) <!-- 여기서 response.json() 가 아니라 http 방식으로 변경하면 성공되려나??-->
+            .then(response => response.json())
             .then(data => {
                 console.log('성공:', data);
                 alert('경로가 저장되었습니다.');
@@ -206,43 +213,31 @@
                 console.error('오류:', error);
                 alert('경로 저장 중 오류가 발생했습니다.');
             });
-
         }
-
-        function resetRoutes() {
-            seq = 1; // 시퀀스 초기화
-            routes = [];
-            markers.forEach(marker => marker.setMap(null));
-            markers = [];
-            polylines.forEach(polyline => polyline.setMap(null));
-            polylines = [];
-            alert('경로가 초기화되었습니다.');
-        }
-
 
         function retrieveRoutes() {
-            var userId = document.getElementById('userId').value;
-            if (!userId.trim()) {
-                alert('사용자 아이디를 입력해주세요!');
+            var userId = document.getElementById('userId').value.trim();
+            if (!userId) {
+                alert('사용자 아이디를 입력해주세요.');
                 return;
             }
 
             fetch(`/map/retrieve/${userId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    routes = data;
-                    resetMap();
-                    displaySavedRoutes();
-                    alert('저장된 경로를 가져왔습니다.');
-                } else {
-                    alert('저장된 경로가 없습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('오류:', error);
-                alert('경로 가져오기 중 오류가 발생했습니다.');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        routes = data;
+                        resetMap();
+                        displaySavedRoutes();
+                        alert('저장된 경로를 가져왔습니다.');
+                    } else {
+                        alert('저장된 경로가 없습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('오류:', error);
+                    alert('경로 가져오기 중 오류가 발생했습니다.');
+                });
         }
 
         function displaySavedRoutes() {
@@ -252,19 +247,7 @@
             });
 
             for (var i = 1; i < routes.length; i++) {
-                var start = new kakao.maps.LatLng(routes[i - 1].lat, routes[i - 1].lng);
-                var end = new kakao.maps.LatLng(routes[i].lat, routes[i].lng);
-
-                var polyline = new kakao.maps.Polyline({
-                    path: [start, end],
-                    strokeWeight: 5,
-                    strokeColor: '#FF0000',
-                    strokeOpacity: 0.8,
-                    strokeStyle: 'solid'
-                });
-
-                polyline.setMap(map);
-                polylines.push(polyline);
+                drawWalkingRoute(routes[i - 1], routes[i]);
             }
 
             var lastPosition = new kakao.maps.LatLng(routes[routes.length - 1].lat, routes[routes.length - 1].lng);
@@ -278,7 +261,6 @@
             polylines.forEach(polyline => polyline.setMap(null));
             polylines = [];
         }
-
         /*]]>*/
     </script>
 </body>

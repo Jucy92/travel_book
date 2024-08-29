@@ -16,6 +16,7 @@ public interface MemberMapper {
     void update(@Param("updateParam") Member member);
 
     Optional<Member> findByMail(String mail);
+    Optional<Member> findByUserId(String userId);
 
     List<Member> findAll(MemberSearchCond searchCond);
 

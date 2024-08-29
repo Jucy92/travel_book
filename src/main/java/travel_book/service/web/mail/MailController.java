@@ -22,6 +22,7 @@ public class MailController {
         log.info("paraMap = {}", paramMap);
         log.info("mail = {}", paramMap.get("mail"));
         String mail = paramMap.get("mail").toString();
+        // 여기에 인증에 사용된 이메일인지 체크하는 로직 추가 필요
         int number = mailService.sendMail(mail);
         String num = "" + number;
         log.info("MailSend 호출 number = {}", number);

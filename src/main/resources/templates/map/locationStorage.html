@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자의 여행 일정</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 카카오맵 스크립트 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2"></script>
+</head>
+<body>
+    <header>
+        <h1>여행 일정</h1>
+    </header>
+
+    <section id="map"></section>
+
+    <section id="trip-info">
+        <h2>여행 주제: <span id="trip-title">여행 주제</span></h2>
+        <p>여행 기간: <span id="trip-dates">YYYY-MM-DD ~ YYYY-MM-DD</span></p>
+    </section>
+
+    <script>
+        // 카카오맵 초기화
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            mapOption = {
+                center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+                level: 3 // 지도의 확대 레벨
+            };
+        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+    </script>
+</body>
+</html>

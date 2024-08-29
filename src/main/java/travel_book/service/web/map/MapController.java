@@ -1,8 +1,6 @@
 package travel_book.service.web.map;
 
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.web.map.dto.LocationModel;
+import travel_book.service.web.map.dto.RouteResponse;
 import travel_book.service.web.map.service.MapService;
 import travel_book.service.web.session.SessionConst;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 
@@ -44,13 +41,18 @@ public class MapController {
 //        HttpSession session = request.getSession();       // @SessionAttribute으로 바로 Member에서 가져오기
 //        session.getAttribute(SessionConst.SESSION_NAME);
 
+        // ### 여기서 반복 돌기전에 M/D로 테이블 나눠 놨으면 Master 테이블에 단건 저장하고, Detail에 반복하면서 SQ 및 시간대별 데이터 저장하면 되지않을까? ###
+        // 메인 테이블(LOCATION_STORAGE_M) 데이터 추가 및 travelId 키 값 리턴
+        int travelId = mapService.saveStorageM(locations.stream().findFirst().orElse(null)/*.setUserId(member.getUserId())*/);  // 화면단에서 userId 가져오는거 아니면 여기서 넣어줘야하는데..
+
         locations.forEach(location -> {
-            location.setMemberId(member.getId());
-//            location.setMemberId(1L);           // 로그인 안하고 테스트 할 때 사용 + WebConfig LoginCheckInterceptor 주석
+            //location.setUserId(member.getUserId());   // 화면단에서 userId 미니 넣어주는거 아니면 여기도 넣어줘야함
             log.info("location={}", location);
-            mapService.saveLocation(location);    // 반복 돌면서 데이터 저장
+            location.setTravelId(travelId);             // 마스터 테이블에 저장한 여행번호 가져와서 넣어주기
+            mapService.saveStorageD(location);    // 반복 돌면서 데이터 저장
         });
-        return new ResponseEntity<>("위치들이 성공적으로 저장되었습니다!", HttpStatus.CREATED);
+//        return new ResponseEntity<>("위치들이 성공적으로 저장되었습니다!", HttpStatus.CREATED);
+        return ResponseEntity.ok("경로가 저장되었습니다");
     }
 
     @GetMapping("/map/retrieve/{userId}")
@@ -70,4 +72,24 @@ public class MapController {
             return mapService.LocationFindById(member.getId());
         }
     }
+    @GetMapping("/storage/{userId}")
+    @ResponseBody
+    public List<LocationModel> locationStorage(@PathVariable(value = "userId") String userId) {
+        return mapService.storageMFindByUserId(userId); // 리스트로된 데이터
+    }
+
+    /**
+     * ID 검색 - 검색된 계정 페이지 - 마음에 드는 여행 리스트 선택 - 가져가기(친구이거나, 어떤 조건에서만 가져갈 수 있도록 불펌금지)
+     *기능 = ㄴ>검색   ㄴ>저장된 리스트 조회                       ㄴ> 복사
+     */
+
+    /*      // 카카오맵 도보 경로 받아오기 위해 선언했던 내용
+    @GetMapping("/map/route")
+    public RouteResponse getRoute(@RequestParam double startLat, @RequestParam double startLng,
+                                  @RequestParam double endLat, @RequestParam double endLng) {
+        log.info("startLat={}, startLng={}, endLat={}, endLng={}", startLat, startLng, endLat, endLng);
+        return mapService.getWalkingRoute(startLat, startLng, endLat, endLng);
+
+    }
+    */
 }

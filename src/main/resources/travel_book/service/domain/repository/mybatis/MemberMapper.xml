@@ -22,6 +22,11 @@
             FROM MEMBER
          WHERE MAIL = #{mail}
     </select>
+    <select id="findByUserId" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+        SELECT ID, USER_ID, MAIL, NAME, PASSWORD, PHONE, CDT
+            FROM MEMBER
+         WHERE USER_ID = #{userId}
+    </select>
 
     <select id="findAll" resultType="Member">
         SELECT ID, MAIL, NAME, PASSWORD, PHONE, CDT

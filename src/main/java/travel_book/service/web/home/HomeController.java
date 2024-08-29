@@ -30,10 +30,18 @@ public class HomeController {
         model.addAttribute("member", loginMember);
         return "loginHome";
     }
-/*
-    @GetMapping("/map")
-    public String map() {
-        return "/map/travelMap";
+
+    /*
+        @GetMapping("/map")
+        public String map() {
+            return "/map/travelMap";
+        }
+        */
+    /*
+    @GetMapping("/trip-planner")
+    public String calll() {
+
     }
     */
+
 }

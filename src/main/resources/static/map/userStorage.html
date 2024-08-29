@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자의 여행 일정</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 카카오맵 스크립트 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2"></script>
+</head>
+<body>
+    <header>
+        <h1>여행 일정</h1>
+    </header>
+
+    <section id="map"></section>
+
+    <section id="trip-info">
+        <h2>여행 목록</h2>
+        <ul id="trip-list">
+            <!-- 여행 정보가 여기에 표시됩니다 -->
+        </ul>
+    </section>
+
+    <script>
+        // 카카오맵 초기화
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            mapOption = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780), // 지도의 중심좌표, 서울 기준
+                level: 4 // 지도의 확대 레벨
+            };
+        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+        // 줌 컨트롤러 추가
+        var zoomControl = new kakao.maps.ZoomControl();
+        map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+        // 내 위치 버튼 추가
+        var geolocationBtn = document.createElement('button');
+        geolocationBtn.textContent = '내 위치 찾기';
+        geolocationBtn.id = 'geoBtn';
+        mapContainer.appendChild(geolocationBtn);
+
+        geolocationBtn.onclick = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude,
+                        lon = position.coords.longitude;
+
+                    var locPosition = new kakao.maps.LatLng(lat, lon);
+                    map.setCenter(locPosition);
+                });
+            } else {
+                alert("현재 위치를 찾을 수 없습니다.");
+            }
+        };
+
+        // 여행 데이터 (예시 데이터)
+        var trips = [
+            { title: '서울 문화 탐방', start: '2024-09-01', end: '2024-09-05' },
+            { title: '제주 힐링 여행', start: '2024-10-01', end: '2024-10-10' },
+            { title: '부산 먹방 투어', start: '2024-11-15', end: '2024-11-18' }
+        ];
+
+        // 여행 정보를 리스트로 표시
+        var tripList = document.getElementById('trip-list');
+        trips.forEach(function(trip) {
+            var listItem = document.createElement('li');
+            listItem.innerHTML = `<strong>${trip.title}</strong><br>여행 기간: ${trip.start} ~ ${trip.end}`;
+            tripList.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>
