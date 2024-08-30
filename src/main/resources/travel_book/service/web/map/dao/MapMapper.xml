@@ -31,9 +31,18 @@
          WHERE MEMBER_ID = #{memberId}
     </select>
     <select id="storageMFindByUserId" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
-        SELECT TITLE, TRIP_START, TRIP_END
+        SELECT TRAVEL_ID, USER_ID, TITLE, TRIP_START, TRIP_END
             FROM LOCATION_STORAGE_M
          WHERE USER_ID = #{userId}
+    </select>
+    <select id="storageDFindByTravelId" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+        SELECT TRAVEL_ID, TRAVEL_SQ, LATITUDE AS LAT, LONGITUDE AS LNG,
+               HOUR00, HOUR01, HOUR02, HOUR03, HOUR04, HOUR05, HOUR06, HOUR07,
+               HOUR08, HOUR09, HOUR10, HOUR11, HOUR12, HOUR13, HOUR14, HOUR15,
+               HOUR16, HOUR17, HOUR18, HOUR19, HOUR20, HOUR21, HOUR22, HOUR23,
+               DAY_TRIP, RMKS
+            FROM LOCATION_STORAGE_D
+         WHERE TRAVEL_ID = #{travelId}
     </select>
 
 </mapper>

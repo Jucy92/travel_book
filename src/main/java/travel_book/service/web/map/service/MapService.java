@@ -27,7 +27,7 @@ public class MapService {
     public void saveLocation(LocationModel location) {  // 좌표 및 입력 데이터(여행계획) 저장
         mapMapper.saveLocation(location);
     }
-    public int saveStorageM(LocationModel location) {  // 여행 계획 마스터
+    public Long saveStorageM(LocationModel location) {  // 여행 계획 마스터
         return mapMapper.saveStorageM(location);
     }
     public void saveStorageD(LocationModel location) {  // 여행 계획 디테일
@@ -39,6 +39,9 @@ public class MapService {
     }
     public List<LocationModel> storageMFindByUserId(String userId) {         // 저장된 좌표 불러오기
         return mapMapper.storageMFindByUserId(userId);
+    }
+    public List<LocationModel> storageDFindByTravelId(Long userId) {         // 저장된 좌표 불러오기
+        return mapMapper.storageDFindByTravelId(userId);
     }
 
 

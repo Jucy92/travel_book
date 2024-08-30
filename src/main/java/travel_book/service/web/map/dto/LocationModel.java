@@ -6,7 +6,7 @@ import lombok.Data;
 public class LocationModel {    // 모델을 두개로 나눠야하나..? 여행 계획 모델 / 상세 계획 모델
 
     //LOCATION_STORAGE_M 테이블 데이터
-    private long travelId;        // 이거 여기서 사용안하고 DB에서 자동증가 해서 선언 안했는데 매퍼쪽에서 keyProperty="id" 오류 발생해서 추가
+    private Long travelId;        // 이거 여기서 사용안하고 DB에서 자동증가 해서 선언 안했는데 매퍼쪽에서 keyProperty="id" 오류 발생해서 추가
     private String userId;          // 사용자 아이디
     private String title;           // 여행 제목 (나중에 불러오기 용도) 저장은 여행 계획 다 작성 후 저장할 때 팝업으로 뜨거나 다른 방법 생각
     private String tripStart;       // 여행 시작일 ex)2024-09-05

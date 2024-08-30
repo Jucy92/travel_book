@@ -26,7 +26,7 @@ public class LogInterceptor implements HandlerInterceptor {
             HandlerMethod hm = (HandlerMethod) handler; // 호출 할 컨트롤러 메서드의 모든 정보가 포함되어 있다.
             log.info("hm.getBean 호출 {}",hm.getBean());
         }
-        log.info("REQUEST [{}][{}][{}]",uuid,requestURI,handler);
+        log.info("REQUEST [{}][{}][{}][{}]",uuid,request.getMethod(),requestURI,handler);
         return true;
     }
 
@@ -39,7 +39,7 @@ public class LogInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {  // 무조건 찍힘
         String requestURI = request.getRequestURI();
         String uuid =(String) request.getAttribute(LOG_ID);
-        log.info("RESPONSE [{}][{}][{}]",uuid,requestURI,handler);
+        log.info("RESPONSE [{}][{}][{}][{}]",uuid,request.getMethod(),requestURI,handler);
 
         if (ex != null) {
             log.error("afterCompletion Error!!", ex);

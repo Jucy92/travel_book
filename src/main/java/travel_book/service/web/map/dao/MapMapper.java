@@ -12,10 +12,11 @@ import java.util.Optional;
 public interface MapMapper {
 
     void saveLocation(LocationModel location);  // Member.save는 Member 반환인데 여기는 저장만하고 되돌려줄 필요 없겠지?
-    int saveStorageM(LocationModel location);
+    Long saveStorageM(LocationModel location);
     void saveStorageD(LocationModel location);
 
     List<LocationModel> LocationFindById(Long memberId);    // M/D 테이블 만들면서 불필요해짐
     List<LocationModel> storageMFindByUserId(String userId);
+    List<LocationModel> storageDFindByTravelId(Long userId);
 
 }

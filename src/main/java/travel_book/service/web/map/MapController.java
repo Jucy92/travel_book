@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
@@ -43,7 +44,7 @@ public class MapController {
 
         // ### 여기서 반복 돌기전에 M/D로 테이블 나눠 놨으면 Master 테이블에 단건 저장하고, Detail에 반복하면서 SQ 및 시간대별 데이터 저장하면 되지않을까? ###
         // 메인 테이블(LOCATION_STORAGE_M) 데이터 추가 및 travelId 키 값 리턴
-        int travelId = mapService.saveStorageM(locations.stream().findFirst().orElse(null)/*.setUserId(member.getUserId())*/);  // 화면단에서 userId 가져오는거 아니면 여기서 넣어줘야하는데..
+        Long travelId = mapService.saveStorageM(locations.stream().findFirst().orElse(null)/*.setUserId(member.getUserId())*/);  // 화면단에서 userId 가져오는거 아니면 여기서 넣어줘야하는데..
 
         locations.forEach(location -> {
             //location.setUserId(member.getUserId());   // 화면단에서 userId 미니 넣어주는거 아니면 여기도 넣어줘야함
@@ -61,7 +62,7 @@ public class MapController {
                                                 @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member loginMember) {
 
         if (userId.isEmpty()) {        // 아이디 입력안하고 바로 가져오기 했을 때 세션에서 로그인 정보자 데이터 가져오기
-            //Optional<Member> member = memberRepository.memberInfoFindByUser(loginMember.getUserId()); // 아래처럼 orElseThrow 처리하면 됨
+//            Optional<Member> member = memberRepository.memberInfoFindByUser(loginMember.getUserId()); // 아래처럼 orElseThrow 처리하면 됨
             Member member = memberRepository.memberInfoFindByUser(loginMember.getUserId()).orElseThrow(); // orElseThrow 있으면 벨류값(객체) 없으면 노서치인셉션
             log.info("저장소(사용자명x) -> Con -> memberInfoFindByUser -> Member ={}",member);
             return mapService.LocationFindById(member.getId());
@@ -73,9 +74,23 @@ public class MapController {
         }
     }
     @GetMapping("/storage/{userId}")
+    public String StorageUser(@PathVariable(value = "userId") String userId, Model model) {     // 모델에 담아서 보내기 model -> responseBody??
+        //log.info("userId={}",userId);     웹에서 인코딩 하는 문제로 storageMFindByUserId 들어갈 때 꺠져서 들어가네...
+        //log.info("List={}",mapService.storageMFindByUserId(userId));
+        model.addAttribute("list", mapService.storageMFindByUserId(userId));
+        return "/map/locationStorage";
+
+    }
+    @PostMapping("/storage/{travelId}")
     @ResponseBody
-    public List<LocationModel> locationStorage(@PathVariable(value = "userId") String userId) {
-        return mapService.storageMFindByUserId(userId); // 리스트로된 데이터
+    public List<LocationModel> locationStorage(@PathVariable(value = "travelId") String travelId) {
+
+        log.info("travelId={}",travelId);
+
+
+        return mapService.storageDFindByTravelId(Long.parseLong(travelId));     
+        // 리스트로 해서 다 가져옴 => postHandle에서 안찍히는 이유는 리스폰스쪽에 모델에 안담겼고, 다른 화면(뷰)도 호출 안하기 떄문
+        //    ㄴ> 내용은 웹브라우저 개발자도구에서 확인 가능
     }
 
     /**

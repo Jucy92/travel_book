@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>사용자의 여행 일정</title>
-    <link rel="stylesheet" href="styles.css">
+    <link th:href="@{/css/styles.css}"
+          href="../css/styles.css" rel="stylesheet">
     <!-- 카카오맵 스크립트 -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2"></script>
 </head>
@@ -16,8 +17,20 @@
     <section id="map"></section>
 
     <section id="trip-info">
-        <h2>여행 주제: <span id="trip-title">여행 주제</span></h2>
-        <p>여행 기간: <span id="trip-dates">YYYY-MM-DD ~ YYYY-MM-DD</span></p>
+        <table border="1">
+            <thead>
+            <th>
+                <th align="left" >여행 주제</th>
+                <th align="center">여행 기간</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${list}">
+                <th th:onclick="storageDetail('[[${item.travelId}]]')" th:text="|${item.title}|">타이틀</th>
+                <th th:text="|${item.tripStart} ~ ${item.tripEnd}|">기간</th>
+            </tr>
+            </tbody>
+        </table>
     </section>
 
     <script>
@@ -28,6 +41,35 @@
                 level: 3 // 지도의 확대 레벨
             };
         var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+        function storageDetail(travelId){
+            alert("디테일 불러오기");
+
+            console.log("Received1 travelId: ", travelId);
+
+
+
+            const url = '/storage/'+travelId;
+
+
+            // URL에 JSON 데이터 전송
+            fetch('/storage/'+travelId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.text()) <!-- 여기서 response.json() -> .text() 로 하면 성공되려나??-->
+            .then(data => {
+                console.log('성공:', data);
+                alert('경로가 저장되었습니다.');
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('경로 저장 중 오류가 발생했습니다.');
+            });
+
+        }
     </script>
 </body>
 </html>

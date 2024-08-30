@@ -22,7 +22,7 @@
     </div>
     <div class="user-controls">
         <input type="text" id="userId" placeholder="사용자 아이디를 입력하세요">
-        <button onclick="retrieveStorage()">사용자 검색</button>
+        <button th:onclick="retrieveStorage()">사용자 검색</button>
     </div>
     <hr class="my-4">
 
@@ -58,31 +58,13 @@
                 alert('사용자 아이디를 입력해주세요!');
                 return;
             }
-            const url = '/storage?userId=${userId}';
+
+            const url = '/storage/${userId}';
 
             <!--     get 방식 - 단순 파라미터 전달       -->
             window.location.href = url;
             <!--     post 방식 - 데이터 전송       -->
-            <!--
-            const url = '/storage';
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ userId: userId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // 페이지 이동이 필요하다면, 이를 활용하여 리다이렉트할 수 있음.
-                // window.location.href = '/nextPage';
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-            -->
         }
 
 </script>
