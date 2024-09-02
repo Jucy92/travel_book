@@ -42,6 +42,10 @@
             };
         var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
 
+        var markers = [];
+        var routes = [];
+        var polylines = [];
+
         function storageDetail(travelId){
             alert("디테일 불러오기");
 
@@ -59,16 +63,91 @@
                     'Content-Type': 'application/json'
                 },
             })
-            .then(response => response.text()) <!-- 여기서 response.json() -> .text() 로 하면 성공되려나??-->
+            .then(response => response.json()) <!-- 여기서 response.json() -> .text() 로 하면 성공되려나??-->
             .then(data => {
                 console.log('성공:', data);
                 alert('경로가 저장되었습니다.');
+                // routes 배열에서 각 데이터를 처리
+                routes = data
+                displaySavedRoutes();
+
             })
             .catch(error => {
                 console.error('오류:', error);
                 alert('경로 저장 중 오류가 발생했습니다.');
             });
 
+        }
+
+        function addMarker(position, num) {
+            console.log('num 데이터:', num);
+            // 기본 마커 이미지 경로 설정
+            var imageBaseUrl = 'http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_';
+            var imageColors = ['blue', 'orange', 'yellow', 'pink']; // 사용할 색상 배열
+            var selectedColor;
+
+            // num에 따라 색상 선택
+            for (var i = 0; i < imageColors.length; i++) {
+                if (num === i + 1) {
+                    selectedColor = imageColors[i];
+                    break;
+                }
+            }
+
+            // num이 imageColors 배열 범위를 벗어나면 기본 색상 선택
+            if (!selectedColor) {
+                selectedColor = imageColors[0]; // 기본 색상 설정 (blue)
+            }
+
+            // 최종 이미지 URL 생성
+            var imageSrc = imageBaseUrl + 'blue' + '.png';
+
+            // 스프라이트 이미지를 위한 MarkerImage 객체 생성
+            var markerImage = new kakao.maps.MarkerImage(
+                imageSrc,
+                new kakao.maps.Size(36, 37), // 마커 이미지의 크기
+                {
+                    offset: new kakao.maps.Point(13, 37), // 마커의 기준 좌표
+                    spriteOrigin: new kakao.maps.Point(36 * (num - 1), 0), // 각 숫자에 맞는 스프라이트 이미지 위치 조정
+                    spriteSize: new kakao.maps.Size(36, 691) // 스프라이트 이미지 전체 크기
+                }
+            );
+
+            // 마커를 생성하고 지도에 표시
+            var marker = new kakao.maps.Marker({
+                position: position,
+                image: markerImage,
+                map: map
+            });
+            console.log('마커 정보:', markerImage);
+            markers.push(marker);
+        }
+
+
+        function displaySavedRoutes() {
+            routes.forEach((route, index) => {
+                var position = new kakao.maps.LatLng(route.lat, route.lng);
+                addMarker(position, route.travelSq);
+            });
+
+            for (var i = 1; i < routes.length; i++) {
+                var start = new kakao.maps.LatLng(routes[i - 1].lat, routes[i - 1].lng);
+                var end = new kakao.maps.LatLng(routes[i].lat, routes[i].lng);
+
+                var polyline = new kakao.maps.Polyline({
+                    path: [start, end],
+                    strokeWeight: 5,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeStyle: 'solid'
+                });
+
+                polyline.setMap(map);
+                polylines.push(polyline);
+            }
+
+            var lastPosition = new kakao.maps.LatLng(routes[routes.length - 1].lat, routes[routes.length - 1].lng);
+            map.setCenter(lastPosition);
         }
     </script>
 </body>
