@@ -47,6 +47,7 @@
         var polylines = [];
 
         function storageDetail(travelId){
+<!--            resetmap();-->
             alert("디테일 불러오기");
 
             console.log("Received1 travelId: ", travelId);
@@ -80,7 +81,6 @@
         }
 
         function addMarker(position, num) {
-            console.log('num 데이터:', num);
             // 기본 마커 이미지 경로 설정
             var imageBaseUrl = 'http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_';
             var imageColors = ['blue', 'orange', 'yellow', 'pink']; // 사용할 색상 배열
@@ -108,7 +108,7 @@
                 new kakao.maps.Size(36, 37), // 마커 이미지의 크기
                 {
                     offset: new kakao.maps.Point(13, 37), // 마커의 기준 좌표
-                    spriteOrigin: new kakao.maps.Point(36 * (num - 1), 0), // 각 숫자에 맞는 스프라이트 이미지 위치 조정
+                    spriteOrigin: new kakao.maps.Point(0, 47 * (num - 1)), // 각 숫자에 맞는 스프라이트 이미지 위치 조정
                     spriteSize: new kakao.maps.Size(36, 691) // 스프라이트 이미지 전체 크기
                 }
             );
@@ -148,6 +148,14 @@
 
             var lastPosition = new kakao.maps.LatLng(routes[routes.length - 1].lat, routes[routes.length - 1].lng);
             map.setCenter(lastPosition);
+        }
+
+        function resetMap() {
+            seq = 1;
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            polylines.forEach(polyline => polyline.setMap(null));
+            polylines = [];
         }
     </script>
 </body>
