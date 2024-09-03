@@ -47,7 +47,6 @@
         var polylines = [];
 
         function storageDetail(travelId){
-<!--            resetmap();-->
             alert("디테일 불러오기");
 
             console.log("Received1 travelId: ", travelId);
@@ -67,9 +66,9 @@
             .then(response => response.json()) <!-- 여기서 response.json() -> .text() 로 하면 성공되려나??-->
             .then(data => {
                 console.log('성공:', data);
-                alert('경로가 저장되었습니다.');
                 // routes 배열에서 각 데이터를 처리
-                routes = data
+                resetMap();
+                routes = data;
                 displaySavedRoutes();
 
             })
@@ -83,16 +82,8 @@
         function addMarker(position, num) {
             // 기본 마커 이미지 경로 설정
             var imageBaseUrl = 'http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_';
-            var imageColors = ['blue', 'orange', 'yellow', 'pink']; // 사용할 색상 배열
+            var imageColors = ['blue', 'orange', 'yellow', 'pink']; // 사용할 색상 배열 -> 나중에 사용하려면 뭐 콤보나 다른걸로 해서 값 받으면 될 듯
             var selectedColor;
-
-            // num에 따라 색상 선택
-            for (var i = 0; i < imageColors.length; i++) {
-                if (num === i + 1) {
-                    selectedColor = imageColors[i];
-                    break;
-                }
-            }
 
             // num이 imageColors 배열 범위를 벗어나면 기본 색상 선택
             if (!selectedColor) {
@@ -100,7 +91,7 @@
             }
 
             // 최종 이미지 URL 생성
-            var imageSrc = imageBaseUrl + 'blue' + '.png';
+            var imageSrc = imageBaseUrl + selectedColor + '.png';
 
             // 스프라이트 이미지를 위한 MarkerImage 객체 생성
             var markerImage = new kakao.maps.MarkerImage(
@@ -151,7 +142,7 @@
         }
 
         function resetMap() {
-            seq = 1;
+            routes = [];
             markers.forEach(marker => marker.setMap(null));
             markers = [];
             polylines.forEach(polyline => polyline.setMap(null));
