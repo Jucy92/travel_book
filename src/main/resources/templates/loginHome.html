@@ -59,11 +59,31 @@
                 return;
             }
 
-            const url = '/storage/${userId}';
+            const url = '/storage/' +userId; <!-- inline설정으로 타임리프에서 변수 치환 이슈 ${userId}에서 +userId로 변경 -->
 
             <!--     get 방식 - 단순 파라미터 전달       -->
             window.location.href = url;
             <!--     post 방식 - 데이터 전송       -->
+            /*
+            const url = '/storage';
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // 페이지 이동이 필요하다면, 이를 활용하여 리다이렉트할 수 있음.
+                // window.location.href = '/nextPage';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+            */
 
         }
 

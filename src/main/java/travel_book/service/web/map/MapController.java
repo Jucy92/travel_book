@@ -39,21 +39,20 @@ public class MapController {
     public ResponseEntity<String> saveLocations(@RequestBody List<LocationModel> locations
             , @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member member) {
 
-//        HttpSession session = request.getSession();       // @SessionAttribute으로 바로 Member에서 가져오기
-//        session.getAttribute(SessionConst.SESSION_NAME);
+        //HttpSession session = request.getSession();       // @SessionAttribute으로 바로 Member에서 가져오기
+        //session.getAttribute(SessionConst.SESSION_NAME);
 
-        // ### 여기서 반복 돌기전에 M/D로 테이블 나눠 놨으면 Master 테이블에 단건 저장하고, Detail에 반복하면서 SQ 및 시간대별 데이터 저장하면 되지않을까? ###
-        // 메인 테이블(LOCATION_STORAGE_M) 데이터 추가 및 travelId 키 값 리턴
-        Long travelId = mapService.saveStorageM(locations.stream().findFirst().orElse(null)/*.setUserId(member.getUserId())*/);  // 화면단에서 userId 가져오는거 아니면 여기서 넣어줘야하는데..
+        // 메인 테이블(LOCATION_STORAGE_M) 데이터 추가 / + 지금은 postman해서 userId 넘겨줬지만, 화면에서 등록하려면 세션 member id 값 가져오거나, 화면단에서 구해서 locations에 담아서 보내줘야함
+        mapService.saveStorageM(locations.stream().findFirst().orElse(null));       // saveStorageM을 리턴 받으면 쿼리 결과 값인 1(insert 1건 성공)을 리턴 받는다. => 하면서 자동으로 keyProperty 설정된 값에 생성된 값을 매핑해서 객체를 반환해 준다.
+        Long travelId = locations.stream().findFirst().orElse(null).getTravelId();  // 첫번째 리스트 객체로 insert 되었기 때문에 거기에만 travelId 값이 들어가있다
 
         locations.forEach(location -> {
-            //location.setUserId(member.getUserId());   // 화면단에서 userId 미니 넣어주는거 아니면 여기도 넣어줘야함
-            log.info("location={}", location);
+            //location.setUserId(member.getUserId());   // 화면단에서 userId 미리 넣어주는거 아니면 여기도 넣어줘야함
             location.setTravelId(travelId);             // 마스터 테이블에 저장한 여행번호 가져와서 넣어주기
-            mapService.saveStorageD(location);    // 반복 돌면서 데이터 저장
+            mapService.saveStorageD(location);          // 반복 돌면서 데이터 저장
         });
-//        return new ResponseEntity<>("위치들이 성공적으로 저장되었습니다!", HttpStatus.CREATED);
-        return ResponseEntity.ok("경로가 저장되었습니다");
+        return new ResponseEntity<>("데이터가 정상적으로 저장되었습니다!", HttpStatus.CREATED);
+        //return ResponseEntity.ok("경로가 저장되었습니다");
     }
 
     @GetMapping("/map/retrieve/{userId}")
@@ -75,7 +74,7 @@ public class MapController {
     }
     @GetMapping("/storage/{userId}")
     public String StorageUser(@PathVariable(value = "userId") String userId, Model model) {     // 모델에 담아서 보내기 model -> responseBody??
-        //log.info("userId={}",userId);     웹에서 인코딩 하는 문제로 storageMFindByUserId 들어갈 때 꺠져서 들어가네...
+        //log.info("userId={}",userId);     웹에서 인코딩 하는 문제로 storageMFindByUserId 들어갈 때 꺠져서 들어가네... -> 타임리프 문제로 ${userId} 에서 + userId로 변경함
         //log.info("List={}",mapService.storageMFindByUserId(userId));
         model.addAttribute("list", mapService.storageMFindByUserId(userId));
         return "/map/locationStorage";

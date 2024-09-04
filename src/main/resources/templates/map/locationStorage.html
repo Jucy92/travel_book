@@ -16,22 +16,44 @@
 
     <section id="map"></section>
 
-    <section id="trip-info">
-        <table border="1">
-            <thead>
-            <th>
-                <th align="left" >여행 주제</th>
-                <th align="center">여행 기간</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="item : ${list}">
-                <th th:onclick="storageDetail('[[${item.travelId}]]')" th:text="|${item.title}|">타이틀</th>
-                <th th:text="|${item.tripStart} ~ ${item.tripEnd}|">기간</th>
-            </tr>
-            </tbody>
-        </table>
-    </section>
+    <div class="container">
+        <section id="trip-info">
+            <table border="1">
+                <thead>
+                <tr>
+                    <th align="left">여행 주제</th>
+                    <th align="center">여행 기간</th>
+                    <th align="center">상세 일정</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${list}">
+                    <th th:onclick="storageDetail('[[${item.travelId}]]')" th:text="|${item.title}|">타이틀</th>
+                    <th th:text="|${item.tripStart} ~ ${item.tripEnd}|">기간</th>
+                    <th>
+                        <!-- 상세 일정 테이블은 우측에 따로 표시 -->
+                        <button onclick="showDetails('[[${item.travelId}]]')">상세 보기</button>
+                    </th>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="details-container">
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>시간</th>
+                    <th>일정</th>
+                    <th>날짜</th>
+                </tr>
+                </thead>
+                <tbody id="details-content">
+                <!-- JavaScript로 여기에 내용이 추가될 예정 -->
+                </tbody>
+            </table>
+        </section>
+    </div>
 
     <script>
         // 카카오맵 초기화
@@ -46,13 +68,10 @@
         var routes = [];
         var polylines = [];
 
+
+
         function storageDetail(travelId){
-            alert("디테일 불러오기");
-
-            console.log("Received1 travelId: ", travelId);
-
-
-
+<!--            console.log("Received1 travelId: ", travelId);-->
             const url = '/storage/'+travelId;
 
 
@@ -70,12 +89,14 @@
                 resetMap();
                 routes = data;
                 displaySavedRoutes();
+                showDetails(travelId);
 
             })
             .catch(error => {
                 console.error('오류:', error);
                 alert('경로 저장 중 오류가 발생했습니다.');
             });
+
 
         }
 
@@ -117,27 +138,31 @@
 
         function displaySavedRoutes() {
             routes.forEach((route, index) => {
-                var position = new kakao.maps.LatLng(route.lat, route.lng);
-                addMarker(position, route.travelSq);
+                if (route.latitude && route.longitude){
+                    var position = new kakao.maps.LatLng(route.latitude, route.longitude, route.locationName);
+                    addMarker(position, route.travelSq);
+                }
             });
 
             for (var i = 1; i < routes.length; i++) {
-                var start = new kakao.maps.LatLng(routes[i - 1].lat, routes[i - 1].lng);
-                var end = new kakao.maps.LatLng(routes[i].lat, routes[i].lng);
+                if (routes[i-1].latitude && routes[i-1].longitude){
+                    var start = new kakao.maps.LatLng(routes[i - 1].latitude, routes[i - 1].longitude);
+                    var end = new kakao.maps.LatLng(routes[i].latitude, routes[i].longitude);
 
-                var polyline = new kakao.maps.Polyline({
-                    path: [start, end],
-                    strokeWeight: 5,
-                    strokeColor: '#FF0000',
-                    strokeOpacity: 0.8,
-                    strokeStyle: 'solid'
-                });
+                    var polyline = new kakao.maps.Polyline({
+                        path: [start, end],
+                        strokeWeight: 5,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid'
+                    });
 
-                polyline.setMap(map);
-                polylines.push(polyline);
+                    polyline.setMap(map);
+                    polylines.push(polyline);
+                }
             }
 
-            var lastPosition = new kakao.maps.LatLng(routes[routes.length - 1].lat, routes[routes.length - 1].lng);
+            var lastPosition = new kakao.maps.LatLng(routes[routes.length - 1].latitude, routes[routes.length - 1].longitude);
             map.setCenter(lastPosition);
         }
 
@@ -147,6 +172,38 @@
             markers = [];
             polylines.forEach(polyline => polyline.setMap(null));
             polylines = [];
+        }
+
+        function showDetails(travelId) {
+            var detailsContainer = document.getElementById('details-container');
+            var detailsContent = document.getElementById('details-content');
+            detailsContent.innerHTML = ''; // 기존 내용을 초기화
+
+            routes.forEach((route, index) => {
+                if (route.travelSq != null){
+                    return;
+                }
+                for (var hour = 0; hour < 24; hour++) {
+                    var row = document.createElement('tr');
+
+                    var timeCell = document.createElement('td');
+                    timeCell.textContent = hour + '시';
+                    row.appendChild(timeCell);
+
+                    var contentCell = document.createElement('td');
+                    contentCell.textContent = route['hour' + (hour < 10 ? '0' : '') + hour];
+                    row.appendChild(contentCell);
+
+                    var dateCell = document.createElement('td');
+
+                    dateCell.textContent = route.dayTrip;;
+                    row.appendChild(dateCell);
+
+                    detailsContent.appendChild(row);
+                }
+            });
+
+            detailsContainer.style.display = 'block';
         }
     </script>
 </body>

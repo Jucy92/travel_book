@@ -123,3 +123,14 @@ body {
 .popup button:hover {
     background-color: #0056b3;
 }
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+#trip-info {
+    width: 50%;
+}
+#details-container {
+    width: 45%;
+    display: none; /* 초기에는 숨김 */
+}

@@ -1,3 +1,4 @@
+-- TRUNCATE TABLE TABLE_NAME;
 drop table if exists MEMBER CASCADE;
 create table MEMBER              -- 회원 정보
 (
@@ -11,16 +12,6 @@ create table MEMBER              -- 회원 정보
  primary key (id)
 );
 
-drop table if exists LOCATION CASCADE;
-create table LOCATION               -- 위,경도 좌표
-(
- latitude           double not null,            -- 위도
- longitude          double not null,            -- 경도
- address_name       varchar(100),       -- 주소지명
- location_name      varchar(100),       -- 장소명(or 건물명)
- primary key (latitude, longitude)
-)
-
 drop table if exists LOCATION_STORAGE_M CASCADE;
 create table LOCATION_STORAGE_M       -- 여행 계획M(장소저장)
 (
@@ -30,6 +21,7 @@ create table LOCATION_STORAGE_M       -- 여행 계획M(장소저장)
  trip_start     date,                       -- 여행 시작일
  trip_end       date,                       -- 여행 마지막
  rmks           varchar(150),               -- 비고
+ cid            bigint,                     -- 생성자      => 나중에 복사하는 경우 최초 생성자 id값 계속 들고가게 해서 원조(?) 판별
  cdt            datetime,                   -- 생성 일자
  primary key (travel_id)
 );
@@ -37,8 +29,8 @@ create table LOCATION_STORAGE_M       -- 여행 계획M(장소저장)
 drop table if exists LOCATION_STORAGE_D CASCADE;
 create table LOCATION_STORAGE_D         -- 여행 계획D
 (
- travel_id      bigint not null,    -- Detail       // 마스터에서 넘겨 받아야함
- travel_sq      bigint not null,                    -- 여행지 순서(클릭 좌표)
+ travel_id      bigint not null,            -- Detail       // 마스터에서 넘겨 받아야함
+ travel_sq      bigint not null,            -- 여행지 순서(클릭 좌표)
  latitude       double not null,            -- 위도
  longitude      double not null,            -- 경도
  hour00         varchar(300),               -- 00:00 ~ 00:59
@@ -66,7 +58,22 @@ create table LOCATION_STORAGE_D         -- 여행 계획D
  hour22         varchar(300),
  hour23         varchar(300),               -- 23:00 ~ 23:59
  day_trip       int,                        -- 여행 일자(2박3일 중 1일차)
- rmks           varchar(150),       -- 비고
- cdt            datetime,           -- 생성 일자
+ rmks           varchar(150),               -- 비고
+ cid            bigint,                     -- 생성자
+ cdt            datetime,                   -- 생성 일자
+ primary key (travel_id, travel_sq)
+);
+
+drop table if exists LOCATION CASCADE;
+create table LOCATION                           -- 여행 별 위,경도 좌표 값 저장
+(
+ travel_id          bigint not null,            -- 여행 번호(LOCATION_STORAGE_M에서 넘겨 받아야함)
+ travel_sq          bigint not null,            -- 여행 순서(클릭 좌표)
+ latitude           double not null,            -- 위도
+ longitude          double not null,            -- 경도
+ address_name       varchar(100),               -- 주소지명
+ location_name      varchar(100),               -- 장소명(or 건물명)
+ cdt                datetime,                   -- 생성 일자
+ cid                bigint,                     -- 생성자
  primary key (travel_id, travel_sq)
 );

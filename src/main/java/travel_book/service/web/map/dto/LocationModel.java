@@ -15,11 +15,11 @@ public class LocationModel {    // 모델을 두개로 나눠야하나..? 여행
     private String locationName;    // 장소명(or 건물명)
     private String rmksM;           // 마스터 비고
 
-    //LOCATION_STORAGE_D 테이블 데이터
+    //LOCATION_STORAGE_D (계획 데이터) + LOCATION (좌표 데이터)
     private Long travelSq;          // 여행지 순서(클릭 좌표)
-    private double lat;             // 위도
+    private double latitude;             // 위도
 
-    private double lng;             // 경도
+    private double longitude;             // 경도
     private String hour00;          // 00:00 ~ 00:59
     private Integer dayTrip;        // 여행 일자(2박3일 중 1일차)
     private String rmksD;           // 디테일 비고
