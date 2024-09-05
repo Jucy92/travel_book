@@ -7,7 +7,7 @@
     <link th:href="@{/css/styles.css}"
           href="../css/styles.css" rel="stylesheet">
     <!-- 카카오맵 스크립트 -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2&libraries=services,clusterer,drawing"></script>
 </head>
 <body>
     <header>
@@ -141,7 +141,18 @@
                 if (route.latitude && route.longitude){
                     var position = new kakao.maps.LatLng(route.latitude, route.longitude, route.locationName);
                     addMarker(position, route.travelSq);
+
+                    var geocoder = new kakao.maps.services.Geocoder();
+                    var callback = function(result, status) {
+                        if (status === kakao.maps.services.Status.OK) {
+
+                            console.log('지역 명칭 : ' + result[0].address_name);
+                            console.log('행정구역 코드 : ' + result[0].code);
+                        }
+                    };
+                    geocoder.coord2RegionCode(position.getLng(), position.getLat(), callback);
                 }
+
             });
 
             for (var i = 1; i < routes.length; i++) {
