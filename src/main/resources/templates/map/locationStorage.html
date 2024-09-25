@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko" >
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>사용자의 여행 일정</title>
-    <link th:href="@{/css/styles.css}"
-          href="../css/styles.css" rel="stylesheet">
-    <!-- 카카오맵 스크립트 -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=31392fb12fa81362020946d15afde9c2&libraries=services,clusterer,drawing"></script>
+    <link th:href="@{/css/styles.css}" href="../css/styles.css" rel="stylesheet">
+    <!-- 구글맵 스크립트 -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA53tcYEG1Lr9raR98hxk-8BEBecqPYJbE"></script>
 </head>
 <body>
     <header>
         <h1>여행 일정</h1>
     </header>
 
-    <section id="map"></section>
+    <section id="map" style="height: 400px;"></section>
 
     <div class="container">
         <section id="trip-info">
@@ -31,7 +30,6 @@
                     <th th:onclick="storageDetail('[[${item.travelId}]]')" th:text="|${item.title}|">타이틀</th>
                     <th th:text="|${item.tripStart} ~ ${item.tripEnd}|">기간</th>
                     <th>
-                        <!-- 상세 일정 테이블은 우측에 따로 표시 -->
                         <button onclick="showDetails('[[${item.travelId}]]')">상세 보기</button>
                     </th>
                 </tr>
@@ -56,124 +54,76 @@
     </div>
 
     <script>
-        // 카카오맵 초기화
-        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
-            mapOption = {
-                center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
-                level: 3 // 지도의 확대 레벨
+        // 구글맵 초기화
+        var map;
+        function initMap() {
+            var mapOptions = {
+                center: {lat: 33.450701, lng: 126.570667}, // 지도의 중심좌표
+                zoom: 8 // 지도의 확대 레벨
             };
-        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        }
 
         var markers = [];
         var routes = [];
         var polylines = [];
 
-
-
-        function storageDetail(travelId){
-<!--            console.log("Received1 travelId: ", travelId);-->
-            const url = '/storage/'+travelId;
-
-
-            // URL에 JSON 데이터 전송
-            fetch('/storage/'+travelId, {
+        function storageDetail(travelId) {
+            fetch('/storage/' + travelId, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
             })
-            .then(response => response.json()) <!-- 여기서 response.json() -> .text() 로 하면 성공되려나??-->
+            .then(response => response.json())
             .then(data => {
                 console.log('성공:', data);
-                // routes 배열에서 각 데이터를 처리
                 resetMap();
                 routes = data;
                 displaySavedRoutes();
                 showDetails(travelId);
-
             })
             .catch(error => {
                 console.error('오류:', error);
                 alert('경로 저장 중 오류가 발생했습니다.');
             });
-
-
         }
 
         function addMarker(position, num) {
-            // 기본 마커 이미지 경로 설정
-            var imageBaseUrl = 'http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_';
-            var imageColors = ['blue', 'orange', 'yellow', 'pink']; // 사용할 색상 배열 -> 나중에 사용하려면 뭐 콤보나 다른걸로 해서 값 받으면 될 듯
-            var selectedColor;
-
-            // num이 imageColors 배열 범위를 벗어나면 기본 색상 선택
-            if (!selectedColor) {
-                selectedColor = imageColors[0]; // 기본 색상 설정 (blue)
-            }
-
-            // 최종 이미지 URL 생성
-            var imageSrc = imageBaseUrl + selectedColor + '.png';
-
-            // 스프라이트 이미지를 위한 MarkerImage 객체 생성
-            var markerImage = new kakao.maps.MarkerImage(
-                imageSrc,
-                new kakao.maps.Size(36, 37), // 마커 이미지의 크기
-                {
-                    offset: new kakao.maps.Point(13, 37), // 마커의 기준 좌표
-                    spriteOrigin: new kakao.maps.Point(0, 47 * (num - 1)), // 각 숫자에 맞는 스프라이트 이미지 위치 조정
-                    spriteSize: new kakao.maps.Size(36, 691) // 스프라이트 이미지 전체 크기
-                }
-            );
-
-            // 마커를 생성하고 지도에 표시
-            var marker = new kakao.maps.Marker({
+            var marker = new google.maps.Marker({
                 position: position,
-                image: markerImage,
-                map: map
+                map: map,
+                label: num.toString() // 마커에 번호 표시
             });
-            console.log('마커 정보:', markerImage);
             markers.push(marker);
         }
 
-
         function displaySavedRoutes() {
             routes.forEach((route, index) => {
-                if (route.latitude && route.longitude){
-                    var position = new kakao.maps.LatLng(route.latitude, route.longitude, route.locationName);
+                if (route.latitude && route.longitude) {
+                    var position = {lat: route.latitude, lng: route.longitude};
                     addMarker(position, route.travelSq);
-
-                    var geocoder = new kakao.maps.services.Geocoder();
-                    var callback = function(result, status) {
-                        if (status === kakao.maps.services.Status.OK) {
-
-                            console.log('지역 명칭 : ' + result[0].address_name);
-                            console.log('행정구역 코드 : ' + result[0].code);
-                        }
-                    };
-                    geocoder.coord2RegionCode(position.getLng(), position.getLat(), callback);
                 }
-
             });
 
             for (var i = 1; i < routes.length; i++) {
-                if (routes[i-1].latitude && routes[i-1].longitude){
-                    var start = new kakao.maps.LatLng(routes[i - 1].latitude, routes[i - 1].longitude);
-                    var end = new kakao.maps.LatLng(routes[i].latitude, routes[i].longitude);
+                if (routes[i-1].latitude && routes[i-1].longitude) {
+                    var start = {lat: routes[i - 1].latitude, lng: routes[i - 1].longitude};
+                    var end = {lat: routes[i].latitude, lng: routes[i].longitude};
 
-                    var polyline = new kakao.maps.Polyline({
+                    var polyline = new google.maps.Polyline({
                         path: [start, end],
-                        strokeWeight: 5,
+                        geodesic: true,
                         strokeColor: '#FF0000',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
                     });
-
                     polyline.setMap(map);
                     polylines.push(polyline);
                 }
             }
 
-            var lastPosition = new kakao.maps.LatLng(routes[routes.length - 1].latitude, routes[routes.length - 1].longitude);
+            var lastPosition = {lat: routes[routes.length - 1].latitude, lng: routes[routes.length - 1].longitude};
             map.setCenter(lastPosition);
         }
 
@@ -186,36 +136,32 @@
         }
 
         function showDetails(travelId) {
-            var detailsContainer = document.getElementById('details-container');
             var detailsContent = document.getElementById('details-content');
             detailsContent.innerHTML = ''; // 기존 내용을 초기화
 
-            routes.forEach((route, index) => {
-                if (route.travelSq != null){
-                    return;
-                }
-                for (var hour = 0; hour < 24; hour++) {
-                    var row = document.createElement('tr');
+            routes.forEach((route) => {
+                var row = document.createElement('tr');
 
-                    var timeCell = document.createElement('td');
-                    timeCell.textContent = hour + '시';
-                    row.appendChild(timeCell);
+                var timeCell = document.createElement('td');
+                timeCell.textContent = '시간 정보';
+                row.appendChild(timeCell);
 
-                    var contentCell = document.createElement('td');
-                    contentCell.textContent = route['hour' + (hour < 10 ? '0' : '') + hour];
-                    row.appendChild(contentCell);
+                var contentCell = document.createElement('td');
+                contentCell.textContent = '일정 정보';
+                row.appendChild(contentCell);
 
-                    var dateCell = document.createElement('td');
+                var dateCell = document.createElement('td');
+                dateCell.textContent = route.dayTrip;
+                row.appendChild(dateCell);
 
-                    dateCell.textContent = route.dayTrip;;
-                    row.appendChild(dateCell);
-
-                    detailsContent.appendChild(row);
-                }
+                detailsContent.appendChild(row);
             });
 
-            detailsContainer.style.display = 'block';
+            document.getElementById('details-container').style.display = 'block';
         }
+
+        // 맵 초기화 호출
+        initMap();
     </script>
 </body>
 </html>

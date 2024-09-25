@@ -32,7 +32,8 @@ public class MapController {
     @GetMapping("/map")
     public String showMap() {
 //        return "/map/gptMap";
-        return "/map/kakaoMap";
+//        return "/map/kakaoMap";
+        return "/map/googleMap";
     }
 
     @PostMapping("/map")
