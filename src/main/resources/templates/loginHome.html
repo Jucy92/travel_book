@@ -30,9 +30,17 @@
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg" type="button"
                     th:onclick="|location.href='@{/trip-planner}'|">
-                여행 계획 세우기
+                여행 계획 생성
             </button>
         </div>
+
+        <div class="col">
+            <button class="w-100 btn btn-secondary btn-lg" type="button"
+                    th:onclick="openPopup()">
+                AI 질문
+            </button>
+        </div>
+
         <div class="col">
             <button class="w-100 btn btn-secondary btn-lg" type="button"
                     th:onclick="|location.href='@{/map}'|">
@@ -47,6 +55,8 @@
                 </button>
             </form>
         </div>
+
+
     </div>
     <hr class="my-4">
 </div> <!-- /container -->
@@ -87,6 +97,9 @@
 
         }
 
+    function openPopup() {
+            window.open('/ai-recommendation-popup', 'AI Recommendation', 'width=600,height=400');
+        }
 </script>
 </body>
 </html>
