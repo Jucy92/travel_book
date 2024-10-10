@@ -21,16 +21,21 @@ public class APIController {
         String destination = request.get("destination");    // 여행지
         String itinerary = request.get("itinerary");        // 여행 요청 내용
 
+        String apiKey = "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";
+        String query = destination + "로 여행을 가려고 하는데" + itinerary + "에 맞춰서 가이드가 되어서 여행 계획을 만들어줘";
+        StringBuffer responseStr = null;
+
         /*
          */
-        URL url = new URL("https://llama3-8b.com/api/v1/questions?apiKey=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");
+        URL url = new URL("https://llama3-8b.com/api/v1/questions");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        String query = destination + "로 여행을 가려고 하는데" + itinerary + "에 맞춰서 가이드가 되어서 여행 계획을 만들어줘";
-        byte[] outputBytes = query.getBytes();
+        connection.setRequestMethod("POST");
+
+        connection.setDoOutput(true);
+        byte[] outputBytes = ("apiKey=" + apiKey + "&query=" + query).getBytes();
         connection.getOutputStream().write(outputBytes);
 
         int responseCode = connection.getResponseCode();
-        StringBuffer responseStr = null;
         if (responseCode == 200) {
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
@@ -41,7 +46,8 @@ public class APIController {
                 System.out.println("inputLine = " + inputLine);
             }
             in.close();
-            System.out.println(responseStr.toString());
+            //JSONObject jsonpObject = new JSONObject(responseStr.toString());
+
         } else {
             System.out.println("Failed HTTP error code : " + responseCode);
         }
@@ -50,8 +56,8 @@ public class APIController {
         String recommendation = "AI가 추천하는 " + destination + "의 일정: " + itinerary;
 
         Map<String, String> response = new HashMap<>();
-        //response.put("recommendation", recommendation);
-        response.put("recommendation", String.valueOf(responseStr));
+        response.put("recommendation", recommendation);
+        //response.put("recommendation", responseStr.toString());
 
         return ResponseEntity.ok(response);
     }
