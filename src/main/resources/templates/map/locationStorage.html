@@ -123,7 +123,8 @@
                 }
             }
 
-            var lastPosition = {lat: routes[routes.length - 1].latitude, lng: routes[routes.length - 1].longitude};
+            var lastPosition = {lat: routes[routes.length - 1].latitude, lng: routes[routes.length - 1].longitude,  zoom: 3};
+            console.log('lastPosition:', lastPosition);
             map.setCenter(lastPosition);
         }
 
@@ -139,24 +140,29 @@
             var detailsContent = document.getElementById('details-content');
             detailsContent.innerHTML = ''; // 기존 내용을 초기화
 
+
             routes.forEach((route) => {
-                var row = document.createElement('tr');
+                if (route.travelSq != null){
+                    return;
+                }
+                for (var hour = 0; hour < 24; hour++) {
+                    var row = document.createElement('tr');
 
-                var timeCell = document.createElement('td');
-                timeCell.textContent = '시간 정보';
-                row.appendChild(timeCell);
+                    var timeCell = document.createElement('td');
+                    timeCell.textContent = hour + '시';
+                    row.appendChild(timeCell);
 
-                var contentCell = document.createElement('td');
-                contentCell.textContent = '일정 정보';
-                row.appendChild(contentCell);
+                    var contentCell = document.createElement('td');
+                    contentCell.textContent = route['hour' + (hour < 10 ? '0' : '') + hour];
+                    row.appendChild(contentCell);
 
-                var dateCell = document.createElement('td');
-                dateCell.textContent = route.dayTrip;
-                row.appendChild(dateCell);
+                    var dateCell = document.createElement('td');
+                    dateCell.textContent = route.dayTrip;
+                    row.appendChild(dateCell);
 
-                detailsContent.appendChild(row);
+                    detailsContent.appendChild(row);
+                }
             });
-
             document.getElementById('details-container').style.display = 'block';
         }
 

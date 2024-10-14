@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>AI 추천 받기</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container" style="max-width: 500px">
+    <h2 class="text-center my-4">AI 추천 받기</h2>
+    <form id="recommendationForm">
+        <div class="mb-3">
+            <label for="itinerary" class="form-label">여행 정보 입력</label>
+            <textarea id="itinerary" class="form-control" rows="4" placeholder="간략한 일정을 입력하세요" required></textarea>
+        </div>
+        <button type="button" class="btn btn-primary w-100" onclick="submitRecommendation()">AI 추천 받기</button>
+    </form>
+
+    <div id="result" class="mt-4" style="display:none;">
+        <h5>AI 추천 결과</h5>
+        <p id="recommendationResult"></p>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function submitRecommendation() {
+        const itinerary = document.getElementById('itinerary').value;
+
+        if (!itinerary.trim()) {
+            alert('여행지와 일정을 모두 입력해주세요!');
+            return;
+        }
+
+        // API 요청을 위한 데이터 구성
+        const requestData = {
+            itinerary: itinerary
+        };
+
+        fetch('/api/llama', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('recommendationResult').innerText = data.responseContent;
+            console.log('받은 데이터:', data);
+
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('추천 요청 중 오류가 발생했습니다.');
+        });
+    }
+
+
+</script>
+</body>
+</html>

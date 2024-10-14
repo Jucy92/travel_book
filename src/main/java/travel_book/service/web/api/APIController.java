@@ -21,12 +21,11 @@ public class APIController {
         String destination = request.get("destination");    // 여행지
         String itinerary = request.get("itinerary");        // 여행 요청 내용
 
+        /*
         String apiKey = "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";
         String query = destination + "로 여행을 가려고 하는데" + itinerary + "에 맞춰서 가이드가 되어서 여행 계획을 만들어줘";
         StringBuffer responseStr = null;
 
-        /*
-         */
         URL url = new URL("https://llama3-8b.com/api/v1/questions");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -51,6 +50,7 @@ public class APIController {
         } else {
             System.out.println("Failed HTTP error code : " + responseCode);
         }
+        */
 
         // 여기에 AI API 호출 또는 추천 로직을 추가합니다.
         String recommendation = "AI가 추천하는 " + destination + "의 일정: " + itinerary;

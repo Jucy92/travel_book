@@ -18,6 +18,7 @@ public interface MemberMapper {
     Optional<Member> findByMail(String mail);
     Optional<Member> findByUserId(String userId);
 
+    List<Member> findAll();
     List<Member> findAll(MemberSearchCond searchCond);
 
     Optional<Member> memberInfoFindByUser(String usermId);

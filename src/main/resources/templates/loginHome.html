@@ -36,7 +36,7 @@
 
         <div class="col">
             <button class="w-100 btn btn-secondary btn-lg" type="button"
-                    th:onclick="openPopup()">
+                    th:onclick="openAI()">
                 AI 질문
             </button>
         </div>
@@ -97,8 +97,8 @@
 
         }
 
-    function openPopup() {
-            window.open('/ai-recommendation-popup', 'AI Recommendation', 'width=600,height=400');
+    function openAI() {
+            window.open('/openPopup', 'AI Recommendation', 'width=600,height=400');
         }
 </script>
 </body>

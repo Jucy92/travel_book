@@ -35,8 +35,8 @@ public class MyBatisRepository implements MemberRepository {
     }
 
     @Override
-    public List<Member> findAll() {     // 사용 안할 예정
-        return null;
+    public List<Member> findAll() {     // 테스트에서 사용으로 로직 변경
+        return memberMapper.findAll();
     }
 
     @Override

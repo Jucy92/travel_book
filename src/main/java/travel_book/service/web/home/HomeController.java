@@ -30,6 +30,10 @@ public class HomeController {
         model.addAttribute("member", loginMember);
         return "loginHome";
     }
+    @GetMapping("/openPopup")
+    public String openAI(){
+        return "api/open-popup";
+    }
 
     /*
         @GetMapping("/map")

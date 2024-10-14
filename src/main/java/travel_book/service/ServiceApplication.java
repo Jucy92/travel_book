@@ -13,13 +13,12 @@ import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.mybatis.MyBatisRepository;
 
 @Slf4j
-@SpringBootApplication(scanBasePackages = "travel_book.service.web")	// scanBasePackages를 사용해서 나머지 빼버렸더니 빈등록 되어있던게 다 빠지고 컨피그 파일만 읽어드림
+@SpringBootApplication(scanBasePackages = {"travel_book.service.web", "travel_book.service.domain.member"})	// scanBasePackages를 사용해서 나머지 빼버렸더니 빈등록 되어있던게 다 빠지고 컨피그 파일만 읽어드림
 @Import({MemberConfig.class, WebConfig.class})		// 이거 안풀어도 @Config 보고 컨테이너 컴포넌트에 등록되는데 위에 scanBasePackages랑 쓰기 위해서 선언
 public class ServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ServiceApplication.class, args);
-
 	}
 
 
