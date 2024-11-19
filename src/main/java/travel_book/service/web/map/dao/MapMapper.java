@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import travel_book.service.web.map.dto.LocationModel;
 import travel_book.service.web.map.dto.LocationSearchCond;
 
+import javax.xml.stream.Location;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,5 +19,7 @@ public interface MapMapper {
     List<LocationModel> LocationFindById(Long memberId);    // M/D 테이블 만들면서 불필요해짐
     List<LocationModel> storageMFindByUserId(String userId);
     List<LocationModel> storageDFindByTravelId(Long userId);
+
+    void copyOfAllItinerary(String userId, Long travelId);
 
 }

@@ -95,16 +95,8 @@ public class MapController {
 
     /**
      * ID 검색 - 검색된 계정 페이지 - 마음에 드는 여행 리스트 선택 - 가져가기(친구이거나, 어떤 조건에서만 가져갈 수 있도록 불펌금지)
-     *기능 = ㄴ>검색   ㄴ>저장된 리스트 조회                       ㄴ> 복사
+     *기능 = ㄴ>검색   ㄴ>저장된 리스트 조회                       ㄴ> 복사            ㄴ> 사용자가 허락/요청/거절 권한 넣어서 허락이면 불펌 가능, 요청은 승인 있어야 가능
      */
 
-    /*      // 카카오맵 도보 경로 받아오기 위해 선언했던 내용
-    @GetMapping("/map/route")
-    public RouteResponse getRoute(@RequestParam double startLat, @RequestParam double startLng,
-                                  @RequestParam double endLat, @RequestParam double endLng) {
-        log.info("startLat={}, startLng={}, endLat={}, endLng={}", startLat, startLng, endLat, endLng);
-        return mapService.getWalkingRoute(startLat, startLng, endLat, endLng);
-
-    }
-    */
+    
 }

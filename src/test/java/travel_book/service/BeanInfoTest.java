@@ -46,7 +46,7 @@ public class BeanInfoTest {
                     && beanDefinition.getBeanClassName().contains("travel_book")) {
                 //System.out.println("beanDefinition = " + beanDefinition);
                 Object bean = applicationContext.getBean(beanName);
-                System.out.println("빈 이름: " + beanName + ", 빈 타입: " + bean.getClass().getName() + ", Where: " + beanDefinition.getClass().getName());
+                System.out.println("빈 이름: " + beanName + ", 빈 타입: " + bean.getClass().getName() + ", 등록된 빈클래스 이름: " + beanDefinition.getBeanClassName() + ", 등록된 클래스 이름: " + beanDefinition.getClass().getName());
             }
         }
     }
