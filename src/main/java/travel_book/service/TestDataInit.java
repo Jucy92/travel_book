@@ -11,7 +11,6 @@ import travel_book.service.domain.repository.MemberRepository;
 
 import java.time.LocalDateTime;
 
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class TestDataInit {

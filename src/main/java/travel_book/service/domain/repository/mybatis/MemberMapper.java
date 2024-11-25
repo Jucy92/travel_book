@@ -2,6 +2,7 @@ package travel_book.service.domain.repository.mybatis;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberSearchCond;
 

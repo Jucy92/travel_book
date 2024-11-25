@@ -18,12 +18,13 @@ public class MemberConfig {
     private final MemberMapper memberMapper;
 
 
+
     @Bean
     public LoginService loginService() {
         return new LoginService(memberRepository());
     }
 
-    @Bean
+    @Bean     // $$Spring$$ 없애려고 이거 지우니깐 컴파일 오류 memberRepository 찾아서 Autowired 써주기
     public MemberRepository memberRepository() {
         return new MyBatisRepository(memberMapper);
 //        return new MemoryRepository();

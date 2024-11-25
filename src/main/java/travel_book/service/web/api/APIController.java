@@ -3,6 +3,7 @@ package travel_book.service.web.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import travel_book.service.domain.member.Member;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,5 +61,10 @@ public class APIController {
         //response.put("recommendation", responseStr.toString());
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/find-member")
+    public Member findMember() {
+        return ;
     }
 }

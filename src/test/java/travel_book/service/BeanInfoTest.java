@@ -1,5 +1,6 @@
 package travel_book.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +12,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.mail.javamail.JavaMailSender;
 import travel_book.service.config.MemberConfig;
+import travel_book.service.web.api.perplexity.PerplexityApiController;
 
-@SpringBootTest(classes = {ServiceApplication.class, MemberConfig.class, WebConfig.class})
+@SpringBootTest(classes = {ServiceApplication.class})
 public class BeanInfoTest {
 
     @Autowired
-    private ApplicationContext applicationContext;    // 모든 빈 출력할 때
+    private ApplicationContext applicationContext/* = new AnnotationConfigApplicationContext(WebConfig.class)*/;    // 모든 빈 출력할 때
     @MockBean
     private JavaMailSender javaMailSender; // Mail 관련 의존성 Mock 처리
 
@@ -50,5 +52,13 @@ public class BeanInfoTest {
             }
         }
     }
-    
+
+    @Test
+    public void basicScan() {
+        PerplexityApiController bean = applicationContext.getBean(PerplexityApiController.class);
+        Assertions.assertThat(bean).isInstanceOf(PerplexityApiController.class);
+        System.out.println("bean = " + bean);
+    }
+
+
 }

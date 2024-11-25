@@ -1,6 +1,7 @@
 package travel_book.service.domain.repository.mybatis;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Primary
 @RequiredArgsConstructor
 public class MyBatisRepository implements MemberRepository {
 

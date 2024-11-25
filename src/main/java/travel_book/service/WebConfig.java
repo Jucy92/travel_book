@@ -9,7 +9,7 @@ import travel_book.service.web.interceptor.LogInterceptor;
 import travel_book.service.web.interceptor.LoginCheckInterceptor;
 
 //@ComponentScan
-@Configuration
+//@Configuration
 public class WebConfig implements WebMvcConfigurer {    // 스프링 인터셉터 사용하기 위해서 implements WebMvcConfigurer 설정
     @Override
     public void addInterceptors(InterceptorRegistry registry) { // 인터셉터 추가
