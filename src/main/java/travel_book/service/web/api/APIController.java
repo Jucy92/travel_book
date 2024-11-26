@@ -65,6 +65,6 @@ public class APIController {
 
     @PostMapping("/api/find-member")
     public Member findMember() {
-        return ;
+        return null;
     }
 }

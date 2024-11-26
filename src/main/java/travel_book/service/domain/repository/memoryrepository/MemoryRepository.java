@@ -2,6 +2,7 @@ package travel_book.service.domain.repository.memoryrepository;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 import travel_book.service.domain.member.Member;
@@ -15,7 +16,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-//@Repository       // config 파일 만들어서 설정 파일 불러오게 해주거나, 해당 빈 등록 주석처리 하면 컨테이너에 등록 안됨 => 여기서는 config 파일 만들어서 진행
 @Slf4j
 public class MemoryRepository implements MemberRepository {
 

@@ -9,7 +9,7 @@ public interface MemberRepository {
 
     public Member save(Member member);
 
-    void update(Member member); // 이거를 id로 나눠서 할 필요가 있을까..? 일단 member로 처리
+    void update(Member member);
 
 //    public Optional<Member> findByMailToId(String mail);
 

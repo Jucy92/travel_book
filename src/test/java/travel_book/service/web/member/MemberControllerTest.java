@@ -6,21 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.mail.javamail.JavaMailSender;
-import travel_book.service.AutoConfig;
 import travel_book.service.ServiceApplication;
-import travel_book.service.WebConfig;
-import travel_book.service.config.MemberConfig;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
-import travel_book.service.domain.repository.mybatis.MemberMapper;
-import travel_book.service.domain.repository.mybatis.MyBatisRepository;
 import travel_book.service.web.mail.service.MailService;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest(classes = {/*ServiceApplication.class,*/AutoConfig.class})
+@SpringBootTest(classes = {ServiceApplication.class})
 //                                    ㄴ> 이걸로 하면 메인이랑 동일   ㄴ> 이걸로 하면 전체 다 끌고 올라와서 중복 (myBatisRepository->.class,memberRepository->MemberConfig)
 class MemberControllerTest {
 

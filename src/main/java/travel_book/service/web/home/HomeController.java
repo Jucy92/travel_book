@@ -1,5 +1,7 @@
 package travel_book.service.web.home;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.web.session.SessionConst;
+
 
 @Controller
 @Slf4j
@@ -22,12 +25,13 @@ public class HomeController {
     }
     */
     @GetMapping("/")
-    public String home(@SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member loginMember, Model model){
-
-        if (loginMember == null) {
+    public String home(@SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member sessionMember, Model model){
+        //                  ㄴ> 세션 정보가 있으면 Member에 담고, 없으면 그냥 빈 값
+        if (sessionMember == null) {
             return "home";
         }
-        model.addAttribute("member", loginMember);
+
+        model.addAttribute("member", sessionMember);    // loginHome에 던져주는 값 - 화면에서 사용할 데이터
         return "loginHome";
     }
     @GetMapping("/openPopup")

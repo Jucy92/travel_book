@@ -37,9 +37,19 @@
     </style>
 </head>
 <body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+    function encryptPassword(event) {
+    event.preventDefault(); <!--  메소드는 브라우저의 기본 동작을 막는 중요한 기능 -->
+    let password = document.getElementById("password").value;
+    password = CryptoJS.SHA256(password).toString();
+    document.getElementById("password").value = password;
+    document.getElementById("loginForm").submit();
+}
+</script>
     <div class="form-container">
         <h2>회원 정보 수정</h2>
-        <form th:action="@{/members/edit}" method="post" th:object="${member}">
+        <form id="loginForm" th:action="@{/members/edit}" method="post" th:object="${member}" onsubmit="encryptPassword(event)">
             <div class="form-group">
                 <label for="mail">이메일</label>
                 <input type="email" id="mail" th:field="*{mail}" required />

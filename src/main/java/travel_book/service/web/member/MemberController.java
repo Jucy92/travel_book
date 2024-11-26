@@ -1,5 +1,7 @@
 package travel_book.service.web.member;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +29,20 @@ public class MemberController {
     }
 
     @PostMapping("/add")
-    public String save(@Validated @ModelAttribute Member member, BindingResult bindingResult){
+    public String save(@Validated @ModelAttribute Member member, BindingResult bindingResult, HttpServletRequest request){
+
         if(bindingResult.hasErrors()){
             log.info("hasErrors = {}", member);   // 에러 발생 했을 때.. login쪽에서는 에러 뱉었던거 같은데 여기는 반응이 없네... 뭔 차이더라..
             return "members/addMemberForm";
         }
         log.info("전달 받은 Member = {}", member);
         memberRepository.save(member);
+        
+        // 회원 가입 하면 바로 로그인+홈화면 이동을 위해 -> 세션 생성
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.SESSION_NAME, member);
+        log.info("session={}", session.getAttribute(SessionConst.SESSION_NAME));
         return "redirect:/";
-//        return "redirect:/login/loginForm"; // -> 이렇게 하면 해당 페이지에서 받는 object 명과 달라서 오류 발생 -> object 명을 바꾸면.. loginModel이 아닌 Member 검증 처리
     }
 
     @GetMapping("/edit")

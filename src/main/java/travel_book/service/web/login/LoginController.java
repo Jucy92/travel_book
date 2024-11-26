@@ -24,13 +24,9 @@ public class LoginController {
 
     private final LoginService loginService;
 
-//    public LoginController(LoginService loginService) {
-//        this.loginService = loginService;
-//    }
-
     @GetMapping("/login")
-//    public String loginForm(@ModelAttribute("loginModel")LoginModel loginModel) {
-    public String loginForm(@ModelAttribute("loginModel")LoginModel loginModel) {
+//    public String loginForm(@ModelAttribute("loginModel")LoginModel loginModel) { // /login 화면 호출 될 때 던져주는 값이 없는데 왜 이렇게 썼던거야..?
+    public String loginForm() { // ㄴ> 만약에 위처럼 받아서 데이터를 쓰려고 했다면 /login을 호출하는 화면(home.html) 에서 th:object="${loginModel}" 처럼 해서 값을 보냈으면 사용 가능
         return "/login/loginForm";
     }
 

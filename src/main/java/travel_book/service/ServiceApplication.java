@@ -13,10 +13,8 @@ import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.mybatis.MyBatisRepository;
 
 @Slf4j
-@SpringBootApplication(scanBasePackages = {"travel_book.service.web", "travel_book.service.domain.member"})	// scanBasePackages를 사용해서 나머지 빼버렸더니 빈등록 되어있던게 다 빠지고 컨피그 파일만 읽어드림
-@Import({MemberConfig.class, WebConfig.class})		// 이거 안풀어도 @Config 보고 컨테이너 컴포넌트에 등록되는데 위에 scanBasePackages랑 쓰기 위해서 선언
-// 메인이랑 테스트랑 컴포넌트 스캔 다른 이유가 config 파일들이 나눠져서 있어서 그러는데, 그냥 모든 config(특히Auto) 다 지우고 메인에서 SpringBootApplication 해서 읽어버리면 될거 같은데
-// 일단 인지만 하고 있고 나중에 진짜 다 변경하자
+@SpringBootApplication//(scanBasePackages = {"travel_book.service.web", "travel_book.service.domain.member"})	// scanBasePackages를 사용해서 나머지 빼버렸더니 빈등록 되어있던게 다 빠지고 컨피그 파일만 읽어드림
+//@Import({MemberConfig.class, WebConfig.class})		// 이거 안풀어도 @Config 보고 컨테이너 컴포넌트에 등록되는데 위에 scanBasePackages랑 쓰기 위해서 선언
 public class ServiceApplication {
 
 	public static void main(String[] args) {
