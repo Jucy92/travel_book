@@ -1,13 +1,11 @@
 package travel_book.service.web.map.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import travel_book.service.web.map.dao.MapMapper;
 import travel_book.service.web.map.dto.LocationModel;
-import travel_book.service.web.map.dto.LocationSearchCond;
-import travel_book.service.web.map.dto.RouteResponse;
+import travel_book.service.web.map.dto.TravelData;
+
 
 import java.util.List;
 
@@ -70,6 +68,13 @@ public class MapService {
     public void copyOfAllItinerary(String userId, Long travelId) {
         mapMapper.copyOfAllItinerary(userId, travelId);
         // 퍼갈 때 필요한 정보들 DTO로 따로 뺴서 만들어야 할듯 - 여행제목,
+    }
+
+    public List<TravelData> findByTravel(long id) {
+        return mapMapper.findByTravel(id);
+    }
+    public List<TravelData> findByTravelId(long id, long travelId) {
+        return mapMapper.findByTravelId(id, travelId);
     }
 
 }

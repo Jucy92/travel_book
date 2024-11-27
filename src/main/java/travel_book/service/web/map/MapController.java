@@ -3,6 +3,7 @@ package travel_book.service.web.map;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.web.map.dto.LocationModel;
 import travel_book.service.web.map.dto.RouteResponse;
+import travel_book.service.web.map.dto.TravelData;
 import travel_book.service.web.map.service.MapService;
 import travel_book.service.web.session.SessionConst;
 
@@ -95,8 +97,53 @@ public class MapController {
 
     /**
      * ID 검색 - 검색된 계정 페이지 - 마음에 드는 여행 리스트 선택 - 가져가기(친구이거나, 어떤 조건에서만 가져갈 수 있도록 불펌금지)
-     *기능 = ㄴ>검색   ㄴ>저장된 리스트 조회                       ㄴ> 복사            ㄴ> 사용자가 허락/요청/거절 권한 넣어서 허락이면 불펌 가능, 요청은 승인 있어야 가능
+     * 기능 = ㄴ>검색   ㄴ>저장된 리스트 조회                       ㄴ> 복사            ㄴ> 사용자가 허락/요청/거절 권한 넣어서 허락이면 불펌 가능, 요청은 승인 있어야 가능
      */
+
+    @GetMapping("/travel")
+    public String travelWithUser() {    // @ModelAttribute("loginModel")LoginModel loginModel   -> 타임리프 object 기능 사용하려면 쓰면 됨
+        // 단순 아이디 입력하는 화면 뿌려주는 용도
+        return "home";
+    }
+
+    /*
+    //타임리프나, jsp 로 처리하는 방법
+    @PostMapping("/travel/{userId}")
+    public String travelList(@RequestParam(value = "userId") String userId, Model model) {   // 화면이 있다면, 화면에 입력 받은 영역 이름을 userId로 사용해야함
+
+        List<TravelData> travels = mapService.findByTravel(memberRepository.findById(userId));  // 사용자 아이디에 등록되어 있는 여행 정보 전부 출력
+
+        model.addAttribute("travel_list", travels);   // 화면에서 값 받아서 쓰려면 타임리프 th:object 기능 써야함,
+        // 그냥 jsp 하려면 따로 담아야하나 싶지만, jsp도 리스트 넘겨받아서 처리하는 방법이 있겠지~
+
+        return "화면명";
+    }
+    */
+    // Json 방식으로 데이터 받고 보내서 처리
+    @PostMapping(value = "/travel/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<TravelData> travelInfo(@PathVariable(value = "userId") String userId) {   //
+
+        List<TravelData> travels = mapService.findByTravel(memberRepository.findById(userId));  // 사용자 아이디에 등록되어 있는 여행 정보 전부 출력
+
+        // model.attribute("화면명", travels);   // 근데 화면에서 값 받아서 쓰려면 타임리프 th:object 기능 쓰거나, -> 이렇게 하려면 @ResponseBody 제거
+        // 아래 방식으로 보내면 화면에서 받아서 자바스크립트로 처리
+        return travels; // @ResponseBody 추가하고 이렇게 보내면 자동으로 JSON 타입으로 전달 -> 자바스크립트에서 받아서 보여주고 선택해서 여행번호까지 보내주면 그 건에 대해서 처리
+    }
+    @PostMapping("/travel/{userId}/{travelId}")
+    @ResponseBody
+    public List<TravelData> travelList(@PathVariable(value = "userId") String userId, @PathVariable(value = "travelId") String travelId) {   //
+
+        long id = memberRepository.findById(userId);        // 사용자 ID 가져오기
+        List<TravelData> travelList = mapService.findByTravelId(id, Integer.parseInt(travelId));
+        log.info("travelId={}",travelList);
+
+        // model.attribute("화면명", travels);   // 근데 화면에서 값 받아서 쓰려면 타임리프 th:object 기능 쓰거나, -> 이렇게 하려면 @ResponseBody 제거
+        // 아래 방식으로 보내면 화면에서 받아서 자바스크립트로 처리
+        return travelList; // @ResponseBody 추가하고 이렇게 보내면 자동으로 JSON 타입으로 전달 -> 자바스크립트에서 받아서 보여주고 선택해서 여행번호까지 보내주면 그 건에 대해서 처리
+    }
+
+
 
     
 }

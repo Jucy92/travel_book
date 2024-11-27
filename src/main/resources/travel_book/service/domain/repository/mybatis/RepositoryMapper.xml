@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="travel_book.service.domain.repository.mybatis.MemberMapper">
+<mapper namespace="travel_book.service.domain.repository.mybatis.RepositoryMapper">
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO MEMBER (MAIL, NAME, USER_ID, PASSWORD, PHONE, CDT)
@@ -22,10 +22,20 @@
             FROM MEMBER
          WHERE MAIL = #{mail}
     </select>
-    <select id="findByUserId" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+    <select id="findByMember" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
         SELECT ID, USER_ID, MAIL, NAME, PASSWORD, PHONE, CDT
             FROM MEMBER
          WHERE USER_ID = #{userId}
+    </select>
+    <select id="findById" resultType="long">  <!-- 자료형(int,long), 래퍼 클래스(java.lang.Integer), 문자열(java.lang.String), Map(java.util.Map) 받을 수 있음-->
+        SELECT ID
+            FROM MEMBER
+         WHERE USER_ID = #{userId}
+    </select>
+    <select id="findByUserId" resultType="long">  <!-- 자료형(int,long), 래퍼 클래스(java.lang.Integer), 문자열(java.lang.String), Map(java.util.Map) 받을 수 있음-->
+        SELECT USER_ID
+            FROM MEMBER
+         WHERE ID = #{id}
     </select>
 
     <select id="findAll" resultType="Member">

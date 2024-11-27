@@ -49,7 +49,7 @@
                    NULL AS HOUR08, NULL AS HOUR09, NULL AS HOUR10, NULL AS HOUR11, NULL AS HOUR12, NULL AS HOUR13, NULL AS HOUR14, NULL AS HOUR15,
                    NULL AS HOUR16, NULL AS HOUR17, NULL AS HOUR18, NULL AS HOUR19, NULL AS HOUR20, NULL AS HOUR21, NULL AS HOUR22, NULL AS HOUR23,
                    NULL AS DAY_TRIP
-                FROM LOCATION
+                FROM LOCATION_OLD
              WHERE TRAVEL_ID = #{travelId}
     </select>
     <select id="copyOfAllItinerary" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
@@ -66,8 +66,26 @@
                    NULL AS HOUR08, NULL AS HOUR09, NULL AS HOUR10, NULL AS HOUR11, NULL AS HOUR12, NULL AS HOUR13, NULL AS HOUR14, NULL AS HOUR15,
                    NULL AS HOUR16, NULL AS HOUR17, NULL AS HOUR18, NULL AS HOUR19, NULL AS HOUR20, NULL AS HOUR21, NULL AS HOUR22, NULL AS HOUR23,
                    NULL AS DAY_TRIP
-                FROM LOCATION
+                FROM LOCATION_OLD
              WHERE TRAVEL_ID = #{travelId}
+    </select>
+
+
+    <select id="findByTravel" resultType="TravelData"> <!-- 사용자 id 값으로 여행 정보 다 가져오기 / TravelData 타입으로 리턴해주면, MapMapper에서 List로 받음-->
+        SELECT TRAVEL_ID, TITLE, OID, CID, CDT
+            FROM TRAVEL
+         WHERE CID = #{id}
+        ORDER BY CDT DESC
+    </select>
+    <select id="findByTravelId" resultType="TravelData">  <!-- id, travelId 넘겨 받아서 단건 조회 -->
+        SELECT A.TRAVEL_ID, A.TITLE, A.OID, A.CID, A.CDT,
+               B.TRAVEL_ID, B.LOCATION_ID, B.LATITUDE, B.LONGITUDE,
+               C.LOCATION_SQ, C.CONTENT
+            FROM TRAVEL          A
+            LEFT JOIN LOCATION        B ON A.TRAVEL_ID = B.TRAVEL_ID
+            LEFT JOIN LOCATION_DETAIL C ON B.TRAVEL_ID = C.TRAVEL_ID AND B.LOCATION_ID = C.LOCATION_ID
+         WHERE A.CID = #{id}
+           AND A.TRAVEL_ID = #{travelId}
     </select>
 
 </mapper>

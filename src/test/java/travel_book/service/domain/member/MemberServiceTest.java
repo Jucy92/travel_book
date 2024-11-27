@@ -2,7 +2,6 @@ package travel_book.service.domain.member;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,6 @@ import travel_book.service.ServiceApplication;
 import travel_book.service.WebConfig;
 import travel_book.service.config.MemberConfig;
 import travel_book.service.domain.repository.MemberRepository;
-import travel_book.service.domain.repository.mybatis.MemberMapper;
-import travel_book.service.web.home.HomeController;
 import travel_book.service.web.mail.service.MailService;
 
 import java.util.List;

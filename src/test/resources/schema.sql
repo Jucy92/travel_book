@@ -21,6 +21,7 @@ create table TRAVEL       -- 여행 정보
  cid            bigint,                     -- 생성자      => 나중에 복사하는 경우 최초 생성자 id값 계속 들고가게 해서 원조(?) 판별
  cdt            datetime,                   -- 생성 일자
  primary key (travel_id),
+ FOREIGN KEY (oid) REFERENCES MEMBER(id),
  FOREIGN KEY (cid) REFERENCES MEMBER(id)
  --CONSTRAINT fk_parent FOREIGN KEY (parent_id) REFERENCES parent_table(id)
 );
@@ -42,7 +43,7 @@ create table LOCATION_DETAIL         -- 여행 계획D
 (
  travel_id      bigint not null,            -- Detail       // 마스터에서 넘겨 받아야함
  location_id    bigint not null,
- location_sd    bigint AUTO_INCREMENT PRIMARY KEY,
+ location_sq    bigint AUTO_INCREMENT PRIMARY KEY,
  content        varchar(max),
  cid            bigint,                     -- 생성자
  cdt            datetime,                   -- 생성 일자

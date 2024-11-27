@@ -2,8 +2,6 @@ package travel_book.service.domain.repository.memoryrepository;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
@@ -59,8 +57,18 @@ public class MemoryRepository implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findByUserId(String userId) {
+    public Optional<Member> findByMember(String userId) {
         return Optional.empty();
+    }
+
+    @Override
+    public long findById(String userId) {
+        return 0;
+    }
+
+    @Override
+    public long findByUserId(long id) {
+        return 0;
     }
 
     @Override

@@ -25,8 +25,8 @@ public class LoginController {
     private final LoginService loginService;
 
     @GetMapping("/login")
-//    public String loginForm(@ModelAttribute("loginModel")LoginModel loginModel) { // /login 화면 호출 될 때 던져주는 값이 없는데 왜 이렇게 썼던거야..?
-    public String loginForm() { // ㄴ> 만약에 위처럼 받아서 데이터를 쓰려고 했다면 /login을 호출하는 화면(home.html) 에서 th:object="${loginModel}" 처럼 해서 값을 보냈으면 사용 가능
+    public String loginForm(@ModelAttribute("loginModel")LoginModel loginModel) { // /login 화면 호출 될 때 던져주는 값이 없는데 왜 이렇게 썼던거야..? -> 이게 없으면 타임리프 오류
+    //                          ㄴ> 순서에 대해서는 잘 모르겠는데, 타임리프 문법에서 아래 페이지로 이동 했을 때 th:object에 대해 @ModelAttribute 없으면 오류 발생 -> 검증 체크 때문인가?
         return "/login/loginForm";
     }
 
