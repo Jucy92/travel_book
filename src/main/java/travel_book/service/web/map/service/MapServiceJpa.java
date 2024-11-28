@@ -2,6 +2,7 @@ package travel_book.service.web.map.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import travel_book.service.domain.map.Location;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Transactional
 @Service
 @RequiredArgsConstructor
@@ -39,23 +41,28 @@ public class MapServiceJpa {
         for (Location originalLocation : originalLocations) {
 
             Location newLocation = new Location();
-            newLocation.setTravelId(saveTravel.getTravelId());  // 여기서 타입 오류 나서 확인 했더니 long이 아니라 Travel 클래스 타입이었네? 그게 가능한가
+            newLocation.setTravel(saveTravel);  // 여기서 타입 오류 나서 확인 했더니 long이 아니라 Travel 클래스 타입이었네? 그게 가능한가
             newLocation.setLatitude(originalLocation.getLatitude());
             newLocation.setLongitude(originalLocation.getLongitude());
 
             Location saveLocation = locationRepository.save(newLocation);
+            log.info("location={}",saveLocation);
+            log.info("locationId={}",saveLocation.getLocationId());
 
             List<LocationDetail> originalLocationDetails = originalLocation.getLocationDetails();
             for (LocationDetail originalLocationDetail : originalLocationDetails) {
 
                 LocationDetail newDetail = new LocationDetail();
-                newDetail.setTravelId(saveTravel.getTravelId());    // saveLocation.getTravelId() 가져가도 상관은 없을거 같은데 메인 테이블 정보를 가져가자
-                newDetail.setLocationId(saveLocation.getLocationId());
+                newDetail.setTravel(saveTravel);    // saveLocation.getTravelId() 가져가도 상관은 없을거 같은데 메인 테이블 정보를 가져가자
+                newDetail.setLocation(saveLocation);
                 newDetail.setContent(originalLocationDetail.getContent());
 
                 locationDetailRepository.save(newDetail);
             }
+
         }
+        log.info("saveTravel={}",saveTravel);
+        log.info("saveTravelId={}",saveTravel.getTravelId());
 
         return saveTravel;
     }

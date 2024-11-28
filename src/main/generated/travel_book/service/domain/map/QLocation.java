@@ -18,6 +18,8 @@ public class QLocation extends EntityPathBase<Location> {
 
     private static final long serialVersionUID = -400080040L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QLocation location = new QLocation("location");
 
     public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
@@ -28,18 +30,27 @@ public class QLocation extends EntityPathBase<Location> {
 
     public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
 
-    public final NumberPath<Long> travelId = createNumber("travelId", Long.class);
+    public final QTravel travel;
 
     public QLocation(String variable) {
-        super(Location.class, forVariable(variable));
+        this(Location.class, forVariable(variable), INITS);
     }
 
     public QLocation(Path<? extends Location> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QLocation(PathMetadata metadata) {
-        super(Location.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QLocation(PathMetadata metadata, PathInits inits) {
+        this(Location.class, metadata, inits);
+    }
+
+    public QLocation(Class<? extends Location> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.travel = inits.isInitialized("travel") ? new QTravel(forProperty("travel")) : null;
     }
 
 }
