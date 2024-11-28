@@ -3,14 +3,10 @@ package travel_book.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
-import travel_book.service.config.MemberConfig;
 import travel_book.service.domain.repository.MemberRepository;
-import travel_book.service.domain.repository.mybatis.MyBatisRepository;
+
 
 @Slf4j
 @SpringBootApplication//(scanBasePackages = {"travel_book.service.web", "travel_book.service.domain.member"})	// scanBasePackages를 사용해서 나머지 빼버렸더니 빈등록 되어있던게 다 빠지고 컨피그 파일만 읽어드림

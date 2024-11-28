@@ -42,7 +42,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'
 
     //JPA, 스프링 데이터 JPA 추가		=> 여기에 jdbc에 관한걸 포함하고 있어서 지워도 된다
-    //	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     //Querydsl 추가 스프링 부트 3.xx 버전
     implementation 'com.querydsl:querydsl-jpa'
@@ -77,7 +77,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-ㅓ
+
 //Querydsl 추가, 자동 생성된 Q클래스 gradle clean으로 제거
 clean {
     delete file('src/main/generated')	// -> inteliJ 빌드 시 생성된 Q 클래스 제거해주는 설정

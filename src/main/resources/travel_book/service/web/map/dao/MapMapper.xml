@@ -53,21 +53,7 @@
              WHERE TRAVEL_ID = #{travelId}
     </select>
     <select id="copyOfAllItinerary" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
-        	SELECT TRAVEL_ID, NULL AS TRAVEL_SQ, NULL AS LATITUDE, NULL AS LONGITUDE, NULL AS ADDRESS_NAME, NULL AS LOCATION_NAME,
-                   HOUR00, HOUR01, HOUR02, HOUR03, HOUR04, HOUR05, HOUR06, HOUR07,
-                   HOUR08, HOUR09, HOUR10, HOUR11, HOUR12, HOUR13, HOUR14, HOUR15,
-                   HOUR16, HOUR17, HOUR18, HOUR19, HOUR20, HOUR21, HOUR22, HOUR23,
-                   DAY_TRIP
-                FROM LOCATION_STORAGE_D
-             WHERE TRAVEL_ID = #{travelId}
-        UNION ALL
-            SELECT TRAVEL_ID, TRAVEL_SQ, LATITUDE, LONGITUDE, ADDRESS_NAME, LOCATION_NAME,
-                   NULL AS HOUR00, NULL AS HOUR01, NULL AS HOUR02, NULL AS HOUR03, NULL AS HOUR04, NULL AS HOUR05, NULL AS HOUR06, NULL AS HOUR07,
-                   NULL AS HOUR08, NULL AS HOUR09, NULL AS HOUR10, NULL AS HOUR11, NULL AS HOUR12, NULL AS HOUR13, NULL AS HOUR14, NULL AS HOUR15,
-                   NULL AS HOUR16, NULL AS HOUR17, NULL AS HOUR18, NULL AS HOUR19, NULL AS HOUR20, NULL AS HOUR21, NULL AS HOUR22, NULL AS HOUR23,
-                   NULL AS DAY_TRIP
-                FROM LOCATION_OLD
-             WHERE TRAVEL_ID = #{travelId}
+
     </select>
 
 

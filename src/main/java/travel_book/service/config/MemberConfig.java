@@ -11,6 +11,7 @@ import travel_book.service.domain.repository.mybatis.MyBatisRepository;
 @RequiredArgsConstructor
 public class MemberConfig {
 
+    /*
     private final RepositoryMapper repositoryMapper;
 
 
@@ -25,4 +26,5 @@ public class MemberConfig {
         return new MyBatisRepository(repositoryMapper);
 //        return new MemoryRepository();
     }
+    */
 }

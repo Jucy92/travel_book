@@ -2,6 +2,7 @@ package travel_book.service.web.map.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import travel_book.service.web.map.MapService;
 import travel_book.service.web.map.dao.MapMapper;
 import travel_book.service.web.map.dto.LocationModel;
 import travel_book.service.web.map.dto.TravelData;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class MapService {
+public class MapServiceMybatis implements MapService {
 
     /*      // 카카오맵 도보 경로 받아오기 위해 선언했던 내용
     @Value("${appkey=31392fb12fa81362020946d15afde9c2}")
@@ -20,7 +21,7 @@ public class MapService {
 
     private final MapMapper mapMapper;
 
-    public MapService(MapMapper mapMapper) {
+    public MapServiceMybatis(MapMapper mapMapper) {
         this.mapMapper = mapMapper;
     }
 
