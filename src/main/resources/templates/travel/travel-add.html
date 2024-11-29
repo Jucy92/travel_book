@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>여행 계획 만들기</title>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA53tcYEG1Lr9raR98hxk-8BEBecqPYJbE"></script> <!-- 구글맵 스크립트 -->
+    <style>
+        #map { height: 500px; width: 100%; }
+        .location-detail { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="locationContainer">
+    </div>
+    <button onclick="saveData()">저장</button>
+
+    <script th:inline="javascript">
+        let map;
+        let markers = [];
+        let locations = [];
+        let locationDetails = [];
+        let currentLocationId = 0;
+
+        function initMap(){
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 37.6390, lng: 127.0318 },
+                zoom: 15,
+            });
+
+            // 맵 클릭 이벤트
+            map.addListener('click', function (event) {
+
+                // 좌표에 대한 건 아래서 처리
+                addLocation(event.latLng);
+            });
+        }
+
+        function addLocation(latLng){
+            currentLocationId++;
+            const location = {
+                locationId: currentLocationId,
+                lat: latLng.lat(),
+                lng: latLng.lng()
+            };
+            console.log(location);
+            locations.push(location);
+
+            const marker = new google.maps.Marker({
+                position: latLng,
+                map: map,
+                title: 'Location ${currentLocationId}'
+            });
+            markers.push(marker);
+
+            updateLocationList();
+        }
+
+        function updateLocationList() {
+            const container = document.getElementById("locationContainer");
+            const locationDiv = document.createElement("div");
+
+            locationDiv.className = "location";
+            locationDiv.innerHTML = `
+                <h3>Location ${currentLocationId}</h3>
+                <p>Lat: ${locations[locations.length-1].lat}, Lng: ${locations[locations.length-1].lng}</p>
+                <div class="location-details">
+
+                    <div class="location-detail">
+                        <input type="text" placeholder="Enter detail">
+                        <button onclick="addDetailField(this)">+</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(locationDiv);
+        }
+
+        function addDetailField(button) {
+            const detailsContainer = button.parentElement.parentElement;
+            const newDetail = document.createElement("div");
+
+            newDetail.className = "location-detail";
+            newDetail.innerHTML = `
+                <input type="text" placeholder="Enter detail">
+                <button onclick="addDetailField(this)">+</button>
+                <button onclick="removeDetailField(this)">-</button>
+            `;
+            detailsContainer.appendChild(newDetail);
+        }
+
+        function removeDetailField(button) {
+            const detailDiv = button.parentElement;
+            detailDiv.parentElement.removeChild(detailDiv);
+        }
+
+        function saveData() {
+            // 위치 상세 정보를 저장할 배열 초기화
+            locationDetails = [];
+
+            // 모든 위치 div를 순회 (.location = .은 class = location인 것을 말함 locationDiv는 location 클래스를 가진 모든 div요소를 말함)
+            document.querySelectorAll('.location').forEach((locationDiv, locationIndex) => {
+                // 현재 위치의 ID 계산 (인덱스는 0부터 시작하므로 1을 더함)
+                const locationId = locationIndex + 1;
+
+                // 현재 위치 div 내의 모든 상세 정보 입력 필드를 순회
+                locationDiv.querySelectorAll('.location-detail input').forEach((input, detailIndex) => {
+                    // 입력 필드의 값이 비어있지 않은 경우에만 처리
+                    if (input.value.trim() !== '') {
+                        // 위치 상세 정보 객체를 생성하여 배열에 추가
+                        locationDetails.push({
+                            locationId: locationId,           // 위치 ID
+                            locationSq: detailIndex + 1,      // 상세 정보 순서 (인덱스에 1을 더함)
+                            content: input.value.trim()       // 입력된 상세 정보 내용
+                        });
+                    }
+                });
+            });
+
+            // 여행 ID 입력 필드에서 값을 가져옴
+            const travelId = document.getElementById("travelId").value;
+
+            // 서버로 전송할 데이터 객체 생성
+            const data = {
+                travelId: travelId,           // 여행 ID
+                locations: locations,         // 위치 정보 배열 (이전에 생성된 전역 변수)
+                locationDetails: locationDetails  // 방금 생성한 위치 상세 정보 배열
+            };
+
+            // 전송할 데이터를 콘솔에 출력 (디버깅 목적)
+            console.log('Data to be sent:', data);
+
+            // TODO: 여기에 실제 서버로 데이터를 전송하는 코드를 추가해야 함
+
+            // 데이터가 저장되었음을 사용자에게 알림
+            alert("Data saved (check console for details)");
+        }
+
+
+        if (typeof window !== "undefined") {
+          window.onload = initMap;
+        }
+
+    </script>
+</body>
+</html>
