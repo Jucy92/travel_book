@@ -9,7 +9,7 @@ public class TravelData {
 
     // TRAVEL 테이블 정보
     private Long travelId;          // 이거 여기서 사용안하고 DB에서 자동증가 해서 선언 안했는데 매퍼쪽에서 keyProperty="id" 오류 발생해서 추가 -> 자동 생성된 값을 여기로 저장해주기 때문에 필요
-    private Long cid;               // id로 하면 오류는 안터지지만 id 값 안들어감
+    //private Long cid;               // id로 하면 오류는 안터지지만 id 값 안들어감
     private String title;           // 여행 제목
 
     // LOCATION 테이블 정보

@@ -13,9 +13,9 @@ import java.util.List;
 @Table(name = "LOCATION")
 public class Location {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)   // AUTO_INCREMENT 옵션 뺌
     @Column(name = "LOCATION_ID")
-    @Setter(AccessLevel.NONE)
+    //@Setter(AccessLevel.NONE) // AUTO_INCREMENT 빼서 값 넣어줘야함
     private Long locationId;
 
     /**
@@ -23,10 +23,10 @@ public class Location {
      * fetch = FetchType.LAZY - 지연 로딩 -> 성능 최적화 -> Location 조회해도 Travel은 실제로 사용할 때 까지 로딩 x
      * @JoinColumn(name = "TRAVEL_ID") - 외래키 설정
      */
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TRAVEL_ID")
-    private Travel travel;    // 필드명 travel 으로 쓰려면 위 매핑 해야하고(테이블-엔티티 매칭), 얘는 FK 필드 값을 바로 쓰는게 아니라 부모테이블 Entity 연결용,
-                                // 필드를 쓰려면 엔티티.getTravelId 해서 써야하나..?
+    @JoinColumn(name = "TRAVEL_ID")   // 조인 컬럼에 대해서는 타입이 아니라 엔티티로 받아서 컬럼명 반드시 명시적으로 표시
+    private Travel travel;
 
     @Column(name = "LATITUDE")
     private Double latitude;

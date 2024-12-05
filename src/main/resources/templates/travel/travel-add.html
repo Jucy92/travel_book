@@ -117,11 +117,12 @@
             });
 
             // 여행 ID 입력 필드에서 값을 가져옴
-            const travelId = document.getElementById("travelId").value;
+            //const travelId = document.getElementById("travelId").value;
+            const title = "여행 제목을 입력하세요.";  // 이후에 뭐 더 추가하고 싶으면 travel [] 로 만들어서 .push해서 사용해도 될 듯
 
             // 서버로 전송할 데이터 객체 생성
             const data = {
-                travelId: travelId,           // 여행 ID
+                title: title,           // 여행 ID
                 locations: locations,         // 위치 정보 배열 (이전에 생성된 전역 변수)
                 locationDetails: locationDetails  // 방금 생성한 위치 상세 정보 배열
             };
@@ -133,6 +134,23 @@
 
             // 데이터가 저장되었음을 사용자에게 알림
             alert("Data saved (check console for details)");
+            fetch('/travel/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response=> response.json())
+            .then(data => {
+                console.log('성공:', data);
+                alert('저장 됐습니다.');
+
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('경로 저장 중 오류가 발생했습니다.');
+            });
         }
 
 

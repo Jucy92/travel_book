@@ -26,7 +26,8 @@ public class Travel {
 
     /**
      * OneToMany = 1:N 관계 설정
-     * mappedBy = "travel"->List<Location> (PK-FK) 관계 설정 -  Location 엔티티에서 참조하는 travel 엔티티 설정(필드x 필드는 엔티티 통해서 접근)
+     * mappedBy = "travel"->List<Location> (PK-FK) 관계 설정 - Location 엔티티에서 참조하는 travel 엔티티 설정(필드x 필드는 엔티티 통해서 접근)
+     *   ㄴ> travelId 참조하는 Location 엔티티의 조인 컬럼명이랑 맞춰줘야 찾는다 / 어노테이션 컬럼명은 실제 테이블 컬럼명과 맞춰줘야함
      * cascade = CascadeType.ALL: - 모든 영속성 작업(저장,업데이트,삭제 등)에 대해서 Travel 엔티티에 따라 Location에 영향이 간다
      * orphanRemoval = true - Travel 엔티티에서 Location이 제거되면 Location 엔티티에서도 삭제된다.
      */

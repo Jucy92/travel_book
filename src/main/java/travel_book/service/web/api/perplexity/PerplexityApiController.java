@@ -15,7 +15,7 @@ public class PerplexityApiController {
 
     private final PerplexityApiService perplexityApiService;
 
-    //@Autowired    // 이게 없으면 컨테이너에 등록되어있더라도 주입을 못하겠지..? -> 컨트롤 안에 서비스가 아니고, 컨트롤, 서비스 각각 컴포넌트 스캔 돼서 Autowired가 없어도 되는건가?
+    //@Autowired    // 생성자가 1개 일 때는 생략 가능
     public PerplexityApiController(PerplexityApiService perplexityApiService) {
         this.perplexityApiService = perplexityApiService;
     }
