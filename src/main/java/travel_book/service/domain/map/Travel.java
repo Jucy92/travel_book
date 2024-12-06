@@ -12,6 +12,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name = "TRAVEL")
 public class Travel {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) // PK, DB에서 자동증가 설정 알려주기
     @Setter(AccessLevel.NONE)

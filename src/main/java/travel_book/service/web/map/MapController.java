@@ -192,8 +192,8 @@ public class MapController {
     public ResponseEntity<Travel> copyOfAllItinerary(@PathVariable("travelId") long travelId,
                                                      @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member member) {
         if (member == null) {
-            Member tempMember = memberRepository.findByMember("test9").orElse(null);
-            member.setId(tempMember.getId());
+            Member tempMember = memberRepository.findByMember("juchje1").orElse(null);
+            member = tempMember;
         }
 
         Travel copiedTravel = mapServiceJpa.copyOfAllItinerary(travelId, member.getId());

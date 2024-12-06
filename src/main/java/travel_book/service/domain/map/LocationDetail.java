@@ -7,21 +7,23 @@ import lombok.Setter;
 
 @Data
 @Entity
+@Table(name = "LOCATION_DETAIL")
 public class LocationDetail {
-    @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)   // AUTO_INCREMENT 옵션 뺌
-    //@Setter(AccessLevel.NONE)
-    @Column(name = "LOCATION_SQ")
-    private Long locationSq;
+    @EmbeddedId
+    private LocationDetailId id;
 
-    @Id
+    /*
+    @MapsId("travelId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TRAVEL_ID")
     private Travel travel;
-
-    @Id
+     */
+    //@MapsId("travelId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LOCATION_ID")
+    @JoinColumns({
+            @JoinColumn(name = "TRAVEL_ID", /*referencedColumnName = "TRAVEL_ID",*/ insertable=false, updatable=false),
+            @JoinColumn(name = "LOCATION_ID", /*referencedColumnName = "LOCATION_ID",*/ insertable=false, updatable=false)
+    })
     private Location location;
 
     @Column(name = "CONTENT")
