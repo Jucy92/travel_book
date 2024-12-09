@@ -3,6 +3,7 @@ package travel_book.service.web.map.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import travel_book.service.domain.map.*;
@@ -116,9 +117,10 @@ public class MapServiceJpa {
             log.info("locationId={}", saveLocation.getId());
 
             List<LocationDetail> originalLocationDetails = originalLocation.getLocationDetails();
-            log.info("오리지날 Details={}",originalLocationDetails);
+            log.info("Detail 데이터 유/무={}", originalLocationDetails);
             for (LocationDetail originalLocationDetail : originalLocationDetails) {
                 log.info("Detail 시작");  // -> ★★★ 여긴 들어오지도 않았고, 트랜잭션 끝나면서 커밋되면서 삭제됨 ★★★ 여기부터 다시 분석 포스트맨
+
                 LocationDetail newDetail = new LocationDetail();
                 //newDetail.setTravel(saveTravel);    // saveLocation.getTravelId() 가져가도 상관은 없을거 같은데 메인 테이블 정보를 가져가자
                 newDetail.setLocation(saveLocation);  // save 하기 전 이미 org_location_id 가져오기 때문에 saveLocation이든, org.saveLocation든 상관 없음
@@ -129,6 +131,8 @@ public class MapServiceJpa {
                 log.info("detail={}", saveDetail);
                 log.info("detailId={}", saveDetail.getId());
             }
+
+            log.info("location 저장 완료!!!!!!!!!!!!!");
 
         }
         log.info("saveTravel={}", saveTravel);
