@@ -1,12 +1,15 @@
 package travel_book.service.web.map.service;
 
+import com.querydsl.apt.hibernate.HibernateConfiguration;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import travel_book.service.domain.map.*;
+import travel_book.service.domain.map.Location;
+import travel_book.service.domain.map.LocationDetail;
+import travel_book.service.domain.map.Travel;
 import travel_book.service.web.map.dao.LocationDetailRepository;
 import travel_book.service.web.map.dao.LocationRepository;
 import travel_book.service.web.map.dao.TravelRepository;
@@ -33,7 +36,7 @@ public class MapServiceJpa {
 
         // Travel 신규 데이터 추가
         Travel travel = new Travel();
-
+        
         try {   // @data Setter Access.none 하고 사용하려고 이짓을 하고있네.. 복습 개념으로 해두자 -> travel.setOid 역할 
             Field oid = null;
             oid = travel.getClass().getDeclaredField("oid");
@@ -50,7 +53,7 @@ public class MapServiceJpa {
         travel.setCdt(LocalDateTime.now());
 
         Travel savedTravel = travelRepository.save(travel);     // TRAVEL INSERT - travelId 값 저장 받음
-        log.info("savedTravel={}", savedTravel);
+        log.info("savedTravel={}",savedTravel);
 
         List<Map<String, Object>> locations = (List<Map<String, Object>>) data.get("locations");
         List<Map<String, Object>> locationDetails = (List<Map<String, Object>>) data.get("locationDetails");
@@ -58,12 +61,8 @@ public class MapServiceJpa {
         // Location 신규 데이터 추가
         for (Map<String, Object> location : locations) {
             Location newLocation = new Location();
-            LocationId locationId = new LocationId();
-            locationId.setTravelId(savedTravel.getTravelId());
-            locationId.setLocationId(((Integer) location.get("locationId")).longValue());   // 정수를 Object 타입으로 받으면 Java는 기본적으로 Integer 타입으로 인식하고, Integer 를 Long으로 형변환 하면 캐스트예외발생한다
-
-            newLocation.setId(locationId);          // LocationId 통해서 다중 PK 값 저장
-            //newLocation.setTravel(savedTravel);     // FK라서 저장 했던 건가...? 지금은 복합 PK로 해서 의미없나..? -> 지워도 될 거 같은데 엔티티에서 설정 해주고 여기서 값 넘겨주면 JPA에서 FK 무결성 보장해주는 듯
+            newLocation.setTravel(savedTravel);
+            newLocation.setLocationId(((Integer) location.get("locationId")).longValue());  // 정수를 Object 타입으로 받으면 Java는 기본적으로 Integer 타입으로 인식하고, Integer 를 Long으로 형변환 하면 캐스트예외발생한다
             newLocation.setLatitude((Double) location.get("lat"));
             newLocation.setLongitude((Double) location.get("lng"));
             Location savedLocation = locationRepository.save(newLocation);
@@ -71,16 +70,10 @@ public class MapServiceJpa {
 
             // LocationDetail 신규 데이터 추가
             for (Map<String, Object> locationDetail : locationDetails) {
-                LocationDetail newLocationDetail = new LocationDetail();    // 스프링 빈 등록해서 싱글톤으로 쓰자니 동시에 데이터 접근 시 값 이슈 생길거라 못함
-                LocationDetailId locationDetailId = new LocationDetailId(); // 그치만, 매번 쿼리 던질 때마다 DB에 붙는 것보다 인스턴스 생겼다가 GC 처리되는게 효율적 일듯
-                locationDetailId.setTravelId(savedTravel.getTravelId());
-                locationDetailId.setLocationId(savedLocation.getId().getLocationId());
-                locationDetailId.setLocationSq(Long.valueOf((Integer) locationDetail.get("locationSq")));
-
-                newLocationDetail.setId(locationDetailId);
-                //newLocationDetail.setTravel(savedTravel);
+                LocationDetail newLocationDetail = new LocationDetail();
+                newLocationDetail.setTravel(savedTravel);
                 newLocationDetail.setLocation(savedLocation);
-
+                newLocationDetail.setLocationSq(Long.valueOf((Integer) locationDetail.get("locationSq")));
                 newLocationDetail.setContent((String) locationDetail.get("content"));
                 LocationDetail savedDetail = locationDetailRepository.save(newLocationDetail);
                 log.info("savedDetail={}", savedDetail);
@@ -89,14 +82,17 @@ public class MapServiceJpa {
 
         }
 
+        
+
 
     }
 
     public Travel copyOfAllItinerary(long travelId, long copyUserId) {   // 여행 정보 전체 복사 (파라미터: 여행 번호, 복사하는 사용자 ID)
         Travel originalTravel = travelRepository.findById(travelId).orElseThrow(() -> new EntityNotFoundException("Travel not found")); // 원본 데이터 조회
 
-        Travel newTravel = new Travel();    // 객체 생성 = 새로운 INSERT !!! ORM 장점!!!!!!!!!!  -> 실제 insert는 아래 save 되는 시점
+        Travel newTravel = new Travel();    // 객체 생성 = 새로운 INSERT !!! ORM 장점!!!!!!!!!!
         newTravel.setTitle(originalTravel.getTitle());
+        newTravel.setOid(originalTravel.getOid());  // 엔티티에서 Setter 설정 뻄 -> 나중에 카운팅 하기 위해 / 전체복사는 가져가는데.. 일부 복사는 어쩌지? 누가 원본이지?
         newTravel.setCid(copyUserId);
         newTravel.setCdt(LocalDateTime.now());
 
@@ -107,36 +103,30 @@ public class MapServiceJpa {
         for (Location originalLocation : originalLocations) {
 
             Location newLocation = new Location();
-            newLocation.setTravel(saveTravel);              // 이 값을 안넣어주면 영속성 작업에 이슈가 생김 -> detail에서 값을 못받음
-            newLocation.setId(originalLocation.getId());    // JPA에서 DB-Entity 연결해서 데이터 가져올 때 담아줬곘지..? -> 담아줌 Id 호출 시점에 travel_id로 조회해서 값 2개 담아줌
+            newLocation.setTravel(saveTravel);
+            //newLocation.setLocationId(originalLocation.getLocationId());    // AUTO_INCREMENT 된 컬럼에도 직접 값을 넣을 수 있다 -> 입력된 최대 값에서 증가되기 시작 -> DB 지식
             newLocation.setLatitude(originalLocation.getLatitude());
             newLocation.setLongitude(originalLocation.getLongitude());
 
             Location saveLocation = locationRepository.save(newLocation);
-            log.info("location={}", saveLocation);
-            log.info("locationId={}", saveLocation.getId());
+            log.info("location={}",saveLocation);
+            log.info("locationId={}",saveLocation.getLocationId());
 
             List<LocationDetail> originalLocationDetails = originalLocation.getLocationDetails();
-            log.info("Detail 데이터 유/무={}", originalLocationDetails);
             for (LocationDetail originalLocationDetail : originalLocationDetails) {
-                log.info("Detail 시작");  // -> ★★★ 여긴 들어오지도 않았고, 트랜잭션 끝나면서 커밋되면서 삭제됨 ★★★ 여기부터 다시 분석 포스트맨
 
                 LocationDetail newDetail = new LocationDetail();
-                //newDetail.setTravel(saveTravel);    // saveLocation.getTravelId() 가져가도 상관은 없을거 같은데 메인 테이블 정보를 가져가자
+                newDetail.setTravel(saveTravel);    // saveLocation.getTravelId() 가져가도 상관은 없을거 같은데 메인 테이블 정보를 가져가자
                 newDetail.setLocation(saveLocation);  // save 하기 전 이미 org_location_id 가져오기 때문에 saveLocation이든, org.saveLocation든 상관 없음
-                newDetail.setId(originalLocationDetail.getId());
+                //newDetail.setLocationSq(originalLocationDetail.getLocationSq());
                 newDetail.setContent(originalLocationDetail.getContent());
 
-                LocationDetail saveDetail = locationDetailRepository.save(newDetail);
-                log.info("detail={}", saveDetail);
-                log.info("detailId={}", saveDetail.getId());
+                locationDetailRepository.save(newDetail);
             }
 
-            log.info("location 저장 완료!!!!!!!!!!!!!");
-
         }
-        log.info("saveTravel={}", saveTravel);
-        log.info("saveTravelId={}", saveTravel.getTravelId());
+        log.info("saveTravel={}",saveTravel);
+        log.info("saveTravelId={}",saveTravel.getTravelId());
 
         return saveTravel;
     }

@@ -12,7 +12,6 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "TRAVEL")
 public class Travel {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) // PK, DB에서 자동증가 설정 알려주기
     @Setter(AccessLevel.NONE)
@@ -20,7 +19,7 @@ public class Travel {
     @Column(length = 100)   // varchar(100)
     private String title;
 
-    @Setter(AccessLevel.NONE)
+    //@Setter(AccessLevel.NONE)
     private Long oid;           // long 타입으로 선언 했는데, 이러면 쿼리 나가고 쿼리 값을 엔티티에 넣으려고 할 때 long = null을 넣으려고 하면서 오류 발생 -> long -> Long 래퍼 타입 변경
     private Long cid;
     private LocalDateTime cdt;

@@ -24,9 +24,11 @@ public class QLocationDetail extends EntityPathBase<LocationDetail> {
 
     public final StringPath content = createString("content");
 
-    public final QLocationDetailId id;
-
     public final QLocation location;
+
+    public final NumberPath<Long> locationSq = createNumber("locationSq", Long.class);
+
+    public final QTravel travel;
 
     public QLocationDetail(String variable) {
         this(LocationDetail.class, forVariable(variable), INITS);
@@ -46,8 +48,8 @@ public class QLocationDetail extends EntityPathBase<LocationDetail> {
 
     public QLocationDetail(Class<? extends LocationDetail> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.id = inits.isInitialized("id") ? new QLocationDetailId(forProperty("id")) : null;
         this.location = inits.isInitialized("location") ? new QLocation(forProperty("location"), inits.get("location")) : null;
+        this.travel = inits.isInitialized("travel") ? new QTravel(forProperty("travel")) : null;
     }
 
 }

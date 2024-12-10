@@ -22,11 +22,11 @@ public class QLocation extends EntityPathBase<Location> {
 
     public static final QLocation location = new QLocation("location");
 
-    public final QLocationId id;
-
     public final NumberPath<Double> latitude = createNumber("latitude", Double.class);
 
     public final ListPath<LocationDetail, QLocationDetail> locationDetails = this.<LocationDetail, QLocationDetail>createList("locationDetails", LocationDetail.class, QLocationDetail.class, PathInits.DIRECT2);
+
+    public final NumberPath<Long> locationId = createNumber("locationId", Long.class);
 
     public final NumberPath<Double> longitude = createNumber("longitude", Double.class);
 
@@ -50,7 +50,6 @@ public class QLocation extends EntityPathBase<Location> {
 
     public QLocation(Class<? extends Location> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.id = inits.isInitialized("id") ? new QLocationId(forProperty("id")) : null;
         this.travel = inits.isInitialized("travel") ? new QTravel(forProperty("travel")) : null;
     }
 
