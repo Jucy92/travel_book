@@ -3,27 +3,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="travel_book.service.web.map.dao.MapMapper">
 
-    <insert id="saveLocation" useGeneratedKeys="true" keyProperty="travelId">
-        INSERT INTO LOCATION_STORAGE (USER_ID, LATITUDE, LONGITUDE, ADDRESS_NAME, SQ, CDT)
-            VALUES (#{userId}, #{lat}, #{lng}, #{addressName}, #{sq}, now())
+    <insert id="saveTravel" useGeneratedKeys="true" keyProperty="travelId">
+        INSERT INTO TRAVEL (TITLE, OID, CID, CDT)
+            VALUES (#{title}, #{oid}, #{cid}, now())
     </insert>
-    <insert id="saveStorageM" useGeneratedKeys="true" keyProperty="travelId">
-        INSERT INTO LOCATION_STORAGE_M (USER_ID, TITLE, TRIP_START, TRIP_END, RMKS, CDT, CID)
-            VALUES (#{userId}, #{title}, #{tripStart}, #{tripEnd}, #{rmksM}, now(), 1)
+    <insert id="saveLocation" keyProperty="locationId">
+        INSERT INTO LOCATION (TRAVEL_ID, LOCATION_ID, LATITUDE, LONGITUDE)
+            VALUES (#{travelId}, #{locationId}, #{latitude}, #{longitude})
     </insert>
-    <insert id="saveStorageD">
-        INSERT INTO LOCATION_STORAGE_D (TRAVEL_ID, TRAVEL_SQ, LATITUDE, LONGITUDE,
-                    HOUR00, HOUR01, HOUR02, HOUR03, HOUR04, HOUR05, HOUR06, HOUR07,
-                    HOUR08, HOUR09, HOUR10, HOUR11, HOUR12, HOUR13, HOUR14, HOUR15,
-                    HOUR16, HOUR17, HOUR18, HOUR19, HOUR20, HOUR21, HOUR22, HOUR23,
-                    DAY_TRIP, RMKS, CDT)
-            VALUES (#{travelId}, #{travelSq}, #{lat}, #{lng},
-                    #{hour00}, #{hour01}, #{hour02}, #{hour03}, #{hour04}, #{hour05}, #{hour06}, #{hour07},
-                    #{hour08}, #{hour09}, #{hour10}, #{hour11}, #{hour12}, #{hour13}, #{hour14}, #{hour15},
-                    #{hour16}, #{hour17}, #{hour18}, #{hour19}, #{hour20}, #{hour21}, #{hour22}, #{hour23},
-                    #{dayTrip}, #{rmksD}, now())
+    <insert id="saveLocationDetail" keyProperty="locationSq">
+        INSERT INTO LOCATION_DETAIL (TRAVEL_ID, LOCATION_ID, LOCATION_SQ, CONTENT)
+            VALUES (#{travelId}, #{locationId}, #{locationSq}, #{content})
     </insert>
-
 
     <select id="LocationFindById" resultType="travel_book.service.web.map.dto.LocationModel">
         SELECT MEMBER_ID, LATITUDE AS lat, LONGITUDE AS lng, SQ
@@ -52,8 +43,34 @@
                 FROM LOCATION_OLD
              WHERE TRAVEL_ID = #{travelId}
     </select>
-    <select id="copyOfAllItinerary" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+    <select id="copyOfAllItinerary" resultType="travel_book.service.web.map.dto.TravelData"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
 
+    </select>
+    <insert id="copyOfTravel" keyProperty="travel_book.service.web.map.dto.TravelData"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+
+    </insert>
+
+    <select id="findById" resultType="TravelModel">
+        SELECT TRAVEL_ID, TITLE, OID, CID, CDT
+            FROM TRAVEL
+         WHERE TRAVEL_ID = #{travelId}
+    </select>
+    <select id="findByLocation" resultType="LocationModel">
+        SELECT TRAVEL_ID, LOCATION_ID, LATITUDE, LONGITUDE
+            FROM LOCATION
+         WHERE TRAVEL_ID = #{travelId}
+    </select>
+    <select id="findByLocationDetail" resultType="LocationDetailModel">
+        SELECT TRAVEL_ID, LOCATION_ID, LOCATION_SQ, CONTENT
+            FROM LOCATION_DETAIL
+        <where>
+            <if test="travelId != null">
+                AND TRAVEL_ID = #{travelId}
+            </if>
+            <if test="locationId != null">
+                And LOCATION_ID = #{locationId}
+            </if>
+        </where>
     </select>
 
 

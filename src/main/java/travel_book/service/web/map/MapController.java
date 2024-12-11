@@ -14,13 +14,12 @@ import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.web.map.dto.LocationModel;
 import travel_book.service.web.map.dto.TravelData;
+import travel_book.service.web.map.dto.TravelModel;
 import travel_book.service.web.map.service.MapServiceJpa;
 import travel_book.service.web.map.service.MapServiceMybatis;
 import travel_book.service.web.session.SessionConst;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Slf4j
@@ -37,26 +36,6 @@ public class MapController {
 //        return "/map/gptMap";
 //        return "/map/kakaoMap";
         return "/map/googleMap";
-    }
-
-    @PostMapping("/map")
-    public ResponseEntity<String> saveLocations(@RequestBody List<LocationModel> locations
-            , @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member member) {
-
-        //HttpSession session = request.getSession();       // @SessionAttribute으로 바로 Member에서 가져오기
-        //session.getAttribute(SessionConst.SESSION_NAME);
-
-        // 메인 테이블(LOCATION_STORAGE_M) 데이터 추가 / + 지금은 postman해서 userId 넘겨줬지만, 화면에서 등록하려면 세션 member id 값 가져오거나, 화면단에서 구해서 locations에 담아서 보내줘야함
-        mapServiceMybatis.saveStorageM(locations.stream().findFirst().orElse(null));       // saveStorageM을 리턴 받으면 쿼리 결과 값인 1(insert 1건 성공)을 리턴 받는다. => 하면서 자동으로 keyProperty 설정된 값에 생성된 값을 매핑해서 객체를 반환해 준다.
-        Long travelId = locations.stream().findFirst().orElse(null).getTravelId();  // 첫번째 리스트 객체로 insert 되었기 때문에 거기에만 travelId 값이 들어가있다
-
-        locations.forEach(location -> {
-            //location.setUserId(member.getUserId());   // 화면단에서 userId 미리 넣어주는거 아니면 여기도 넣어줘야함
-            location.setTravelId(travelId);             // 마스터 테이블에 저장한 여행번호 가져와서 넣어주기
-            mapServiceMybatis.saveStorageD(location);          // 반복 돌면서 데이터 저장
-        });
-        return new ResponseEntity<>("데이터가 정상적으로 저장되었습니다!", HttpStatus.CREATED);
-        //return ResponseEntity.ok("경로가 저장되었습니다");
     }
 
     @GetMapping("/map/retrieve/{userId}")
@@ -108,33 +87,19 @@ public class MapController {
 
     @PostMapping("/travel/add")
     @ResponseBody
-    public ResponseEntity<String> addItinerary(@RequestBody Map<String, Object> data, @SessionAttribute(value = SessionConst.SESSION_NAME, required = false) Member member) {
+    public ResponseEntity<Map<String,String>> addItinerary(@RequestBody Map<String, Object> data, @SessionAttribute(value = SessionConst.SESSION_NAME, required = false) Member member) {
         // 데이터를 각 테이블로 쪼개서 받냐, 아니면 TravelData에 한번에 담아서 여러번 받냐......... 화면 만들 때 다시 고민
         if (member == null) {
             Member tempMember = memberRepository.findByMember("test9").orElse(null);
             member = tempMember;
         }
 
-/*+
-//        String travelId = (String) data.get("travelId");
+        mapServiceMybatis.addItinerary(data, member.getId());
+        //mapServiceJpa.addItinerary(data, member.getId());
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "데이터가 정상적으로 저장되었습니다!");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
 
-        List<Map<String, Object>> locations = (List<Map<String, Object>>) data.get("locations");
-        List<Map<String, Object>> locationDetails = (List<Map<String, Object>>) data.get("locationDetails");
-        log.info("RequestBody={}", data);
-        Object title = data.get("title");
-        log.info("title", title);
-        //log.info("locations", locations);
-        //log.info("locationDetails", locationDetails);
-        for (Map<String, Object> location : locations) {
-            log.info("locationId={}, lat={}, lng={}", location.get("locationId"), location.get("lat"), location.get("lng"));
-        }
-        for (Map<String, Object> locationDetail : locationDetails) {
-            log.info("locationId={}, locationSq={}, content={}", locationDetail.get("locationId"), locationDetail.get("locationSq"), locationDetail.get("content"));
-        }
-        */
-
-        mapServiceJpa.addItinerary(data, member.getId());
-        return new ResponseEntity<>("데이터가 정상적으로 저장되었습니다!", HttpStatus.CREATED);
     }
 
     /**
@@ -189,15 +154,19 @@ public class MapController {
 
     @PostMapping("/travel/copy/{travelId}")
     @ResponseBody
-    public ResponseEntity<Travel> copyOfAllItinerary(@PathVariable("travelId") long travelId,
-                                                     @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member member) {
+    //public ResponseEntity<Travel> copyOfAllItinerary(@PathVariable("travelId") long travelId,
+    public ResponseEntity<Map<String,String>> copyOfAllItinerary(@PathVariable("travelId") long travelId,
+                                                          @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member member) {
         if (member == null) {
             Member tempMember = memberRepository.findByMember("juchje1").orElse(null);
             member = tempMember;
         }
 
-        Travel copiedTravel = mapServiceJpa.copyOfAllItinerary(travelId, member.getId());
-        return ResponseEntity.ok(copiedTravel);
+        mapServiceMybatis.copyOfAllItinerary(travelId, member.getId());     // 저장된 결과 값 받고 싶으면 서비스 로직에서 TravelData에 저장된 리턴 값 set으로 담던가~
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "정상적으로 복사 했습니다.");
+        //Travel copiedTravel = mapServiceJpa.copyOfAllItinerary(travelId, member.getId());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
