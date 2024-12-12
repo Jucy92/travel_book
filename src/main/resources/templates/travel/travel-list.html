@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>여행 계획 불러오기</title>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA53tcYEG1Lr9raR98hxk-8BEBecqPYJbE"></script> <!-- 구글맵 스크립트 -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA53tcYEG1Lr9raR98hxk-8BEBecqPYJbE"></script>
     <style>
         #travelTable {
             width: 100%;
@@ -26,11 +26,51 @@
             background-color: #e6e6e6;
             cursor: pointer;
         }
-        #map {
+        #location {
             width: 100%;
             height: 400px;
             margin-top: 20px;
             display: none; /* 초기에는 숨김 처리 */
+        }
+        #location-detail {
+            margin-bottom: 10px;
+        }
+        .location-group {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .location-group h4 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .marker-label {
+            background-color: #4285F4;
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .location-item {
+            margin-left: 34px;
+            margin-bottom: 5px;
+        }
+
+        .location-sq {
+            font-weight: bold;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -58,43 +98,149 @@
             </div>
         </div>
     </div>
-    !-- 구글 맵을 표시할 영역 -->
-    <div id="map"></div>
 
-    <script th:inline="javascript">
-        let map; // 구글 맵 객체
+    <div id="location"></div>
+    <div id="location-detail" style="display: none;">
+        <h3>여행 상세 정보</h3>
+            <ul id="location-list">
+                <li th:each="location : ${locations}" th:id="'location-' + ${location.locationId}">
+                    <span th:text="${location.locationSq} + '. ' + ${location.content}"></span>
+                </li>
+            </ul>
+    </div>
+
+        <script th:inline="javascript">
+        let map;
+        let travelData = [];
+
+        function initMap() {
+            // IP 기반 위치 정보 가져오기
+            fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+            console.log('주소 데이터 ', data);
+            const userLocation = {
+                lat: parseFloat(data.latitude),
+                lng: parseFloat(data.longitude)
+            };
+
+            map = new google.maps.Map(document.getElementById('location'), {
+                center: userLocation,
+                zoom: 10
+            });
+
+            //document.getElementById('location').style.display = 'none';    // 비동기 처리라도 아래서 지웠는데 여기서 갑자기 보일 수가 있나?
+        })
+        .catch(error => {
+            console.error('위치 정보를 가져오는 데 실패했습니다:', error);
+            // 오류 발생 시 기본 위치 사용
+            map = new google.maps.Map(document.getElementById('location'), {
+                center: {lat: 25.0330, lng: 121.5654}, // 타이페이 중심 좌표
+                zoom: 10
+            });
+            document.getElementById('location').style.display = 'none';
+        });
+            // 초기에 지도 숨기기 -> 스타일에서 적용해놨는데, 나중에 스타일 지우면 여기서 적용
+            document.getElementById('location').style.display = 'none';
+            document.getElementById('location-Detail').style.display = 'none';
+        }
 
         function selectTravel(row) {
-            var travelId = row.getAttribute('data-travel-id');
+            let travelId = row.getAttribute('data-travel-id');
             console.log("선택된 여행 ID: " + travelId);
-            const url =
-            fetch(
+            const url = '/travel/' + travelId;
+            console.log(url);
 
-            // 지도 표시
-            showMap();
-        }
-
-        function showMap() {
-            // 지도 영역을 표시
-            const mapElement = document.getElementById('map');
-            mapElement.style.display = 'block';
-
-            // 지도 초기화 (서울 좌표로 설정)
-            const seoul = { lat: 37.5665, lng: 126.9780 }; // 서울의 위도와 경도
-            map = new google.maps.Map(mapElement, {
-                center: seoul,
-                zoom: 12
-            });
-
-            // 마커 추가
-            new google.maps.Marker({
-                position: seoul,
-                map,
-                title: "서울"
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('성공', data);
+                alert('데이터를 정상적으로 호출했습니다.');
+                travelData = data;
+                showLocation();
+                showLocationDetails();
+            })
+            .catch(error => {
+                console.log('오류:', error);
+                alert('불러오기 중 오류가 발생했습니다.');
             });
         }
-    </script>
 
-    </script>
+        function showLocation() {
+            if (!travelData || travelData.length === 0) {
+                console.log('여행 데이터가 없습니다.');
+                return;
+            }
 
+            const locationElement = document.getElementById('location');
+            locationElement.style.display = 'block';
+
+            const bounds = new google.maps.LatLngBounds();
+
+            travelData.forEach((location) => {
+                const latLng = new google.maps.LatLng(parseFloat(location.latitude), parseFloat(location.longitude));
+                const marker = new google.maps.Marker({
+                    position: latLng,
+                    map: map,
+                    title: location.content,
+                    label: {
+                        text: String(location.locationId),
+                        color: 'white',
+                        fontSize: '14px'
+                    }
+                });
+                bounds.extend(latLng);
+            });
+
+            map.fitBounds(bounds);
+        }
+
+        function showLocationDetails() {
+            const locationList = document.getElementById('location-list');
+            locationList.innerHTML = ''; // 기존 내용 초기화
+
+            travelData.sort((a, b) => {         // locationId로 먼저 정렬 후 같다면 locationSq로 정렬
+                if (a.locationId !== b.locationId) {
+                    return a.locationId - b.locationId;
+                }
+                return a.locationSq - b.locationSq;
+            });
+
+            let currentLocationId = null;
+            let locationGroup = null;
+
+            travelData.forEach(location => {
+                if (location.locationId !== currentLocationId) {
+                    currentLocationId = location.locationId;
+                    locationGroup = document.createElement('div');
+                    locationGroup.className = 'location-group';
+
+                    const locationHeader = document.createElement('h4');
+                    locationHeader.innerHTML = `
+                        <span class="marker-label">${location.locationId}</span>
+                        위치 ${location.locationId}
+                    `;
+                    locationGroup.appendChild(locationHeader);
+
+                    locationList.appendChild(locationGroup);
+                }
+
+                const locationItem = document.createElement('div');
+                locationItem.className = 'location-item';
+                locationItem.innerHTML = `<span class="location-sq">${location.locationSq}.</span> ${location.content}`;
+                locationGroup.appendChild(locationItem);
+            });
+
+            document.getElementById('location-detail').style.display = 'block';
+        }
+
+        // 페이지 로드 시 지도 초기화
+        window.onload = initMap;
+    </script>
 </body>
+</html>

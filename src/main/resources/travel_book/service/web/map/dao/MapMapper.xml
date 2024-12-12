@@ -57,11 +57,10 @@
         SELECT A.TRAVEL_ID, A.TITLE, A.OID, A.CID, A.CDT,
                B.TRAVEL_ID, B.LOCATION_ID, B.LATITUDE, B.LONGITUDE,
                C.LOCATION_SQ, C.CONTENT
-            FROM TRAVEL          A
+            FROM TRAVEL               A
             LEFT JOIN LOCATION        B ON A.TRAVEL_ID = B.TRAVEL_ID
             LEFT JOIN LOCATION_DETAIL C ON B.TRAVEL_ID = C.TRAVEL_ID AND B.LOCATION_ID = C.LOCATION_ID
-         WHERE A.CID = #{id}
-           AND A.TRAVEL_ID = #{travelId}
+         WHERE A.TRAVEL_ID = #{travelId}
     </select>
 
 </mapper>

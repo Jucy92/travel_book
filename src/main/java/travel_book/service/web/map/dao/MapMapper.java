@@ -18,6 +18,6 @@ public interface MapMapper {
     List<LocationModel> findByLocation(Long travelId);
     List<LocationDetailModel> findByLocationDetail(@Param("travelId") Long travelId, @Param("locationId") Long locationId);
     List<TravelData> findByTravel(long id);
-    List<TravelData> findByTravelId(@Param("id")long id, @Param("travelId")long travelId);     // 파라미터가 2개면 명시해줘야 한다. 아니면 id 못찾는다고 에러
+    List<TravelData> findByTravelId(@Param("travelId")long travelId);     // 파라미터가 2개 이상이면 @Param 명시해야 한다. 1개면 생략 가능
 
 }

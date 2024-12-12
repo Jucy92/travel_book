@@ -68,29 +68,30 @@ public class MapController {
 
 
     @GetMapping("/travel/{userId}")
-    public String travelList(@PathVariable(value = "userId") String userId, Model model, ModelAndView mv) {
+    public String travelList(@PathVariable(value = "userId") String userId, Model model/*, ModelAndView mv*/) {
         List<TravelData> travelList = mapServiceMybatis.findByTravel(memberRepository.findById(userId));
         model.addAttribute("travelList", travelList);  // 이렇게 한다고 데이터를 가지고 list 화면으로 넘어가나?
-        //mv.getModel().put("travelList", travelList);
+        //mv.getModel().put("travelList", travelList);  // -> 필요 없음 model + return String 으로 전달됨
         //mv.setViewName("/travel/travel-list");
         return "/travel/travel-list";
     }
 
-    /*
-    //타임리프나, jsp 로 처리하는 방법
-    @PostMapping("/travel/{userId}")
-    public String travelList(@RequestParam(value = "userId") String userId, Model model) {   // 화면이 있다면, 화면에 입력 받은 영역 이름을 userId로 사용해야함
 
-        List<TravelData> travels = mapService.findByTravel(memberRepository.findById(userId));  // 사용자 아이디에 등록되어 있는 여행 정보 전부 출력
+    @PostMapping("/travel/{travelId}")  // travel/파라미터 하나 날아오는걸로 userId인지 travelId인지 구별 못함, 순서 바꿔도 안돼서 아래 주석 sonsumers = JSON이라 우선으로 잡혔나..?
+    @ResponseBody
+    public List<TravelData> travelList(@PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
+        //                              ㄴ> 검색 조건이 더 많아지면 번호가 아니라 DTO로 하는게 낫지않나..?
+        List<TravelData> travelList = mapServiceMybatis.findByTravelId(travelId);
+        log.info("travelId={}", travelList);
 
-        model.addAttribute("travel_list", travels);   // 화면에서 값 받아서 쓰려면 타임리프 th:object 기능 써야함,
-        // 그냥 jsp 하려면 따로 담아야하나 싶지만, jsp도 리스트 넘겨받아서 처리하는 방법이 있겠지~
-
-        return "화면명";
+        // model.attribute("화면명", travels);   // 근데 화면에서 값 받아서 쓰려면 타임리프 th:object 기능 쓰거나, -> 이렇게 하려면 @ResponseBody 제거
+        // 아래 방식으로 보내면 화면에서 받아서 자바스크립트로 처리
+        return travelList; // @ResponseBody 추가하고 이렇게 보내면 자동으로 JSON 타입으로 전달 -> 자바스크립트에서 받아서 보여주고 선택해서 여행번호까지 보내주면 그 건에 대해서 처리
     }
-    */
-    // Json 방식으로 데이터 받고 보내서 처리
-    @PostMapping(value = "/travel/{userId}"/*, consumes = MediaType.APPLICATION_JSON_VALUE*/)   // 화면 만들기 위해 JSON 타입 해지
+
+    /*  
+    // Json 방식으로 데이터 받고 보내는 테스트 용도 / 실제 동작은 위 화면에서 진행
+    @PostMapping(value = "/travel/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)   // 화면 만들기 위해 JSON 타입 해지
     @ResponseBody
     public List<TravelData> travelInfo(@PathVariable(value = "userId") String userId) {   // 사용자 아이디에 등록되어 있는 여행 정보 전부 출력
 
@@ -100,20 +101,7 @@ public class MapController {
         // 아래 방식으로 보내면 화면에서 받아서 자바스크립트로 처리
         return travelsList; // @ResponseBody 추가하고 이렇게 보내면 자동으로 JSON 타입으로 전달 -> 자바스크립트에서 받아서 보여주고 선택해서 여행번호까지 보내주면 그 건에 대해서 처리
     }
-
-    @PostMapping("/travel/{userId}/{travelId}")
-    @ResponseBody
-    public List<TravelData> travelList(@PathVariable(value = "userId") String userId,       // (사용자 아이디,) 여행 번호 넘겨 받아 해당 여행 정보 출력 -> 여행 번호가 중복이 안되니 삭제해도 무방할듯..?
-                                       @PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
-
-        long id = memberRepository.findById(userId);        // 사용자 ID 가져오기
-        List<TravelData> travelList = mapServiceMybatis.findByTravelId(id, travelId);
-        log.info("travelId={}", travelList);
-
-        // model.attribute("화면명", travels);   // 근데 화면에서 값 받아서 쓰려면 타임리프 th:object 기능 쓰거나, -> 이렇게 하려면 @ResponseBody 제거
-        // 아래 방식으로 보내면 화면에서 받아서 자바스크립트로 처리
-        return travelList; // @ResponseBody 추가하고 이렇게 보내면 자동으로 JSON 타입으로 전달 -> 자바스크립트에서 받아서 보여주고 선택해서 여행번호까지 보내주면 그 건에 대해서 처리
-    }
+     */
 
     @PostMapping("/travel/copy/{travelId}")
     @ResponseBody

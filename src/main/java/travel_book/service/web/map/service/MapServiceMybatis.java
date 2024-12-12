@@ -60,8 +60,8 @@ public class MapServiceMybatis implements MapService {
         return mapMapper.findByTravel(id);
     }
 
-    public List<TravelData> findByTravelId(long id, long travelId) {    // 사용자 ID, travelId로 여행 한 건에 대한 모든 정보 가져오기 -> 사용자 ID는 제거해도 될거 같음 
-        return mapMapper.findByTravelId(id, travelId);
+    public List<TravelData> findByTravelId(long travelId) {    // travelId로 여행 한 건에 대한 모든 정보 가져오기
+        return mapMapper.findByTravelId(travelId);
     }
 
     public void addItinerary(Map<String, Object> data, long id) {
