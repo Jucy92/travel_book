@@ -13,7 +13,7 @@
     <div id="map"></div>
     <div id="locationContainer">
     </div>
-    <button onclick="saveData()">저장</button>
+    <button id="saveButton" onclick="saveData()" disabled>저장</button>
 
     <script th:inline="javascript">
         let map;
@@ -50,8 +50,17 @@
             const marker = new google.maps.Marker({
                 position: latLng,
                 map: map,
-                title: `Location ${currentLocationId}`  //' 아니고 ` <- 숫자1옆에
+                title: `Location ${currentLocationId}`,  //' 아니고 ` <- 숫자1옆에
+                label: {
+                        text: String(currentLocationId),
+                        color: 'white',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                }
             });
+
+            document.getElementById("saveButton").disabled = false; // 마커 찍힐 때 저장 버튼 활성화
+
             markers.push(marker);
 
             updateLocationList();
@@ -119,7 +128,12 @@
 
             // 여행 ID 입력 필드에서 값을 가져옴
             //const travelId = document.getElementById("travelId").value;
-            const title = "여행 제목을 입력하세요.";  // 이후에 뭐 더 추가하고 싶으면 travel [] 로 만들어서 .push해서 사용해도 될 듯
+            const title = prompt("여행 주제를 입력해주세요.");
+            if (!title) {
+                alert("여행 주제를 입력해야 합니다.");
+                return;
+            }
+
             //travel.push({title});
 
             // 서버로 전송할 데이터 객체 생성
