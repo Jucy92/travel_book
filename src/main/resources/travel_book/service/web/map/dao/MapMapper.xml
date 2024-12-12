@@ -16,39 +16,11 @@
             VALUES (#{travelId}, #{locationId}, #{locationSq}, #{content})
     </insert>
 
-    <select id="LocationFindById" resultType="travel_book.service.web.map.dto.LocationModel">
-        SELECT MEMBER_ID, LATITUDE AS lat, LONGITUDE AS lng, SQ
-            FROM LOCATION_STORAGE
-         WHERE MEMBER_ID = #{memberId}
-    </select>
-    <select id="storageMFindByUserId" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
-        SELECT TRAVEL_ID, USER_ID, TITLE, TRIP_START, TRIP_END
-            FROM LOCATION_STORAGE_M
-         WHERE USER_ID = #{userId}
-    </select>
-    <select id="storageDFindByTravelId" resultType="travel_book.service.web.map.dto.LocationModel"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
-        	SELECT TRAVEL_ID, NULL AS TRAVEL_SQ, NULL AS LATITUDE, NULL AS LONGITUDE, NULL AS ADDRESS_NAME, NULL AS LOCATION_NAME,
-                   HOUR00, HOUR01, HOUR02, HOUR03, HOUR04, HOUR05, HOUR06, HOUR07,
-                   HOUR08, HOUR09, HOUR10, HOUR11, HOUR12, HOUR13, HOUR14, HOUR15,
-                   HOUR16, HOUR17, HOUR18, HOUR19, HOUR20, HOUR21, HOUR22, HOUR23,
-                   DAY_TRIP
-                FROM LOCATION_STORAGE_D
-             WHERE TRAVEL_ID = #{travelId}
-        UNION ALL
-            SELECT TRAVEL_ID, TRAVEL_SQ, LATITUDE, LONGITUDE, ADDRESS_NAME, LOCATION_NAME,
-                   NULL AS HOUR00, NULL AS HOUR01, NULL AS HOUR02, NULL AS HOUR03, NULL AS HOUR04, NULL AS HOUR05, NULL AS HOUR06, NULL AS HOUR07,
-                   NULL AS HOUR08, NULL AS HOUR09, NULL AS HOUR10, NULL AS HOUR11, NULL AS HOUR12, NULL AS HOUR13, NULL AS HOUR14, NULL AS HOUR15,
-                   NULL AS HOUR16, NULL AS HOUR17, NULL AS HOUR18, NULL AS HOUR19, NULL AS HOUR20, NULL AS HOUR21, NULL AS HOUR22, NULL AS HOUR23,
-                   NULL AS DAY_TRIP
-                FROM LOCATION_OLD
-             WHERE TRAVEL_ID = #{travelId}
-    </select>
-    <select id="copyOfAllItinerary" resultType="travel_book.service.web.map.dto.TravelData"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
-
-    </select>
     <insert id="copyOfTravel" keyProperty="travel_book.service.web.map.dto.TravelData"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
-
     </insert>
+
+    <select id="copyOfAllItinerary" resultType="travel_book.service.web.map.dto.TravelData"> <!-- 원래대로라면 패키지 풀 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+    </select>
 
     <select id="findById" resultType="TravelModel">
         SELECT TRAVEL_ID, TITLE, OID, CID, CDT
@@ -75,9 +47,10 @@
 
 
     <select id="findByTravel" resultType="TravelData"> <!-- 사용자 id 값으로 여행 정보 다 가져오기 / TravelData 타입으로 리턴해주면, MapMapper에서 List로 받음-->
-        SELECT TRAVEL_ID, TITLE, OID, CID, CDT
-            FROM TRAVEL
-         WHERE CID = #{id}
+        SELECT TRAVEL_ID, TITLE, OID, CID, A.CDT, B.USER_ID
+            FROM TRAVEL A
+            JOIN MEMBER B ON A.CID = B.ID
+         WHERE A.CID = #{id}
         ORDER BY CDT DESC
     </select>
     <select id="findByTravelId" resultType="TravelData">  <!-- id, travelId 넘겨 받아서 단건 조회 -->

@@ -9,12 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import travel_book.service.domain.map.Travel;
+import org.springframework.web.servlet.ModelAndView;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
-import travel_book.service.web.map.dto.LocationModel;
 import travel_book.service.web.map.dto.TravelData;
-import travel_book.service.web.map.dto.TravelModel;
 import travel_book.service.web.map.service.MapServiceJpa;
 import travel_book.service.web.map.service.MapServiceMybatis;
 import travel_book.service.web.session.SessionConst;
@@ -36,45 +34,6 @@ public class MapController {
 //        return "/map/gptMap";
 //        return "/map/kakaoMap";
         return "/map/googleMap";
-    }
-
-    @GetMapping("/map/retrieve/{userId}")
-    @ResponseBody   // http 강의 다시 들어야 할듯..  + GetMapping return 타입 페이지 아니고 값 넘기려면 무조건 @ResponseBody 가 있었어야 했나..?
-    public List<LocationModel> retrieveLocation(@PathVariable(value = "userId") String userId,
-                                                @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member loginMember) {
-
-        if (userId.isEmpty()) {        // 아이디 입력안하고 바로 가져오기 했을 때 세션에서 로그인 정보자 데이터 가져오기
-//            Optional<Member> member = memberRepository.memberInfoFindByUser(loginMember.getUserId()); // 아래처럼 orElseThrow 처리하면 됨
-            Member member = memberRepository.memberInfoFindByUser(loginMember.getUserId()).orElseThrow(); // orElseThrow 있으면 벨류값(객체) 없으면 노서치인셉션
-            log.info("저장소(사용자명x) -> Con -> memberInfoFindByUser -> Member ={}", member);
-            return mapServiceMybatis.LocationFindById(member.getId());
-
-        } else {
-            Member member = memberRepository.memberInfoFindByUser(userId).orElseThrow();    // orElseThrow 있으면 벨류값(객체) 없으면 노서치인셉션
-            log.info("저장소(사용자명o) -> Con -> memberInfoFindByUser -> Member ={}", member);
-            return mapServiceMybatis.LocationFindById(member.getId());
-        }
-    }
-
-    @GetMapping("/storage/{userId}")
-    public String StorageUser(@PathVariable(value = "userId") String userId, Model model) {     // 모델에 담아서 보내기 model -> responseBody??
-        //log.info("userId={}",userId);     웹에서 인코딩 하는 문제로 storageMFindByUserId 들어갈 때 꺠져서 들어가네... -> 타임리프 문제로 ${userId} 에서 + userId로 변경함
-        //log.info("List={}",mapService.storageMFindByUserId(userId));
-        model.addAttribute("list", mapServiceMybatis.storageMFindByUserId(userId));
-        return "/map/locationStorage";
-
-    }
-
-    @PostMapping("/storage/{travelId}")
-    @ResponseBody
-    public List<LocationModel> locationStorage(@PathVariable(value = "travelId") String travelId) {
-
-        log.info("travelId={}", travelId);
-
-
-        return mapServiceMybatis.storageDFindByTravelId(Long.parseLong(travelId));  // 리턴 타입이 List<LocationModel>
-        // 리스트로 해서 다 가져옴 => postHandle에서 안찍히는 이유는 리스폰스쪽에 모델에 안담겼고, 다른 화면(뷰)도 호출 안하기 떄문
-        //    ㄴ> 내용은 웹브라우저 개발자도구에서 확인 가능
     }
 
     /**
@@ -107,10 +66,14 @@ public class MapController {
      * 기능 = ㄴ>검색   ㄴ>저장된 리스트 조회                       ㄴ> 복사            ㄴ> 사용자가 허락/요청/거절 권한 넣어서 허락이면 불펌 가능, 요청은 승인 있어야 가능
      */
 
-    @GetMapping("/travel")
-    public String travelWithUser() {    // @ModelAttribute("loginModel")LoginModel loginModel   -> 타임리프 object 기능 사용하려면 쓰면 됨
-        // 단순 아이디 입력하는 화면 뿌려주는 용도
-        return "home";
+
+    @GetMapping("/travel/{userId}")
+    public String travelList(@PathVariable(value = "userId") String userId, Model model, ModelAndView mv) {
+        List<TravelData> travelList = mapServiceMybatis.findByTravel(memberRepository.findById(userId));
+        model.addAttribute("travelList", travelList);  // 이렇게 한다고 데이터를 가지고 list 화면으로 넘어가나?
+        //mv.getModel().put("travelList", travelList);
+        //mv.setViewName("/travel/travel-list");
+        return "/travel/travel-list";
     }
 
     /*
@@ -127,7 +90,7 @@ public class MapController {
     }
     */
     // Json 방식으로 데이터 받고 보내서 처리
-    @PostMapping(value = "/travel/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/travel/{userId}"/*, consumes = MediaType.APPLICATION_JSON_VALUE*/)   // 화면 만들기 위해 JSON 타입 해지
     @ResponseBody
     public List<TravelData> travelInfo(@PathVariable(value = "userId") String userId) {   // 사용자 아이디에 등록되어 있는 여행 정보 전부 출력
 

@@ -153,37 +153,5 @@ public class MapServiceMybatis implements MapService {
                 log.info("savedLocationDetail={}",savedLocationDetail);
             }
         }
-
-
-        //mapMapper.copyOfAllItinerary(travelId, userId);
-        // 퍼갈 때 필요한 정보들 DTO로 따로 뺴서 만들어야 할듯 - 여행제목,
-    }
-    public List<LocationModel> LocationFindById(Long memberId) {         // 저장된 좌표 불러오기
-        return mapMapper.LocationFindById(memberId);
-    }
-
-    public List<LocationModel> storageMFindByUserId(String userId) {         // 저장된 좌표 불러오기
-        return mapMapper.storageMFindByUserId(userId);
-    }
-
-    public List<LocationModel> storageDFindByTravelId(Long userId) {         // 저장된 좌표 불러오기
-        /*
-        // 단일 스레드인지 확인하려고 했는데 Thread:http-nio-8080-exec-1,3 등 요청에 따라 나눠져서 들어옴 
-        // 스프링 프레임워크에서 멀티 스레드 지원해주는 듯
-        try {
-            
-              for (int i = 0; i < 10; i++) {
-                Thread.currentThread().getState();
-                System.out.println("Thread:" + Thread.currentThread().getName() + " 대기시간 :" + i + "초" + " 상태:" + Thread.currentThread().getState());
-                Thread.sleep(1000);
-            }
-        } catch (InterruptedException e) {
-            log.info("storageDFindByTravelId 화면에서 오류 ={}", e);
-        } finally {
-            return mapMapper.storageDFindByTravelId(userId);
-
-        }
-        */
-        return mapMapper.storageDFindByTravelId(userId);
     }
 }

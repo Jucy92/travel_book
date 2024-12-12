@@ -1,6 +1,6 @@
 package travel_book.service.web.map.service;
 
-import com.querydsl.apt.hibernate.HibernateConfiguration;
+
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
