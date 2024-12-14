@@ -35,6 +35,10 @@
                 // 좌표에 대한 건 아래서 처리
                 addLocation(event.latLng);
             });
+
+            map.addListener('rightclick', function (event) {
+                removeLastLocation();
+            });
         }
 
         function addLocation(latLng){
@@ -65,6 +69,36 @@
 
             updateLocationList();
         }
+
+        function removeLastLocation() {
+            if (locations.length > 0) {
+                // 배열에서 마지막 위치 제거
+                locations.pop();
+
+                // 마지막 마커 제거
+                const lastMarker = markers.pop();
+                lastMarker.setMap(null);
+
+                // 마지막 위치 상세 정보 제거
+                const container = document.getElementById("locationContainer");
+                if (container.lastChild) {
+                    container.removeChild(container.lastChild);
+                }
+
+                // currentLocationId 감소
+                currentLocationId--;
+
+                // 모든 위치가 제거되면 저장 버튼 비활성화
+                if (locations.length === 0) {
+                    document.getElementById("saveButton").disabled = true;
+                }
+
+                console.log("Removed last location. Remaining locations:", locations.length);
+            } else {
+                console.log("No locations to remove");
+            }
+        }
+
 
         function updateLocationList() {
             const container = document.getElementById("locationContainer");
