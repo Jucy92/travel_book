@@ -66,6 +66,7 @@ public class MapServiceMybatis implements MapService {
 
     public void addItinerary(Map<String, Object> data, long id) {
         log.info("RequestBody={}", data);
+
         //Map<String, Object> travel = (Map<String, Object>) data.get("travel");
         List<Map<String, Object>> locations = (List<Map<String, Object>>) data.get("locations");
         List<Map<String, Object>> locationDetails = (List<Map<String, Object>>) data.get("locationDetails");

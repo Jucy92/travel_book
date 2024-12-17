@@ -15,7 +15,8 @@
     </div>
     <button id="saveButton" onclick="saveData()" disabled>저장</button>
 
-    <script th:inline="javascript">
+</body>
+<script th:inline="javascript">
         let map;
         let markers = [];
         let travel = [];
@@ -43,13 +44,19 @@
 
         function addLocation(latLng){
             currentLocationId++;
+
             const location = {
                 locationId: currentLocationId,
                 lat: latLng.lat(),
                 lng: latLng.lng()
             };
-            console.log(location);
+            //console.log(location);
             locations.push(location);
+
+            if (currentLocationId == 1) {    // 처음인 경우에만 해당 좌표로 날씨 정보 가져오기
+                const lat = latLng.lat(), lng = latLng.lng();
+                loadWeather(latLng.lat(), latLng.lng());
+            }
 
             const marker = new google.maps.Marker({
                 position: latLng,
@@ -137,6 +144,28 @@
             detailDiv.parentElement.removeChild(detailDiv);
         }
 
+        function loadWeather(latitude, longitude) {
+            const coordinate = {lat: latitude , lng: longitude};
+            const response = [];
+
+            fetch('/weather', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(coordinate)
+            })
+            .then(response=> response.json())
+            .then(data => {
+                console.log('날씨 정보 불러오기 성공:', data);
+            })
+            .catch(error => {
+                console.error('날씨 정보 불러오기 오류:', error);
+            });
+
+            response = { coord: data.coord, weather: data.weather
+        }
+
         function saveData() {
             // 위치 상세 정보를 저장할 배열 초기화
             locationDetails = [];
@@ -209,5 +238,4 @@
         }
 
     </script>
-</body>
 </html>

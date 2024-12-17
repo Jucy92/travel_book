@@ -23,6 +23,7 @@ public class PerplexityApiService {
             .build();
 
 
+
     // PerplexityApiModel
 //    @Value("${pplx-xxx}")    // 이렇게 쓰는게 아니라.. application.properties 에 명시..
     @Value("${perplexity.api.key}")
