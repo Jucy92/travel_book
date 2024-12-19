@@ -35,6 +35,19 @@
         #location-detail {
             margin-bottom: 10px;
         }
+        #copyTravelBtn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+          }
         .location-group {
             margin-bottom: 20px;
             border: 1px solid #ddd;
@@ -91,7 +104,7 @@
                             <td th:text="${travel.title}">제목</td>
                             <td th:text="${travel.userId}">작성자</td>
                             <td th:text="${#temporals.format(travel.cdt, 'yyyy-MM-dd HH:mm')}">작성일자</td>
-                            <input type="hidden" th:value="${travel.travelId}" />
+                            <input type="hidden" id="travelId" th:value="${travel.travelId}" />
                         </tr>
                     </tbody>
                 </table>
@@ -101,7 +114,10 @@
 
     <div id="location"></div>
     <div id="location-detail" style="display: none;">
-        <h3>여행 상세 정보</h3>
+        <div id="detail-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3>여행 상세 정보</h3>
+            <button id="copyTravelBtn" style="display: none;">여행 복사</button>
+        </div>
             <ul id="location-list">
                 <li th:each="location : ${locations}" th:id="'location-' + ${location.locationId}">
                     <span th:text="${location.locationSq} + '. ' + ${location.content}"></span>
@@ -111,6 +127,7 @@
 
         <script th:inline="javascript">
         let map;
+        let travelId;
         let travelData = [];
 
         function initMap() {
@@ -146,7 +163,7 @@
         }
 
         function selectTravel(row) {
-            let travelId = row.getAttribute('data-travel-id');
+            travelId = row.getAttribute('data-travel-id');
             console.log("선택된 여행 ID: " + travelId);
             const url = '/travel/' + travelId;
             console.log(url);
@@ -161,7 +178,7 @@
             .then(data => {
                 console.log('성공', data);
                 alert('데이터를 정상적으로 호출했습니다.');
-                travelData = data;
+                travelData = data;  // 이렇게 바로 담으면 Object로 담기고, 이걸 사용하려면 forEach 사용하거나, .map으로 바꿔야 값에 접근할 수 있음
                 showLocation();
                 showLocationDetails();
             })
@@ -236,7 +253,55 @@
                 locationGroup.appendChild(locationItem);
             });
 
+          const copyButton = document.getElementById('copyTravelBtn');
+          copyButton.style.display = 'block';
+          copyButton.onclick = function() {
+            /* 클립보드에 데이터 복사하는 설정
+            const travelInfo = travelData.map(location =>
+              `위치 ${location.locationId}: ${location.content}`
+            ).join('\n');
+
+            navigator.clipboard.writeText(travelInfo).then(() => {
+              alert('여행 정보가 클립보드에 복사되었습니다.');
+            }).catch(err => {
+              console.error('복사 중 오류 발생:', err);
+            });
+            */
+            copyTravel(travelId);
+          };
+
             document.getElementById('location-detail').style.display = 'block';
+        }
+        function copyTravel(travelId) {
+            const url = '/travel/copy/' + travelId;
+            const title = prompt("여행 주제를 입력해주세요.");
+            if (!title) {
+                alert("여행 주제를 입력해야 합니다.");
+                return;
+            }
+            const requestMessage = {title: title};
+
+            console.log(title);
+            console.log(requestMessage);
+            console.log(JSON.stringify(title));
+            console.log(JSON.stringify(requestMessage));
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestMessage)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('여행 복사 성공:', data);
+                alert('여행이 성공적으로 복사되었습니다.');
+            })
+            .catch(error => {
+                console.error('여행 복사 중 오류 발생:', error);
+                alert('여행 복사 중 오류가 발생했습니다.');
+            });
         }
 
         // 페이지 로드 시 지도 초기화

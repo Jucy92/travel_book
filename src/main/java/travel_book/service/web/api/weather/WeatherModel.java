@@ -14,13 +14,10 @@ public class WeatherModel {                 // (ignoreUnknown = true) - JSON 데
     private Wind wind;
     private Clouds clouds;
     private String name;
-    public WeatherModel() {
-
-    }
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private class Coord {
+    public static class Coord {
         private double lat;     // 위도
         private double lon;     // 경도
 
@@ -29,16 +26,16 @@ public class WeatherModel {                 // (ignoreUnknown = true) - JSON 데
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private class Weather {         // 날씨 상태
-        private int id;             // 날씨 상태 코드
+    public static class Weather {         // 날씨 상태
+        //private int id;             // 날씨 상태 코드
         private String main;        // 주요 날씨 상태 (Clear - 맑음)
         private String description; // 상세 날씨 설명 (clear sky - 맑은 하늘)
-        private String icon;        // 날씨 아이콘 코드
+        //private String icon;        // 날씨 아이콘 코드
     }
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private class Main {
+    public static class Main {
         private double temp;
         private double feels_like;
         private double temp_min;
@@ -49,7 +46,7 @@ public class WeatherModel {                 // (ignoreUnknown = true) - JSON 데
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private class Wind {
+    public static class Wind {
         private double speed;
         private int deg;
         private double gust;
@@ -57,7 +54,7 @@ public class WeatherModel {                 // (ignoreUnknown = true) - JSON 데
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private class Clouds {
+    public static class Clouds {
         private int all;
     }
 }

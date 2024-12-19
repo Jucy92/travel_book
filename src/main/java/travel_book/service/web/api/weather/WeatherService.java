@@ -1,16 +1,15 @@
 package travel_book.service.web.api.weather;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -27,9 +26,17 @@ public class WeatherService {
             .setReadTimeout(Duration.ofMillis(3000))
             .build();
     }
-    public String getWeatherData(double lat, double lon) {
-        log.info("restTemplate.getForObject={}", restTemplate.getForObject(WEATHER_API_URL, String.class, lat, lon, apiKey)); // URL에 값 넘겨주면 응답 값 받음
-        return restTemplate.getForObject(WEATHER_API_URL, String.class, lat, lon, apiKey);
+    public WeatherModel getWeatherData(double lat, double lon) {
+
+        String jsonResponse = restTemplate.getForObject(WEATHER_API_URL, String.class, lat, lon, apiKey);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(jsonResponse, WeatherModel.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error parsing weather data", e);
+        }
+
+
 
 
     }

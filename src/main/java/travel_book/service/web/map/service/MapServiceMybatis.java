@@ -118,13 +118,13 @@ public class MapServiceMybatis implements MapService {
     }
 
 
-    public void copyOfAllItinerary(Long travelId, Long userId) {
+    public void copyOfAllItinerary(Long travelId, Long userId, String title) {
         TravelModel originalTravel = findById(travelId);
         Long originalTravelId = originalTravel.getTravelId();   // 원본 travelId -> 기존 데이터 조회용
         TravelModel newTravel = new TravelModel();
         newTravel.setOid(originalTravel.getOid());
         newTravel.setCid(userId);
-        newTravel.setTitle(originalTravel.getTitle());
+        newTravel.setTitle(title);  // 복사하면서 넘겨받은 제목 저장
 
         TravelModel savedTravel = saveTravel(newTravel);
         log.info("savedTravel={}",savedTravel);

@@ -4,12 +4,10 @@ package travel_book.service.web.map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.web.map.dto.TravelData;
@@ -107,16 +105,19 @@ public class MapController {
     @ResponseBody
     //public ResponseEntity<Travel> copyOfAllItinerary(@PathVariable("travelId") long travelId,
     public ResponseEntity<Map<String,String>> copyOfAllItinerary(@PathVariable("travelId") long travelId,
+                                                          @RequestBody Map<String, String> requestMessage,
                                                           @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member member) {
         if (member == null) {
             Member tempMember = memberRepository.findByMember("juchje1").orElse(null);
             member = tempMember;
         }
 
-        mapServiceMybatis.copyOfAllItinerary(travelId, member.getId());     // 저장된 결과 값 받고 싶으면 서비스 로직에서 TravelData에 저장된 리턴 값 set으로 담던가~
+        log.info("requestMassage={}", requestMessage);
+
+        mapServiceMybatis.copyOfAllItinerary(travelId, member.getId(), requestMessage.get("title"));     // 저장된 결과 값 받고 싶으면 서비스 로직에서 TravelData에 저장된 리턴 값 set으로 담던가~
+        //Travel copiedTravel = mapServiceJpa.copyOfAllItinerary(travelId, member.getId());
         Map<String, String> response = new HashMap<>();
         response.put("message", "정상적으로 복사 했습니다.");
-        //Travel copiedTravel = mapServiceJpa.copyOfAllItinerary(travelId, member.getId());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

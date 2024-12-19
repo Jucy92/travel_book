@@ -12,6 +12,11 @@
 <body>
     <div id="map"></div>
     <div id="locationContainer">
+        <div id="weather" style="display: none;">
+            <h3>현재 날씨</h3>
+            <p id="temperature"></p>
+            <p id="description"></p>
+        </div>
     </div>
     <button id="saveButton" onclick="saveData()" disabled>저장</button>
 
@@ -95,9 +100,10 @@
                 // currentLocationId 감소
                 currentLocationId--;
 
-                // 모든 위치가 제거되면 저장 버튼 비활성화
+                // 모든 위치가 제거되면 저장 버튼/ 현재 날씨 비활성화
                 if (locations.length === 0) {
                     document.getElementById("saveButton").disabled = true;
+                    document.getElementById('weather').style.display = 'none';
                 }
 
                 console.log("Removed last location. Remaining locations:", locations.length);
@@ -146,7 +152,7 @@
 
         function loadWeather(latitude, longitude) {
             const coordinate = {lat: latitude , lng: longitude};
-            const response = [];
+
 
             fetch('/weather', {
                 method: 'POST',
@@ -158,12 +164,23 @@
             .then(response=> response.json())
             .then(data => {
                 console.log('날씨 정보 불러오기 성공:', data);
+                const response = {
+                    coord: data.coord,
+                    weather: data.weather,
+                    main: data.main,
+                    wind: data.wind
+                    };
+                console.log(response);
+
+                // 날씨 정보 화면에 표시
+                document.getElementById('weather').style.display = 'block';
+                document.getElementById('temperature').textContent = `기온: ${response.main.temp}°C`;
+                document.getElementById('description').textContent = `날씨: ${response.weather[0].description}`;
             })
             .catch(error => {
                 console.error('날씨 정보 불러오기 오류:', error);
             });
 
-            response = { coord: data.coord, weather: data.weather
         }
 
         function saveData() {

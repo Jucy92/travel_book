@@ -15,7 +15,9 @@ public class WeatherController {
     private final WeatherService weatherService;
 
     @PostMapping("/weather")
-    public String getWeather(@RequestBody Map<String, Double> coordinate) {
-        return weatherService.getWeatherData(coordinate.get("lat"), coordinate.get("lng"));
+    public WeatherModel getWeather(@RequestBody Map<String, Double> coordinate) {
+        WeatherModel weatherData = weatherService.getWeatherData(coordinate.get("lat"), coordinate.get("lng"));
+        log.info("Main={}",weatherData.getMain());
+        return weatherData;
     }
 }
