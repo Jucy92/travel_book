@@ -133,30 +133,30 @@
         function initMap() {
             // IP 기반 위치 정보 가져오기
             fetch('https://ipapi.co/json/')
-        .then(response => response.json())
-        .then(data => {
-            console.log('주소 데이터 ', data);
-            const userLocation = {
-                lat: parseFloat(data.latitude),
-                lng: parseFloat(data.longitude)
-            };
+            .then(response => response.json())
+            .then(data => {
+                console.log('주소 데이터 ', data);
+                const userLocation = {
+                    lat: parseFloat(data.latitude),
+                    lng: parseFloat(data.longitude)
+                };
 
-            map = new google.maps.Map(document.getElementById('location'), {
-                center: userLocation,
-                zoom: 10
-            });
+                map = new google.maps.Map(document.getElementById('location'), {
+                    center: userLocation,
+                    zoom: 10
+                });
 
-            //document.getElementById('location').style.display = 'none';    // 비동기 처리라도 아래서 지웠는데 여기서 갑자기 보일 수가 있나?
-        })
-        .catch(error => {
-            console.error('위치 정보를 가져오는 데 실패했습니다:', error);
-            // 오류 발생 시 기본 위치 사용
-            map = new google.maps.Map(document.getElementById('location'), {
-                center: {lat: 25.0330, lng: 121.5654}, // 타이페이 중심 좌표
-                zoom: 10
+                //document.getElementById('location').style.display = 'none';    // 비동기 처리라도 아래서 지웠는데 여기서 갑자기 보일 수가 있나?
+            })
+            .catch(error => {
+                console.error('위치 정보를 가져오는 데 실패했습니다:', error);
+                // 오류 발생 시 기본 위치 사용
+                map = new google.maps.Map(document.getElementById('location'), {
+                    center: {lat: 25.0330, lng: 121.5654}, // 타이페이 중심 좌표
+                    zoom: 10
+                });
+                document.getElementById('location').style.display = 'none';
             });
-            document.getElementById('location').style.display = 'none';
-        });
             // 초기에 지도 숨기기 -> 스타일에서 적용해놨는데, 나중에 스타일 지우면 여기서 적용
             document.getElementById('location').style.display = 'none';
             document.getElementById('location-Detail').style.display = 'none';
@@ -280,11 +280,6 @@
                 return;
             }
             const requestMessage = {title: title};
-
-            console.log(title);
-            console.log(requestMessage);
-            console.log(JSON.stringify(title));
-            console.log(JSON.stringify(requestMessage));
 
             fetch(url, {
                 method: 'POST',

@@ -15,5 +15,6 @@ public class LoginModel {
     private String userId;
     @NotEmpty(message = "비밀번호를 입력해 주세요.")
     private String password;
+    private String encryptedPassword;
     //private String phone;     // 로그인 페이지에서는 두개만 입력 받으면 되는거니깐..?
 }

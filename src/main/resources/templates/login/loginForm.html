@@ -5,13 +5,20 @@
     <link th:href="@{/css/bootstrap.min.css}"
           href="../css/bootstrap.min.css" rel="stylesheet">
     <style>
- .container {
- max-width: 560px;
- }
- .field-error {
- border-color: #dc3545;
- color: #dc3545;
- }
+     .container {
+     max-width: 560px;
+     }
+     .field-error {
+     border-color: #dc3545;
+     color: #dc3545;
+     }
+     .find-buttons {
+        margin-top: 20px;
+        text-align: center;
+     }
+     .find-buttons a {
+        margin: 0 10px;
+     }
     </style>
 </head>
 <body>
@@ -39,6 +46,7 @@
             <input type="text" id="loginId" th:field="*{userId}" class="form-control" placeholder="아이디를 입력하세요"
                    th:errorclass="field-error">
             <div class="field-error" th:errors="*{userId}"/>
+            <input type="hidden" id="encryptedPassword" name="encryptedPassword">
         </div>
         <!--<div>       이메일 로그인에서 아이디로 변경
             <label for="loginId">이메일 주소</label>
@@ -70,6 +78,11 @@
             </div>
         </div>
     </form>
+    <!-- ID 찾기 / 비밀번호 찾기 버튼 추가 -->
+    <div class="find-buttons">
+        <a th:href="@{/find-id}" class="btn btn-link">ID 찾기</a>
+        <a th:href="@{/find-password}" class="btn btn-link">비밀번호 찾기</a>
+    </div>
 </div> <!-- /container -->
 </body>
 </html>

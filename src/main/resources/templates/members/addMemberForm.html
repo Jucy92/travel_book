@@ -25,13 +25,19 @@ color: #dc3545;
 <script>
   function fn_sendNum(){
     $.ajax({
-        url:"/mail",
-        type:"post",
-        dataType:"json",
-        data:{"mail" : $("#mail").val()},
-        success: function(data){
-            alert("인증번호 발송");
-            $("#crtf").attr("value",data)
+        url: "/mail",
+        type: "post",
+        dataType: "json",
+        data: {"mail": $("#mail").val()},
+        success: function(data) {
+            if (data.message) {
+                alert(data.message);
+                $("#crtf").attr("value", data.num);
+            }
+
+        },
+        error: function(xhr, status, error) {
+            alert("오류가 발생했습니다: " + error);
         }
     });
   }

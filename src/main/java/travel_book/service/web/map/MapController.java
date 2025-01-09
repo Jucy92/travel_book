@@ -43,7 +43,6 @@ public class MapController {
     }
 
     @PostMapping("/travel/add")
-    @ResponseBody
     public ResponseEntity<Map<String,String>> addItinerary(@RequestBody Map<String, Object> data, @SessionAttribute(value = SessionConst.SESSION_NAME, required = false) Member member) {
         // 데이터를 각 테이블로 쪼개서 받냐, 아니면 TravelData에 한번에 담아서 여러번 받냐......... 화면 만들 때 다시 고민
         if (member == null) {
@@ -75,8 +74,10 @@ public class MapController {
     }
 
 
-    @PostMapping("/travel/{travelId}")  // travel/파라미터 하나 날아오는걸로 userId인지 travelId인지 구별 못함, 순서 바꿔도 안돼서 아래 주석 sonsumers = JSON이라 우선으로 잡혔나..?
+    @PostMapping("/travel/{travelId}")
+    // travel/파라미터 하나 날아오는걸로 userId인지 travelId인지 구별 못함, 순서 바꿔도 안돼서 아래 주석 sonsumers = JSON이라 우선으로 잡혔나..?
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public List<TravelData> travelList(@PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
         //                              ㄴ> 검색 조건이 더 많아지면 번호가 아니라 DTO로 하는게 낫지않나..?
         List<TravelData> travelList = mapServiceMybatis.findByTravelId(travelId);
@@ -102,7 +103,6 @@ public class MapController {
      */
 
     @PostMapping("/travel/copy/{travelId}")
-    @ResponseBody
     //public ResponseEntity<Travel> copyOfAllItinerary(@PathVariable("travelId") long travelId,
     public ResponseEntity<Map<String,String>> copyOfAllItinerary(@PathVariable("travelId") long travelId,
                                                           @RequestBody Map<String, String> requestMessage,

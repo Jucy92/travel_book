@@ -6,12 +6,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import travel_book.service.domain.member.Member;
+import travel_book.service.domain.repository.MemberRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MailService {
 
+    private final MemberRepository memberRepository;
     private final JavaMailSender javaMailSender;
     private static final String senderEmail = "jcy92@gmail.com";
     private static int number;
@@ -45,5 +50,11 @@ public class MailService {
         MimeMessage message = CreateMail(mail);
         javaMailSender.send(message);
         return number;
+    }
+
+    public boolean checkedMail(String mail) {
+        //Member member = memberRepository.findByMail(mail).orElse(null);
+        boolean memberExists = memberRepository.findByMail(mail).isPresent();   // Optional 기능 (isPresent 값이 있으면 true 없으면 false / isEmpty 값이 없으면 true)
+        return memberExists;
     }
 }
