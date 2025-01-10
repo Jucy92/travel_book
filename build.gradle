@@ -29,6 +29,9 @@ dependencies {
     // RESTful API 중 okHttp라는 라이브러리 사용하기 위해 추가
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
+    // Bouncy Castle 암호화 라이브러리 사용하기 위해 추가
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
+
     // JSONObject 사용하기 위해 추가 -> 직접 꺼내서 사용 (PerplexityApiService 참고)
     implementation 'org.json:json:20210307'
     //JSONObject 사용하기 위해서 추가 -> 매퍼 만들어서 사용 (WeatherService 참고)
