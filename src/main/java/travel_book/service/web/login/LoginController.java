@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import travel_book.service.domain.login.serivce.LoginService;
 import travel_book.service.domain.member.Member;
 import travel_book.service.web.login.model.LoginModel;
+import travel_book.service.web.login.model.LoginSearchModel;
 import travel_book.service.web.session.SessionConst;
 
 @Controller
@@ -28,8 +29,8 @@ public class LoginController {
     public String loginForm(@ModelAttribute("loginModel")LoginModel loginModel) { // /login 화면 호출 될 때 던져주는 값이 없는데 왜 이렇게 썼던거야..? -> 이게 없으면 타임리프 오류
     //                          ㄴ> 순서에 대해서는 잘 모르겠는데, 타임리프 문법에서 아래 페이지로 이동 했을 때 th:object에 대해 @ModelAttribute 없으면 오류 발생 -> 검증 체크 때문인가?
         return "/login/loginForm";
-    }
 
+    }
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute LoginModel loginModel, BindingResult bindingResult, HttpServletRequest request,// ){
                         @RequestParam(name = "redirectURL", defaultValue = "/") String redirectURL) {
@@ -66,4 +67,16 @@ public class LoginController {
         }
         return "redirect:/";
     }
+
+    @GetMapping("/login/search_id")
+    public String searchId(@ModelAttribute("loginModel") LoginSearchModel searchModel) {
+        return "/login/search-id";
+    }
+    @PostMapping("/login/search_id")
+    public String findId(@ModelAttribute("loginModel") LoginSearchModel searchModel) {
+        Member findMember = loginService.findById(searchModel); // 타입이 달라서 ModelAttribute에 자동으로 안담기는건가?? Member != LoginSearchModel
+        searchModel.setUserId(findMember.getUserId());
+        return "/login/search-id-result";
+    }
+
 }

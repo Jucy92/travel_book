@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import travel_book.service.domain.crypto.service.EncryptionService;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
+import travel_book.service.web.login.model.LoginSearchModel;
 //import travel_book.service.domain.member.MemberRepository;
 
 @Service
@@ -32,5 +33,11 @@ public class LoginService {
         return memberRepository.findByMember(userId)
                 .filter(m -> m.getPassword().equals(password))
                 .orElse(null);
+    }
+
+    public Member findById(LoginSearchModel searchModel) {
+        log.info("searchModel ={}", searchModel);
+        return memberRepository.findByMail(searchModel.getMail()).orElseThrow();
+        // 이러면 무슨 오류가 발생할까?? 널포인터?? 이 오류를 캐치로 잡아서 일치하는 이메일 주소 없다고 알려주기  => 발생하는 예외 NoSuchElementException
     }
 }

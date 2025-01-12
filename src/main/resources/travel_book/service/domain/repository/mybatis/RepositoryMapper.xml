@@ -18,7 +18,7 @@
     </update>
 
     <select id="findByMail" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
-        SELECT ID, MAIL, NAME, PASSWORD, PHONE, CDT
+        SELECT ID, MAIL, USER_ID, NAME, PASSWORD, PHONE, CDT
             FROM MEMBER
          WHERE MAIL = #{mail}
     </select>

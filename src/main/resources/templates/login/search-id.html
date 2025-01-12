@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>회원정보 입력</title>
+</head>
+<body>
+    <h2>회원정보 입력</h2>
+    <p>회원구분별로 가입 시 입력한 본인확인 본을 입력해 주세요.</p>
+
+    <form th:action="@{/login/search_id}" method="post" th:object="${loginModel}">
+        <div>
+            <h3>개인회원</h3>
+            <div>
+                <input type="radio" id="individual" name="memberType" value="individual" checked>
+                <label for="individual">이메일 인증</label>
+
+                <input type="radio" id="corporate" name="memberType" value="corporate">
+                <label for="corporate">휴대폰 인증</label>
+            </div>
+
+            <div>
+                <label for="name">이름</label>
+                <input type="text" id="name" th:field="*{domain}">
+            </div>
+
+            <div>
+                <label for="email">이메일 주소</label>
+                <input type="email" id="email" th:field="*{mail}">
+                <div class="field-error" th:errors="*{mail}"/>
+                <select>
+                    <option>선택하세요</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit">아이디 찾기</button>
+    </form>
+</body>
+</html>
