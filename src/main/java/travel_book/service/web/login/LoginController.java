@@ -78,5 +78,9 @@ public class LoginController {
         searchModel.setUserId(findMember.getUserId());
         return "/login/search-id-result";
     }
-
+    @GetMapping("/login/search_pwd")
+    public String searchPassword(@ModelAttribute("loginModel")LoginSearchModel searchModel) { // /login 화면 호출 될 때 던져주는 값이 없는데 왜 이렇게 썼던거야..? -> 이게 없으면 타임리프 오류
+        //                          ㄴ> 순서에 대해서는 잘 모르겠는데, 타임리프 문법에서 아래 페이지로 이동 했을 때 th:object에 대해 @ModelAttribute 없으면 오류 발생 -> 검증 체크 때문인가?
+        return "/login/search-pwd";
+    }
 }

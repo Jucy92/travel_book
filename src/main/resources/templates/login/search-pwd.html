@@ -20,8 +20,12 @@
             </div>
 
             <div>
+                <label for="name">아이디</label>
+                <input type="text" id="id" th:field="*{userId}">
+            </div>
+            <div>
                 <label for="name">이름</label>
-                <input type="text" id="name" th:field="*{domain}">
+                <input type="text" id="name" th:field="*{name}">
             </div>
 
             <div>
@@ -34,7 +38,7 @@
             </div>
         </div>
 
-        <button type="submit">아이디 찾기</button>
+        <button type="submit">비밀번호 찾기</button>
     </form>
 </body>
 </html>
