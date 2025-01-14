@@ -1,10 +1,11 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+<head th:replace="~{common/header :: common-header}">
     <meta charset="utf-8">
     <title>회원정보 입력</title>
 </head>
 <body>
+    <div th:replace="~{common/header :: header}"></div>
     <h2>회원정보 입력</h2>
     <p>회원구분별로 가입 시 입력한 본인정보를 입력해 주세요.</p>
 

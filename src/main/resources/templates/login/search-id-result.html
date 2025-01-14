@@ -31,7 +31,6 @@
         <h2>아이디 조회</h2>
         <p class="info-text">개인정보보호를 위해 일부분은 *로 표시됩니다.</p>
         <p class="info-text">동명이인이 있는 경우, 본인 외의 ID가 노출될 수 있습니다.</p>
-        ${loginModel);
 
         <div class="result-box" th:if="${not #lists.isEmpty(loginModel)}">
             <p>일치된 정보로 등록된 아이디는 <span th:text="${#lists.size(loginModel)}">총1개</span> 있습니다.</p>
@@ -45,7 +44,7 @@
 
         <div class="button-group">
             <button type="button" class="btn" th:onclick="'location.href=\'' + @{/login} + '\''">로그인</button>
-            <button type="button" class="btn" th:onclick="'location.href=\'' + @{/login/search-pwd} + '\''">비밀번호 찾기</button>
+            <button type="button" class="btn" th:onclick="'location.href=\'' + @{/login/search_pwd} + '\''">비밀번호 찾기</button>
         </div>
     </div>
 </body>

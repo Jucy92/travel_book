@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="common-header">
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+    <title>공통 헤더</title>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</head>
+<body>
+    <header th:fragment="header">
+        <button onclick="goBack()">←</button>
+        <!-- 여기에 다른 공통 헤더 요소들을 추가할 수 있습니다 -->
+    </header>
+</body>
+</html>
