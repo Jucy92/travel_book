@@ -37,6 +37,9 @@
             <ul>
                 <li th:each="id : ${loginModel}">
                     <span th:text="${id.userId}">juch**</span>
+                    <span th:text="'(가입일: ' + ${#temporals.format(id.cdt, 'yyyy-MM-dd')} + ')'">
+                        (가입일: 2019-07-12)
+                    </span>
 
                 </li>
             </ul>

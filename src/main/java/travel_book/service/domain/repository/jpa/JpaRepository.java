@@ -3,6 +3,7 @@ package travel_book.service.domain.repository.jpa;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.MemberSearchCond;
+import travel_book.service.web.login.model.FindIdDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,11 @@ public class JpaRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByMember(String userId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Member> findByCondition(FindIdDto searchModel) {
         return Optional.empty();
     }
 

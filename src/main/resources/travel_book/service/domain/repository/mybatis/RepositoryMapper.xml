@@ -22,34 +22,51 @@
             FROM MEMBER
          WHERE MAIL = #{mail}
     </select>
+    <!-- Like를 안쓰는 조건문일 경우 합쳐도 될 거 같은데 findByMail, findByMember 같은 경우.. -->
     <select id="findByMember" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
         SELECT ID, USER_ID, MAIL, NAME, PASSWORD, PHONE, CDT
             FROM MEMBER
          WHERE USER_ID = #{userId}
     </select>
+
+    <!-- findByMail, findByMember 둘 중에 하나 수정해서 동적쿼리로 만들려고 했는데, 각자 다른 화면에서 호출하고 있어서 신규로 추가하고, 두 기능 대신 얘 호출해보기 -->
+    <select id="findByCondition" resultType="Member">
+        SELECT ID, MAIL, USER_ID, NAME, PASSWORD, PHONE, CDT
+            FROM MEMBER
+        <where>
+            <if test="mail != '' and mail != null">
+                AND MAIL = #{mail}
+            </if>
+            <if test="userId != null and userId !=''">
+                AND USER_ID = #{userId}
+            </if>
+        </where>
+    </select>
+
     <select id="findById" resultType="long">  <!-- 자료형(int,long), 래퍼 클래스(java.lang.Integer), 문자열(java.lang.String), Map(java.util.Map) 받을 수 있음-->
         SELECT ID
             FROM MEMBER
          WHERE USER_ID = #{userId}
     </select>
+    <!-- 위에는 userId로 id를 아래는 id로 userId를 찾음 이름을 더 구체적으로 findUserIdById 이런식으로 지었어야 했나.. 뭐로 뭘 찾는지 들어와서 확인하기 전까지 애매하네 -->
     <select id="findByUserId" resultType="long">  <!-- 자료형(int,long), 래퍼 클래스(java.lang.Integer), 문자열(java.lang.String), Map(java.util.Map) 받을 수 있음-->
         SELECT USER_ID
             FROM MEMBER
          WHERE ID = #{id}
     </select>
 
-    <select id="findAll" resultType="Member">
-        SELECT ID, MAIL, NAME, PASSWORD, PHONE, CDT
+    <select id="findAll" resultType="Member">                   <!-- findAll(), findAll(MemberSearchCond) 두개다 사용하는 곳 없음 ()만 메모리랑 테스트에서 사용 -->
+        SELECT ID, MAIL, USER_ID, NAME, PASSWORD, PHONE, CDT
             FROM MEMBER
          <where>
              <if test="mail != null and mail !=''">
                  AND MAIL LIKE CONCAT('%', #{mail}, '%')
              </if>
-             <!--
-             <if test="userId != null and userId !=''">
-                 AND MAIL LIKE CONCAT('%', #{userId}, '%')
+
+             <if test="userId != null and userId !=''">         <!-- 비밀번호 찾기 로직에서 이걸 사용하려고 했는데.. 반환 타입이 List<Member> -->
+                 AND USER_ID LIKE CONCAT('%', #{userId}, '%')   <!-- 아직까지는 얘를 사용 안하긴 하는데.. 비밀번호 찾기는 단일 건으로만 처리해야해서 새로 생성 -->
              </if>
-             -->
+
              <if test="name != null and name !=''">     <!-- 검색 조건 선택하는 쪽에서 두개 같이만 안넘겨주면 콤보박스로 사용 like 문법 오류 안남-->
                  AND NAME LIKE CONCAT('%', #{name}, '%')
                  <!--

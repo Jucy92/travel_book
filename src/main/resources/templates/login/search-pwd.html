@@ -9,9 +9,9 @@
     <h2>회원정보 입력</h2>
     <p>회원구분별로 가입 시 입력한 본인정보를 입력해 주세요.</p>
 
-    <form th:action="@{/login/search_id}" method="post" th:object="${loginModel}">
+    <form th:action="@{/login/search_pwd}" method="post" th:object="${loginModel}">
         <div>
-            <h3>개인회원</h3>
+            <h3>개인회원(비밀번호 찾기)</h3>
             <div>
                 <input type="radio" id="individual" name="memberType" value="individual" checked>
                 <label for="individual">이메일 인증</label>
@@ -21,25 +21,25 @@
             </div>
 
             <div>
-                <label for="name">아이디</label>
+                <label for="id">아이디</label>
                 <input type="text" id="id" th:field="*{userId}">
+                <div class="field-error" th:errors="*{userId}"/>
             </div>
-            <div>
-                <label for="name">이름</label>
-                <input type="text" id="name" th:field="*{name}">
-            </div>
-
             <div>
                 <label for="email">이메일 주소</label>
                 <input type="email" id="email" th:field="*{mail}">
-                <div class="field-error" th:errors="*{mail}"/>
                 <select>
-                    <option>선택하세요</option>
+                    <option disabled="true">선택하세요</option>
                 </select>
+                <div class="field-error" th:errors="*{mail}"/>
             </div>
         </div>
 
         <button type="submit">비밀번호 찾기</button>
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="err : ${#fields.globalErrors()}"
+               th:text="${err}">전체 오류 메시지</p>
+        </div>
     </form>
 </body>
 </html>

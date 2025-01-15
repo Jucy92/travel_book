@@ -11,7 +11,7 @@
 
     <form th:action="@{/login/search_id}" method="post" th:object="${loginModel}">
         <div>
-            <h3>개인회원</h3>
+            <h3>개인회원(아이디 찾기)</h3>
             <div>
                 <input type="radio" id="individual" name="memberType" value="individual" checked>
                 <label for="individual">이메일 인증</label>
@@ -21,17 +21,12 @@
             </div>
 
             <div>
-                <label for="name">이름</label>
-                <input type="text" id="name" th:field="*{domain}">
-            </div>
-
-            <div>
                 <label for="email">이메일 주소</label>
                 <input type="email" id="email" th:field="*{mail}">
-                <div class="field-error" th:errors="*{mail}"/>
                 <select>
-                    <option>선택하세요</option>
+                    <option disabled="true">선택하세요</option>
                 </select>
+                <div class="field-error" th:errors="*{mail}"/>
             </div>
         </div>
 

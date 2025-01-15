@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import travel_book.service.domain.login.serivce.LoginService;
 import travel_book.service.domain.member.Member;
 import travel_book.service.web.login.model.LoginModel;
-import travel_book.service.web.login.model.LoginSearchModel;
+import travel_book.service.web.login.model.FindIdDto;
+import travel_book.service.web.login.model.FindPasswordDto;
 import travel_book.service.web.session.SessionConst;
 
 @Controller
@@ -26,11 +28,12 @@ public class LoginController {
     private final LoginService loginService;
 
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute("loginModel")LoginModel loginModel) { // /login 화면 호출 될 때 던져주는 값이 없는데 왜 이렇게 썼던거야..? -> 이게 없으면 타임리프 오류
-    //                          ㄴ> 순서에 대해서는 잘 모르겠는데, 타임리프 문법에서 아래 페이지로 이동 했을 때 th:object에 대해 @ModelAttribute 없으면 오류 발생 -> 검증 체크 때문인가?
+    public String loginForm(@ModelAttribute("loginModel") LoginModel loginModel) { // -> 이게 없으면 타임리프 오류
+        //                          ㄴ> th:object에 대해 th:field로 값을 매핑해줘야 하는데 loginModel이 없어서 오류
         return "/login/loginForm";
 
     }
+
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute LoginModel loginModel, BindingResult bindingResult, HttpServletRequest request,// ){
                         @RequestParam(name = "redirectURL", defaultValue = "/") String redirectURL) {
@@ -69,18 +72,46 @@ public class LoginController {
     }
 
     @GetMapping("/login/search_id")
-    public String searchId(@ModelAttribute("loginModel") LoginSearchModel searchModel) {
+    public String searchId(@ModelAttribute("loginModel") FindIdDto searchModel) {
         return "/login/search-id";
     }
+
     @PostMapping("/login/search_id")
-    public String findId(@ModelAttribute("loginModel") LoginSearchModel searchModel) {
-        Member findMember = loginService.findById(searchModel); // 타입이 달라서 ModelAttribute에 자동으로 안담기는건가?? Member != LoginSearchModel
+    public String findId(@Validated @ModelAttribute("loginModel") FindIdDto searchModel, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            log.info("findId error =[{}]", bindingResult);
+            return "login/search-id";
+        }
+        Member findMember = loginService.findByMail(searchModel); // 타입이 달라서 ModelAttribute에 자동으로 안담기는건가?? Member != LoginSearchModel
         searchModel.setUserId(findMember.getUserId());
+        searchModel.setCdt(findMember.getCdt());
         return "/login/search-id-result";
     }
+
     @GetMapping("/login/search_pwd")
-    public String searchPassword(@ModelAttribute("loginModel")LoginSearchModel searchModel) { // /login 화면 호출 될 때 던져주는 값이 없는데 왜 이렇게 썼던거야..? -> 이게 없으면 타임리프 오류
-        //                          ㄴ> 순서에 대해서는 잘 모르겠는데, 타임리프 문법에서 아래 페이지로 이동 했을 때 th:object에 대해 @ModelAttribute 없으면 오류 발생 -> 검증 체크 때문인가?
+    public String searchPassword(@ModelAttribute("loginModel") FindPasswordDto searchModel) {
         return "/login/search-pwd";
+    }
+
+    @PostMapping("/login/search_pwd")
+    public String findPassword(@Validated @ModelAttribute("loginModel") FindPasswordDto searchModel, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            log.info("find password error={}",bindingResult);
+            return "/login/search-pwd";
+        }
+        Member result = loginService.findByCondition(searchModel);
+        if (result == null) {
+            bindingResult.reject("notFound", "일치하는 데이터가 없습니다");
+            return "/login/search-pwd";
+        }
+
+        return "/login/search-pwd-result";
+    }
+
+    @PostMapping("/login/init_pwd")
+    public String initPassword(@ModelAttribute("loginModel") LoginModel loginModel) {
+        // 이제 입력 받은 비밀번호 저장하는 처리
+        return null;
     }
 }

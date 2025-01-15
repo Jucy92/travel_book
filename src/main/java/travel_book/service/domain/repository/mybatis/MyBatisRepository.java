@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.MemberSearchCond;
+import travel_book.service.web.login.model.FindIdDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class MyBatisRepository implements MemberRepository {
 
     private final RepositoryMapper repositoryMapper;
+
     @Override
     public Member save(Member member) {
         repositoryMapper.save(member);
@@ -32,6 +34,10 @@ public class MyBatisRepository implements MemberRepository {
         return repositoryMapper.findByMail(mail);
     }
 
+    public Optional<Member> findByCondition(FindIdDto findIdDto) {
+        return repositoryMapper.findByCondition(findIdDto);
+    }
+
     @Override
     public Optional<Member> findByMember(String userId) {
         return repositoryMapper.findByMember(userId);
@@ -41,6 +47,7 @@ public class MyBatisRepository implements MemberRepository {
     public long findById(String userId) {
         return repositoryMapper.findById(userId);
     }
+
 
     @Override
     public long findByUserId(long id) {

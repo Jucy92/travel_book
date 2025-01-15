@@ -6,6 +6,7 @@ import org.springframework.util.ObjectUtils;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.MemberSearchCond;
+import travel_book.service.web.login.model.FindIdDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,11 @@ public class MemoryRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByMember(String userId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Member> findByCondition(FindIdDto searchModel) {
         return Optional.empty();
     }
 
