@@ -38,14 +38,14 @@ public class PerplexityApiService {
         //model.setContent2("지금부터 너의 직업은 여행사를 운영하고 있는 여행 플래너야 " + model.getDestination() + "나라에 대해서 최대한 많은 정보를 수집해서 요청사항에 맞게 계획을 만들어주고 만들어 줄 때 한국어로 변환해서 알려줘. \n 요청사항 :" + model.getItinerary());
         // ㄴ> 굳이 이걸 set해서 model 리턴하면서 내부 처리방법을 공개할 필요가 없어보임
         String prompt = "지금부터 너의 직업은 여행사를 운영하고 있는 여행 플래너야 \n" + model.getDestination() +
-                        "나라에 대해서 최대한 많은 정보를 수집해서 요청사항에 맞게 계획을 만들어줘.\n 요청사항 :" + model.getItinerary() +
+                        "장소에 대해서 최대한 많은 정보를 수집해서 요청사항에 맞게 계획을 만들어줘.\n 요청사항 :" + model.getItinerary() +
                         "\n 모든 작업이 끝난 후 답변을 줄 때는 반드시 한국어로 변환해서 알려줘";
 
         /**
          * JSONObject 라이브러리 객체 설정 (유료 자바에선 기본 제공)
          */
         JSONObject bodyContent = new JSONObject();      // requestBody 설정 정보
-        bodyContent.put("model", "mistral-7b-instruct");
+        bodyContent.put("model", "llama-3.1-sonar-small-128k-online");
         JSONArray messages = new JSONArray();
         //JSONObject systemMessage = new JSONObject();
         //systemMessage.put("role", "system");
