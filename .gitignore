@@ -38,3 +38,6 @@ out/
 
 # Application properties
 application.properties
+
+# JVM 비정상 종료 로그 제외
+hs_err_pid*.log
