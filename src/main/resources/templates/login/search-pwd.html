@@ -4,7 +4,71 @@
     <meta charset="utf-8">
     <title>회원정보 입력</title>
 </head>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailInput = document.getElementById('email');
+        const emailVerifyBtn = document.getElementById('emailVerifyBtn');
+        const verificationSection = document.getElementById('verificationSection');
+        const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+
+        emailInput.addEventListener('input', function() {
+            if (emailInput.value.trim() !== '') {
+                emailVerifyBtn.style.display = 'inline-block';
+            } else {
+                emailVerifyBtn.style.display = 'none';
+                verificationSection.style.display = 'none';
+            }
+        });
+
+        emailVerifyBtn.addEventListener('click', function() {
+            // 서버에 인증번호 요청 AJAX 호출
+            fetch('/mail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ mail: emailInput.value, isPasswordFind: "true" })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    emailVerifyBtn.textContent = '인증번호 재요청';
+                    verificationSection.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다: " + error);
+            });
+        });
+
+        verifyCodeBtn.addEventListener('click', function() {
+            const code = document.getElementById('verificationCode').value;
+            // 서버에 인증번호 확인 AJAX 호출
+            fetch('/verifyCode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    //window.location.href = '/login/init_pwd';
+                    emailVerifyBtn.style.display = 'none';
+                    verificationSection.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다: " + error);
+            });
+        });
+    });
+</script>
 <body>
+
     <div th:replace="~{common/header :: header}"></div>
     <h2>회원정보 입력</h2>
     <p>회원구분별로 가입 시 입력한 본인정보를 입력해 주세요.</p>
@@ -32,6 +96,11 @@
                     <option disabled="true">선택하세요</option>
                 </select>
                 <div class="field-error" th:errors="*{mail}"/>
+                <button type="button" id="emailVerifyBtn" style="display:none;">인증번호 요청</button>
+            </div>
+            <div id="verificationSection" style="display:none;">
+                <input type="text" id="verificationCode" placeholder="인증번호 입력">
+                <button type="button" id="verifyCodeBtn">이메일 인증</button>
             </div>
         </div>
 

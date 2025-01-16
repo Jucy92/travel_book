@@ -78,9 +78,10 @@ public class LoginController {
 
     @PostMapping("/login/search_id")
     public String findId(@Validated @ModelAttribute("loginModel") FindIdDto searchModel, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             log.info("findId error =[{}]", bindingResult);
-            return "login/search-id";
+            return "redirect:/login/search-id";
         }
         Member findMember = loginService.findByMail(searchModel); // 타입이 달라서 ModelAttribute에 자동으로 안담기는건가?? Member != LoginSearchModel
         searchModel.setUserId(findMember.getUserId());
@@ -98,12 +99,12 @@ public class LoginController {
 
         if (bindingResult.hasErrors()) {
             log.info("find password error={}",bindingResult);
-            return "/login/search-pwd";
+            return "redirect:/login/search-pwd";
         }
         Member result = loginService.findByCondition(searchModel);
         if (result == null) {
             bindingResult.reject("notFound", "일치하는 데이터가 없습니다");
-            return "/login/search-pwd";
+            return "redirect:/login/search-pwd";
         }
 
         return "/login/search-pwd-result";
