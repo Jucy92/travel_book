@@ -73,7 +73,7 @@
     <h2>회원정보 입력</h2>
     <p>회원구분별로 가입 시 입력한 본인정보를 입력해 주세요.</p>
 
-    <form th:action="@{/login/search_pwd}" method="post" th:object="${loginModel}">
+    <form th:action="@{/login/search-pwd}" method="post" th:object="${loginModel}">
         <div>
             <h3>개인회원(비밀번호 찾기)</h3>
             <div>
@@ -101,6 +101,9 @@
             <div id="verificationSection" style="display:none;">
                 <input type="text" id="verificationCode" placeholder="인증번호 입력">
                 <button type="button" id="verifyCodeBtn">이메일 인증</button>
+            </div>
+            <div id="">
+
             </div>
         </div>
 

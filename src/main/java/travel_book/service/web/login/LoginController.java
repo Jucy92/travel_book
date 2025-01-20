@@ -3,16 +3,15 @@ package travel_book.service.web.login;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import travel_book.service.domain.login.serivce.LoginService;
 import travel_book.service.domain.member.Member;
 import travel_book.service.web.login.model.LoginModel;
@@ -71,48 +70,127 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @GetMapping("/login/search_id")
-    public String searchId(@ModelAttribute("loginModel") FindIdDto searchModel) {
+    @GetMapping("/login/search-id")
+    public String searchId(@ModelAttribute("loginModel") FindIdDto searchModel, HttpSession session, Model model) {
+        // 세션은 각(브라우저) HTTP1.1 요청에 따라서 생성되기 때문에, key 값을 알아도 조회 불가
+
+        BindingResult bindingResult = (BindingResult) session.getAttribute("org.springframework.validation.BindingResult.loginModel");
+
+        if (bindingResult != null ) {
+            model.addAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+            session.removeAttribute("org.springframework.validation.BindingResult.loginModel");
+        }
+
         return "/login/search-id";
     }
 
-    @PostMapping("/login/search_id")
-    public String findId(@Validated @ModelAttribute("loginModel") FindIdDto searchModel, BindingResult bindingResult) {
+    @PostMapping("/login/search-id")
+    public String findId(@Validated @ModelAttribute("loginModel") FindIdDto searchModel, BindingResult bindingResult, HttpServletRequest request) {
+        /**
+         * 원래 그냥 RedirectAttributes redirectAttributes 파라미터로 받고     // 그냥 리다이렉트 하면, validated, loginModel 데이터 다 사라져서 RedirectAttributes 사용
+         * redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+         * redirectAttributes.addFlashAttribute("loginModel", searchModel);  
+         * Get 화면에서 loginModel 조회되는데 bindingResult 전달이 안돼서
+         * 세션으로 값 저장하고 넘겨주고 받아서 처리
+         */
+        HttpSession session = request.getSession();
 
         if (bindingResult.hasErrors()) {
-            log.info("findId error =[{}]", bindingResult);
+            log.info("findId bindingResult error =[{}]", bindingResult);
+            session.setAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+
+            return "redirect:/login/search-id"; // 리다하면서 loginModel 데이터 없이 오류메시지만 세션에 담아서 전달
+        }
+        try {
+            Member findMember = loginService.findByMail(searchModel); // 만약 회원이 조회되지 않으면 예외 터뜨리게 해놓음 -> 나중에 공통 예외 페이지 생성
+            log.info("findMember={}", findMember);
+            searchModel.setUserId(findMember.getUserId());
+            searchModel.setCdt(findMember.getCdt());
+            session.setAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+            session.setAttribute("loginModel", searchModel);
+
+            return "redirect:/login/search-id-result";
+        } catch (Exception e) {
+            bindingResult.reject("notFound", "일치하는 데이터가 없습니다.");
+            session.setAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+
             return "redirect:/login/search-id";
         }
-        Member findMember = loginService.findByMail(searchModel); // 타입이 달라서 ModelAttribute에 자동으로 안담기는건가?? Member != LoginSearchModel
-        searchModel.setUserId(findMember.getUserId());
-        searchModel.setCdt(findMember.getCdt());
+    }
+    @GetMapping("/login/search-id-result")
+    public String searchIdResult(HttpSession session, Model model) {
+        // 세션은 각(브라우저) HTTP1.1 요청에 따라서 생성되기 때문에, key 값을 알아도 조회 불가
+        BindingResult bindingResult = (BindingResult) session.getAttribute("org.springframework.validation.BindingResult.loginModel");
+        FindIdDto loginModel = (FindIdDto) session.getAttribute("loginModel");
+
+        if (bindingResult != null && loginModel != null) {
+            model.addAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+            model.addAttribute("loginModel", loginModel);     //@ModelAttribute("loginModel") 을 통해 add 되어 있음
+            session.removeAttribute("org.springframework.validation.BindingResult.loginModel");
+            session.removeAttribute("loginModel");
+        }
+        // 새로고침하면 그냥 빈 값 페이지 뜨는데.. 이게 맞을까.. 아니면 다른 사이트로 리다이렉트 보내주는게 맞을까..
+
         return "/login/search-id-result";
     }
+    @GetMapping("/login/search-pwd")
+    public String searchPassword(@ModelAttribute("loginModel") FindPasswordDto searchModel, HttpSession session, Model model) {
+        log.info("loginModel {}", searchModel); // 얘는 그냥 redirect하고
 
-    @GetMapping("/login/search_pwd")
-    public String searchPassword(@ModelAttribute("loginModel") FindPasswordDto searchModel) {
+        BindingResult bindingResult = (BindingResult) session.getAttribute("org.springframework.validation.BindingResult.loginModel");
+
+        if (bindingResult != null ) {
+            model.addAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+            session.removeAttribute("org.springframework.validation.BindingResult.loginModel");
+        }
+
         return "/login/search-pwd";
     }
 
-    @PostMapping("/login/search_pwd")
-    public String findPassword(@Validated @ModelAttribute("loginModel") FindPasswordDto searchModel, BindingResult bindingResult) {
+    @PostMapping("/login/search-pwd")
+    public String findPassword(@Validated @ModelAttribute("loginModel") FindPasswordDto searchModel,
+                               BindingResult bindingResult, HttpServletRequest request) {
+        HttpSession session = request.getSession();
 
         if (bindingResult.hasErrors()) {
-            log.info("find password error={}",bindingResult);
+            log.info("find password error={}", bindingResult);
+            //redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult); // 사용하는 클래스 경로 명시
+            //redirectAttributes.addFlashAttribute("loginModel", searchModel);
+            //log.info("redirectAttributes: {}", redirectAttributes.getFlashAttributes());
+            session.setAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
             return "redirect:/login/search-pwd";
         }
-        Member result = loginService.findByCondition(searchModel);
+        Member result = loginService.findByCondition(searchModel);  // 모델에 이메일이 없네? 상속받았는데?
         if (result == null) {
-            bindingResult.reject("notFound", "일치하는 데이터가 없습니다");
+            bindingResult.reject("notFound", "일치하는 데이터가 없습니다.");
+            session.setAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
             return "redirect:/login/search-pwd";
         }
-
-        return "/login/search-pwd-result";
+        session.setAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+        session.setAttribute("loginModel", searchModel);
+        return "redirect:/login/search-pwd-result";
     }
 
-    @PostMapping("/login/init_pwd")
-    public String initPassword(@ModelAttribute("loginModel") LoginModel loginModel) {
+    @GetMapping("/login/search-pwd-result")
+    public String searchPasswordResult(HttpSession session, Model model) {
+        // 세션은 각(브라우저) HTTP1.1 요청에 따라서 생성되기 때문에, key 값을 알아도 조회 불가
+        BindingResult bindingResult = (BindingResult) session.getAttribute("org.springframework.validation.BindingResult.loginModel");
+        FindIdDto loginModel = (FindIdDto) session.getAttribute("loginModel");
+
+        if (bindingResult != null && loginModel != null) {
+            model.addAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
+            model.addAttribute("loginModel", loginModel);     //@ModelAttribute("loginModel") 을 통해 add 되어 있음
+            //session.removeAttribute("org.springframework.validation.BindingResult.loginModel");
+            //session.removeAttribute("loginModel");
+        }
+        // 새로고침하면 그냥 빈 값 페이지 뜨는데.. 이게 맞을까.. 아니면 다른 사이트로 리다이렉트 보내주는게 맞을까..
+
+        return "/login/search-id-result";
+    }
+    @PostMapping("/login/init-password")
+    public String initPassword(@RequestBody LoginModel loginModel) {
         // 이제 입력 받은 비밀번호 저장하는 처리
-        return null;
+        System.out.println("loginModel = " + loginModel);
+        return "OK";
     }
 }
