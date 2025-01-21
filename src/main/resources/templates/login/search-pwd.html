@@ -5,11 +5,33 @@
     <title>회원정보 입력</title>
 </head>
 <script th:inline="javascript">
+    function checkedSubmit(event){
+        event.preventDefault(); // 기본 제출 동작을 막습니다.
+
+        const submitCheck = document.getElementById("checkedVerify").value;
+        const emailValue = document.getElementById('email').value.trim();
+        const idValue = document.getElementById('id').value.trim();
+
+        if (submitCheck !== 'true') {
+            if (emailValue !== '' && idValue !== '') {
+                alert('인증 완료 후 클릭해 주세요.');
+                return;
+            }
+
+        }
+        document.getElementById("findPassword").submit();
+    }
     document.addEventListener('DOMContentLoaded', function() {
         const emailInput = document.getElementById('email');
         const emailVerifyBtn = document.getElementById('emailVerifyBtn');
         const verificationSection = document.getElementById('verificationSection');
         const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+
+
+        if (emailInput.dataset.showVerify === 'true') {     // 이거 없어도 그냥 값이 th:style에 적용되서 보이는거 같은데..?
+            emailVerifyBtn.style.display = 'inline-block';
+        }
+
 
         emailInput.addEventListener('input', function() {
             if (emailInput.value.trim() !== '') {
@@ -21,7 +43,6 @@
         });
 
         emailVerifyBtn.addEventListener('click', function() {
-            // 서버에 인증번호 요청 AJAX 호출
             fetch('/mail', {
                 method: 'POST',
                 headers: {
@@ -38,13 +59,13 @@
                 }
             })
             .catch(error => {
-                alert("오류가 발생했습니다: " + error);
+                console.error("Error occurred:", error);
+                alert("오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
             });
         });
 
         verifyCodeBtn.addEventListener('click', function() {
             const code = document.getElementById('verificationCode').value;
-            // 서버에 인증번호 확인 AJAX 호출
             fetch('/verifyCode', {
                 method: 'POST',
                 headers: {
@@ -59,10 +80,13 @@
                     //window.location.href = '/login/init_pwd';
                     emailVerifyBtn.style.display = 'none';
                     verificationSection.style.display = 'none';
+                    document.getElementById("checkedVerify").value = data.checkedVerify;
+
                 }
             })
             .catch(error => {
-                alert("오류가 발생했습니다: " + error);
+                console.error("Error occurred:", error);
+                alert("오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
             });
         });
     });
@@ -73,7 +97,7 @@
     <h2>회원정보 입력</h2>
     <p>회원구분별로 가입 시 입력한 본인정보를 입력해 주세요.</p>
 
-    <form th:action="@{/login/search-pwd}" method="post" th:object="${loginModel}">
+    <form th:id="findPassword" th:action="@{/login/search-pwd}" method="post" th:object="${loginModel}" th:onsubmit="checkedSubmit(event)">
         <div>
             <h3>개인회원(비밀번호 찾기)</h3>
             <div>
@@ -86,27 +110,29 @@
 
             <div>
                 <label for="id">아이디</label>
-                <input type="text" id="id" th:field="*{userId}">
+                <input type="text" id="id" th:field="*{userId}" placeholder="아이디를 입력해주세요">
                 <div class="field-error" th:errors="*{userId}"/>
             </div>
             <div>
                 <label for="email">이메일 주소</label>
-                <input type="email" id="email" th:field="*{mail}">
-                <select>
-                    <option disabled="true">선택하세요</option>
+                <input type="email" id="email" th:field="*{mail}" placeholder="이메일을 입력해주세요">
+                <select id="emailDomain" disabled="true">
+                    <option value="" disabled selected>선택하세요</option>
+                    <option value="gmail.com">gmail.com</option>
+                    <option value="naver.com">naver.com</option>
+                    <option value="daum.net">daum.net</option>
                 </select>
-                <div class="field-error" th:errors="*{mail}"/>
-                <button type="button" id="emailVerifyBtn" style="display:none;">인증번호 요청</button>
+                <button type="button" id="emailVerifyBtn" th:style="${showEmailVerifyBtn} ? 'display:inline-block' : 'display:none'">인증번호 요청</button>
             </div>
-            <div id="verificationSection" style="display:none;">
+            <div id="verificationSection" th:style="${showVerifyCodeBtn} ? 'display:inline-block' : 'display:none'">
                 <input type="text" id="verificationCode" placeholder="인증번호 입력">
                 <button type="button" id="verifyCodeBtn">이메일 인증</button>
             </div>
-            <div id="">
+            <div class="field-error" th:errors="*{mail}"/>
 
             </div>
         </div>
-
+        <input type="hidden" id="checkedVerify"/>
         <button type="submit">비밀번호 찾기</button>
         <div th:if="${#fields.hasGlobalErrors()}">
             <p class="field-error" th:each="err : ${#fields.globalErrors()}"

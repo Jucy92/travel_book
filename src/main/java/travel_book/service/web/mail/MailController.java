@@ -58,14 +58,15 @@ public class MailController {
     @PostMapping("/verifyCode")     // 인증메일 확인 절차
     public ResponseEntity<Map<String, String>> CheckedCode(@RequestBody Map<String, String> requestMap) {
         String userInputCode = requestMap.get("code");
-        log.info("userInputCode={}",userInputCode);
+        log.info("userInputCode={}", userInputCode);
         Map<String, String> responseMap = new HashMap<>();
         if (mailService.verifyCode(userInputCode)) {
             responseMap.put("message", "인증에 성공했습니다.");
-            return new ResponseEntity<>(responseMap,HttpStatus.ACCEPTED);
+            responseMap.put("checkedVerify", "true"); // 인증 성공
+            return new ResponseEntity<>(responseMap, HttpStatus.ACCEPTED);
         }
         responseMap.put("message", "인증 번호가 다릅니다.");
-        return new ResponseEntity<>(responseMap,HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(responseMap, HttpStatus.NO_CONTENT);
     }
 
 }

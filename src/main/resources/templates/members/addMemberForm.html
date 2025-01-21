@@ -55,7 +55,7 @@ color: #dc3545;
     }
   }
   function encryptPassword(event) {
-        event.preventDefault(); <!--  메소드는 브라우저의 기본 동작을 막는 중요한 기능 -->
+        event.preventDefault(); // 기본 제출 동작을 막습니다.
         let password = document.getElementById("password").value;
         password = CryptoJS.SHA256(password).toString();
         document.getElementById("password").value = password;

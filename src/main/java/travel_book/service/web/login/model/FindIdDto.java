@@ -18,46 +18,4 @@ public class FindIdDto {
     private String userId;
     private String name;
     private LocalDateTime cdt;
-
-   /* public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDateTime getCdt() {
-        return cdt;
-    }
-
-    public void setCdt(LocalDateTime cdt) {
-        this.cdt = cdt;
-    }
-
-    @Override
-    public String toString() {
-        return "FindIdDto{" +
-                "mail='" + mail + '\'' +
-                ", userId='" + userId + '\'' +
-                ", name='" + name + '\'' +
-                ", cdt=" + cdt +
-                '}';
-    }*/
 }
