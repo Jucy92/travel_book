@@ -2,6 +2,7 @@ package travel_book.service.domain.repository;
 
 import travel_book.service.domain.member.Member;
 import travel_book.service.web.login.model.FindIdDto;
+import travel_book.service.web.login.model.LoginModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,7 @@ public interface MemberRepository {
     public Member save(Member member);
 
     void update(Member member);
+    boolean updatePassword(LoginModel model);
 
 //    public Optional<Member> findByMailToId(String mail);
 

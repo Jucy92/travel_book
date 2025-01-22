@@ -6,18 +6,24 @@ import jakarta.servlet.http.HttpSession;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import travel_book.service.domain.crypto.service.EncryptionService;
 import travel_book.service.domain.login.serivce.LoginService;
 import travel_book.service.domain.member.Member;
 import travel_book.service.web.login.model.LoginModel;
 import travel_book.service.web.login.model.FindIdDto;
 import travel_book.service.web.login.model.FindPasswordDto;
 import travel_book.service.web.session.SessionConst;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @Slf4j
@@ -196,10 +202,29 @@ public class LoginController {
         return "/login/search-pwd-result";
     }
 
+    @ResponseBody
     @PostMapping("/login/init-password")
-    public String initPassword(@RequestBody LoginModel loginModel) {
-        // 이제 입력 받은 비밀번호 저장하는 처리
-        System.out.println("loginModel = " + loginModel);
-        return "OK";
+    public ResponseEntity<Map<String, Object>> initPassword(@RequestBody LoginModel loginModel) {
+        // 이제 입력 받은 비밀번호 저장하는 처리 -> Map 말고 DTO 통해서 처리해보기
+        log.info("initPassword.loginModel={}", loginModel);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        try {
+            boolean isUpdate = loginService.updatePassword(loginModel);
+            log.info("initPassword.isUpdate={}", isUpdate);
+            if (!isUpdate) {
+                responseMap.put("message", "변경에 실패 했습니다.");
+                responseMap.put("status", false);
+                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+            }
+            responseMap.put("message", "정상적으로 변경 했습니다.");
+            responseMap.put("status", true);
+
+            return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        } catch (Exception e) {
+            responseMap.put("message", "서버 오류가 발생했습니다.");
+            responseMap.put("status", false);
+            return new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

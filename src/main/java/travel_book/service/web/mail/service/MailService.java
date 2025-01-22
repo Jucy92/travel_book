@@ -8,13 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Enumeration;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,18 +32,17 @@ public class MailService {
 
     public MimeMessage CreateMail(String mail){
         createNumber();
+        // 재요청 시 같은 변수에 값 그대로 덮어씀
         session.setAttribute("verificationCode", number);
         session.setAttribute("verificationTime", LocalDateTime.now());
-
         MimeMessage message = javaMailSender.createMimeMessage();
 
         try{
-
             message.setFrom(senderEmail);
             message.setRecipients(MimeMessage.RecipientType.TO, mail);
             message.setSubject("이메일 인증");
             String body = "";
-            body += "<h3>" + "이메일 인증 코드 보내드립니다." + "</h3>";
+            body += "<h3>" + "이메일 인증 코드 보내드립니다. (코드는 5분 후 만료 됩니다.)" + "</h3>";
             body += "<h1>" + number + "</h1>";
             body += "<h3>" + "감사합니다." + "</h3>";
             message.setText(body, "UTF-8", "html");
@@ -55,58 +51,42 @@ public class MailService {
             log.info("MessagingException = {}", e);
             e.printStackTrace();
         }
-        Enumeration<String> attributeNames = session.getAttributeNames();
-        while (attributeNames.hasMoreElements()) {
-            String attributeName = attributeNames.nextElement();
-            Object attributeValue = session.getAttribute(attributeName);
-            System.out.println("createMail -> " +attributeName + ": " + attributeValue);
-        }
         return message;
     }
 
     public int sendMail(String mail) {
-        Enumeration<String> attributeNames = session.getAttributeNames();
+        MimeMessage message = CreateMail(mail);     // 인증번호 + 메일 내용 생성
+        log.info("생성된 코드번호={}", session.getAttribute("verificationCode"));
+        log.info("생성된 시간={}", session.getAttribute("verificationTime"));
+        javaMailSender.send(message);   // 인증번호 메일 통해서 발송
 
-        log.info("sendMail before={}",attributeNames);
-
-        while (attributeNames.hasMoreElements()) {
-            String attributeName = attributeNames.nextElement();
-            Object attributeValue = session.getAttribute(attributeName);
-            System.out.println("before -> " +attributeName + ": " + attributeValue);
-        }
-        MimeMessage message = CreateMail(mail);
-        log.info("sendMail after={}",attributeNames);
-        while (attributeNames.hasMoreElements()) {
-            String attributeName = attributeNames.nextElement();
-            Object attributeValue = session.getAttribute(attributeName);
-            System.out.println("before -> " +attributeName + ": " + attributeValue);
-        }
-        javaMailSender.send(message);
         return number;
     }
 
     // 메일 계정 유무 확인
     public boolean checkedMail(String mail) {
         //Member member = memberRepository.findByMail(mail).orElse(null);
-        boolean memberExists = memberRepository.findByMail(mail).isPresent();   // Optional 기능 (isPresent 값이 있으면 true 없으면 false / isEmpty 값이 없으면 true)
-        return memberExists;
+        return memberRepository.findByMail(mail).isPresent();   // Optional 기능 (isPresent 값이 있으면 true 없으면 false / isEmpty 값이 없으면 true)
     }
     // 인증번호 유효기간 확인 (세션으로 관리)
     public boolean verifyCode(String userInputCode) {
+        /*
+        // 세션에 담긴 값 찍어봄
         Enumeration<String> attributeNames = session.getAttributeNames();
         while (attributeNames.hasMoreElements()) {
             String attributeName = attributeNames.nextElement();
             Object attributeValue = session.getAttribute(attributeName);
             System.out.println("verifyCode -> " +attributeName + ": " + attributeValue);
         }
+        */
         // 세션에서 인증번호와 발급 시간 가져오기
         String storedCode = String.valueOf(session.getAttribute("verificationCode"));
         LocalDateTime storedTime = (LocalDateTime) session.getAttribute("verificationTime");
-
         // 인증번호가 없거나 시간 초과시 false 반환
         if (storedCode == null || storedTime == null) {
             return false;
         }
+
 
         // 시간이 5분을 초과하면 인증번호 만료 처리
         if (Duration.between(storedTime, LocalDateTime.now()).toMinutes() > TIMEOUT_MINUTES) {
@@ -115,6 +95,13 @@ public class MailService {
             session.removeAttribute("verificationTime");
             return false;
         }
+        /*
+        log.info("인증번호 검증 화면 Code={}",storedCode);
+        log.info("인증번호 검증 화면 Time={}",storedTime);
+        log.info("인증번호 검증 화면 유효시간 확인={}",Duration.between(storedTime, LocalDateTime.now()).toMinutes() > TIMEOUT_MINUTES);
+        log.info("인증번호 검증 화면 유효시간 로직 값={}",Duration.between(storedTime, LocalDateTime.now()).toMinutes());
+        log.info("인증번호 검증 화면 유효시간={}분", TIMEOUT_MINUTES);
+        */
 
         // 인증번호 일치 여부 확인
         return storedCode.equals(userInputCode);

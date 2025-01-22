@@ -66,7 +66,7 @@
 
         verifyCodeBtn.addEventListener('click', function() {
             const code = document.getElementById('verificationCode').value;
-            fetch('/verifyCode', {
+            fetch('/mail/verifyCode', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -77,11 +77,11 @@
             .then(data => {
                 if (data.message) {
                     alert(data.message);
-                    //window.location.href = '/login/init_pwd';
-                    emailVerifyBtn.style.display = 'none';
-                    verificationSection.style.display = 'none';
-                    document.getElementById("checkedVerify").value = data.checkedVerify;
-
+                    if (data.checkedVerify === "true"){
+                        emailVerifyBtn.style.display = 'none';
+                        verificationSection.style.display = 'none';
+                        document.getElementById("checkedVerify").value = data.checkedVerify;
+                    }
                 }
             })
             .catch(error => {

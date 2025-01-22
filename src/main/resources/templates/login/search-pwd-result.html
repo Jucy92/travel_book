@@ -27,12 +27,12 @@
     </style>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script th:inline="javascript">
     function init_password(){
         const password = document.getElementById('pwd').value;
         const confirmPassword = document.getElementById('confirmPwd').value;
         const encryptPassword = CryptoJS.SHA256(password).toString();
+        const userId = /*[[${loginModel.userId}]]*/ 'default';     // 타임리프 문법 ${} -> 자바스크립트에서 사용하는 방법
 
         if (password !== confirmPassword) {
             alert('비밀번호가 일치하지 않습니다.');
@@ -49,11 +49,10 @@
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                userId: document.getElementById('userId').value,
+                userId: userId,
                 password: encryptPassword
             })
         })
-        .then(response => response.json())
         .then(response => {
             if (!response.ok) {
                 throw new Error('서버 응답 오류');
@@ -61,7 +60,10 @@
             return response.json();
         })
         .then(data => {
-            if (data.message){
+            if (data.status){
+                alert(data.message);
+                window.location.href = '/login';
+            }else{
                 alert(data.message);
             }
         })
@@ -73,6 +75,7 @@
     }
 
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
     <div class="container">
         <h2>비밀번호 재설정</h2>

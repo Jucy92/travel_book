@@ -7,6 +7,7 @@ import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.MemberSearchCond;
 import travel_book.service.web.login.model.FindIdDto;
+import travel_book.service.web.login.model.LoginModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,11 @@ public class MyBatisRepository implements MemberRepository {
     @Override
     public void update(Member member) {
         repositoryMapper.update(member);
+    }
+
+    @Override
+    public boolean updatePassword(LoginModel model) {  // 다형성(메모리, JPA, 마이바티스) 때문에 하나씩 계속 생성하는데.. 동적으로 처리해야하나..
+        return repositoryMapper.updatePassword(model);
     }
 
     @Override

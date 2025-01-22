@@ -7,6 +7,7 @@ import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.MemberSearchCond;
 import travel_book.service.web.login.model.FindIdDto;
+import travel_book.service.web.login.model.LoginModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,11 @@ public class MemoryRepository implements MemberRepository {
 
         log.info("update 호출={}", findMember);
         log.info("List={}",findAll());
+    }
+
+    @Override
+    public boolean updatePassword(LoginModel model) {
+        return false;
     }
 
 
