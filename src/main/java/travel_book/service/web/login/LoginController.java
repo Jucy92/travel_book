@@ -189,7 +189,7 @@ public class LoginController {
     }
 
     @GetMapping("/login/search-pwd-result")
-    public String searchPasswordResult(HttpSession session, Model model) {
+    public String searchPasswordResult(@ModelAttribute("loginModel") FindPasswordDto loginModel, HttpSession session, Model model) {
         // 세션은 각(브라우저) HTTP1.1 요청에 따라서 생성되기 때문에, key 값을 알아도 조회 불가
         BindingResult bindingResult = (BindingResult) session.getAttribute("org.springframework.validation.BindingResult.loginModel");
 
