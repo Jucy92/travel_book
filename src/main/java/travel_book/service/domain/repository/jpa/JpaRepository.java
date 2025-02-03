@@ -66,4 +66,9 @@ public class JpaRepository implements MemberRepository {
     public Optional<Member> memberInfoFindByUser(String paramId) {
         return Optional.empty();
     }
+
+    @Override
+    public <T> T selectOne(String queryId, Object param) {
+        return null;
+    }
 }

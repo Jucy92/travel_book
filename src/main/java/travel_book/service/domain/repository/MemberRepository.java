@@ -26,7 +26,7 @@ public interface MemberRepository {
     public List<Member> findAll(MemberSearchCond searchCond);
     public Optional<Member> memberInfoFindByUser(String paramId);       // 넘겨 받은 userId or name 가지고 id 값 찾기
 
-
+    <T> T selectOne(String queryId, Object param);
 
 
 }

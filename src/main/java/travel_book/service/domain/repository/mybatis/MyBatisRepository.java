@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Primary
+@Primary    // 기본 빈으로 지정
 @RequiredArgsConstructor
 public class MyBatisRepository implements MemberRepository {
 
@@ -73,6 +73,17 @@ public class MyBatisRepository implements MemberRepository {
 
     public Optional<Member> memberInfoFindByUser(String userId) {      // 넘겨 받은 userId or name 가지고 id 값 찾기
         return repositoryMapper.memberInfoFindByUser(userId);
+    }
+
+    @Override
+    public Member selectOne(String queryId, Object param) {
+        System.out.println("selectOne 호출");
+        Object obj = repositoryMapper.selectOne(queryId, param);// xml 에서 어떻게 처리를 할까
+
+        System.out.println("obj = " + obj);
+        Member member = (Member) obj;
+        System.out.println("member = " + member);
+        return member;
     }
 
 }

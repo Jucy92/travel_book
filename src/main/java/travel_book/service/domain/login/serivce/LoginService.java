@@ -15,9 +15,9 @@ import travel_book.service.web.login.model.LoginModel;
 @Slf4j
 public class LoginService {
 
-    private final MemberRepository memberRepository;
+    private final MemberRepository memberRepository;    // = 회원 서비스(Repository == Service) 용어 혼동 x
     private final EncryptionService encryptionService;
-    
+
     /*
     public Member login(String email, String password) {        // 이메일 로그인 방식에서 아이디 로그인 방식으로 변경
         log.info("loginService [email = [{}], pass = [{}]]", email, password);
@@ -38,7 +38,9 @@ public class LoginService {
 
     public Member findByMail(FindIdDto searchModel) {
         log.info("findByMail.searchModel ={}", searchModel);
-        return memberRepository.findByMail(searchModel.getMail()).orElseThrow();
+        return memberRepository.selectOne("findByMail",searchModel);
+
+        //return memberRepository.findByMail(searchModel.getMail()).orElseThrow();
         // 이러면 무슨 오류가 발생할까?? 널포인터?? 이 오류를 캐치로 잡아서 일치하는 이메일 주소 없다고 알려주기  => 발생하는 예외 NoSuchElementException
     }
 

@@ -117,6 +117,7 @@ public class LoginController {
 
             return "redirect:/login/search-id-result";
         } catch (Exception e) {
+            log.info("이메일 조회 쿼리 실행 중 예외 발생", e);
             bindingResult.reject("notFound", "일치하는 데이터가 없습니다.");
             session.setAttribute("org.springframework.validation.BindingResult.loginModel", bindingResult);
 

@@ -13,6 +13,7 @@ import java.util.UUID;
 public class LogInterceptor implements HandlerInterceptor {
 
     public static final String LOG_ID = "logId";
+    //String uuid;  // 이렇게 사용 못하는 이유는 LogInterceptor 객체가 싱글톤 이므로 값이 바뀜 -> 지역 변수로 사용
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {   // 예외 상황에서 통과
@@ -32,7 +33,8 @@ public class LogInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {  // 예외 상황 통과
-        log.info("postHandle [{}]", modelAndView);
+        String uuid = (String) request.getAttribute(LOG_ID);
+        log.info("postHandle [{}][{}]", uuid, modelAndView);
     }
 
     @Override

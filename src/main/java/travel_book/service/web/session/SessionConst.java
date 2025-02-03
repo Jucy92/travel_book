@@ -1,6 +1,6 @@
 package travel_book.service.web.session;
 
-public class SessionConst {
+public abstract class SessionConst {
     public static final String SESSION_NAME = "loginSession";
 }
 

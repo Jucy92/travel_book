@@ -115,6 +115,11 @@ public class MemoryRepository implements MemberRepository {
         return Optional.empty();
     }
 
+    @Override
+    public <T> T selectOne(String queryId, Object param) {
+        return null;
+    }
+
     public void clearStore() {
         store.clear();
     }
