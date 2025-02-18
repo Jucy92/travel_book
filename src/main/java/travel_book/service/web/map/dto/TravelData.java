@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 //@Alias("TravelData")  // 여기서 이렇게 설정하면 xml 파일에서 resultType에 클래스명 바로 입력해도 인식함
-public class TravelData {
+public class TravelData {   // 이 DTO도 나눴어야 했는데.. 리스트 가져오는거, 리스트의 상세 데이터 가져오는거 두개로... => TravelList, TravelDetail로 나눔
 
     private String userId;
 

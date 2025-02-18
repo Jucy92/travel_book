@@ -10,7 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
-import travel_book.service.web.map.dto.TravelData;
+import travel_book.service.web.map.dto.TravelDetail;
+import travel_book.service.web.map.dto.TravelList;
 import travel_book.service.web.map.service.MapServiceJpa;
 import travel_book.service.web.map.service.MapServiceMybatis;
 import travel_book.service.web.session.SessionConst;
@@ -43,7 +44,7 @@ public class MapController {
     }
 
     @PostMapping("/travel/add")
-    public ResponseEntity<Map<String,String>> addItinerary(@RequestBody Map<String, Object> data, @SessionAttribute(value = SessionConst.SESSION_NAME, required = false) Member member) {
+    public ResponseEntity<String> addItinerary(@RequestBody Map<String, Object> data, @SessionAttribute(value = SessionConst.SESSION_NAME, required = false) Member member) {
         // 데이터를 각 테이블로 쪼개서 받냐, 아니면 TravelData에 한번에 담아서 여러번 받냐......... 화면 만들 때 다시 고민
         if (member == null) {
             Member tempMember = memberRepository.findByMember("test9").orElse(null);
@@ -52,9 +53,7 @@ public class MapController {
 
         mapServiceMybatis.addItinerary(data, member.getId());
         //mapServiceJpa.addItinerary(data, member.getId());
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "데이터가 정상적으로 저장되었습니다!");
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body("데이터가 정상적으로 저장되었습니다!");
 
     }
 
@@ -66,8 +65,8 @@ public class MapController {
 
     @GetMapping("/travel/{userId}")
     public String travelList(@PathVariable(value = "userId") String userId, Model model/*, ModelAndView mv*/) {
-        List<TravelData> travelList = mapServiceMybatis.findByTravel(memberRepository.findById(userId));
-        model.addAttribute("travelList", travelList);  // 이렇게 한다고 데이터를 가지고 list 화면으로 넘어가나?
+        List<TravelList> list = mapServiceMybatis.findByTravel(memberRepository.findById(userId));
+        model.addAttribute("travelList", list);  // 이렇게 한다고 데이터를 가지고 list 화면으로 넘어가나?
         //mv.getModel().put("travelList", travelList);  // -> 필요 없음 model + return String 으로 전달됨
         //mv.setViewName("/travel/travel-list");
         return "/travel/travel-list";
@@ -77,15 +76,11 @@ public class MapController {
     @PostMapping("/travel/{travelId}")
     // travel/파라미터 하나 날아오는걸로 userId인지 travelId인지 구별 못함, 순서 바꿔도 안돼서 아래 주석 sonsumers = JSON이라 우선으로 잡혔나..?
     @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public List<TravelData> travelList(@PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
-        //                              ㄴ> 검색 조건이 더 많아지면 번호가 아니라 DTO로 하는게 낫지않나..?
-        List<TravelData> travelList = mapServiceMybatis.findByTravelId(travelId);
-        log.info("travelId={}", travelList);
+    public ResponseEntity<List<TravelDetail>> travelList(@PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
+        List<TravelDetail> detail = mapServiceMybatis.findByTravelId(travelId);
+        log.info("travelId={}", detail);
 
-        // model.attribute("화면명", travels);   // 근데 화면에서 값 받아서 쓰려면 타임리프 th:object 기능 쓰거나, -> 이렇게 하려면 @ResponseBody 제거
-        // 아래 방식으로 보내면 화면에서 받아서 자바스크립트로 처리
-        return travelList; // @ResponseBody 추가하고 이렇게 보내면 자동으로 JSON 타입으로 전달 -> 자바스크립트에서 받아서 보여주고 선택해서 여행번호까지 보내주면 그 건에 대해서 처리
+        return ResponseEntity.status(HttpStatus.OK).body(detail);
     }
 
     /*  

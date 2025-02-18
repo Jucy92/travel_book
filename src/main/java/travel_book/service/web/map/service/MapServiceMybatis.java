@@ -6,10 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import travel_book.service.domain.repository.mybatis.MyBatisRepository;
 import travel_book.service.web.map.MapService;
 import travel_book.service.web.map.dao.MapMapper;
-import travel_book.service.web.map.dto.LocationDetailModel;
-import travel_book.service.web.map.dto.LocationModel;
-import travel_book.service.web.map.dto.TravelData;
-import travel_book.service.web.map.dto.TravelModel;
+import travel_book.service.web.map.dto.*;
 
 
 import java.util.List;
@@ -56,11 +53,11 @@ public class MapServiceMybatis implements MapService {
         return mapMapper.findByLocationDetail(travelId, locationId);
     }
 
-    public List<TravelData> findByTravel(long id) {     // 사용자 ID로 저장된 여행 리스트 가져오기
+    public List<TravelList> findByTravel(long id) {     // 사용자 ID로 저장된 여행 리스트 가져오기
         return mapMapper.findByTravel(id);
     }
 
-    public List<TravelData> findByTravelId(long travelId) {    // travelId로 여행 한 건에 대한 모든 정보 가져오기
+    public List<TravelDetail> findByTravelId(long travelId) {    // travelId로 여행 한 건에 대한 모든 정보 가져오기
         return mapMapper.findByTravelId(travelId);
     }
 

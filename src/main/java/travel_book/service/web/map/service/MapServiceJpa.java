@@ -13,7 +13,6 @@ import travel_book.service.domain.map.Travel;
 import travel_book.service.web.map.dao.LocationDetailRepository;
 import travel_book.service.web.map.dao.LocationRepository;
 import travel_book.service.web.map.dao.TravelRepository;
-import travel_book.service.web.map.dto.TravelData;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
