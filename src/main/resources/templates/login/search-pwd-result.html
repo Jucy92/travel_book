@@ -33,7 +33,7 @@
         const confirmPassword = document.getElementById('confirmPwd').value;
         const encryptPassword = CryptoJS.SHA256(password).toString();
         const userId = /*[[${loginModel.userId}]]*/ 'default';     // 타임리프 문법 ${} -> 자바스크립트에서 사용하는 방법
-N
+
         if (password !== confirmPassword) {
             alert('비밀번호가 일치하지 않습니다.');
             return;

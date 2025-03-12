@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <title>파일 업로드 화면</title>
+    <script>
+        function uploadFiles() {
+            const files = document.getElementById('files').files;
+            const formData = new FormData();
+
+            for (let i = 0; i < files.length; i++){
+                formData.append("files", files[i]);
+            }
+
+
+            fetch('/files/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("업로드 성공: " + data.uploadedFiles.join(", "));
+                //document.getElementById('uploadStatus').innerText = data.message; // 이게 uploadStatus 화면을 따로 만들어서 성공/실패 상태 값 처리한다는데.. 굳이 이렇게 할 필요가 있나
+            })
+            .catch(error => {
+                console.log("Error:", error);
+                alert("업로드 실패");
+                //document.getElementById('uploadStatus').innerText = 'Upload failed: ' + error;
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>File Upload</h2>
+    <input type="file" id="files" multiple>
+    <button onclick="uploadFiles()">업로드</button>
+    <div id="uploadStatus"></div>
+
+</div>
+</body>
+</html>

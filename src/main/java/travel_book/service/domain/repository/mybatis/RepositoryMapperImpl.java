@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Primary
-@Repository
+@Repository   // MyBatis의 자동 프록시가 아닌 직접 구현체 사용
 @RequiredArgsConstructor
 public class RepositoryMapperImpl implements RepositoryMapper{
 
@@ -23,58 +23,39 @@ public class RepositoryMapperImpl implements RepositoryMapper{
     private final SqlSession sqlSession;
     @Override
     public void save(Member member) {
-
+        sqlSession.insert("RepositoryMapper.save", member); // RepositoryMapper 인터페이스의 save(Member member)을 수동으로 호출
+        // 인터페이스에 @Mapper가 붙는 경우 자동으로 프록시 기능을 통해 구현체 생성해주지만,
+        // 여기서는 DAO 공통으로 호출할 수 있도록 queryId를 넘겨주고 받기 위해 직접 구현체 생성 했기에 위와같이 수동으로 호출 해줘야한다.
     }
 
     @Override
     public void update(Member member) {
-
+        sqlSession.update("RepositoryMapper.update", member);
     }
 
-    @Override
-    public int update(String queryId, Object parameter) {
-        return sqlSession.update(queryId, parameter);
+    /*
+    public int update(String queryId, Object parameter) {   // insert, update 확장 가능성 있음? Member 테이블인데? 다른 테이블을 여기서 저장하거나 변경할 일이 있을까?
+        return sqlSession.update(queryId, parameter);       // ㄴ> 사용할 일이 없을거 같아서 공통으로 빼주는 작업 추후로 미룸 -> 부분 insert, update 시 필요해보임
     }
+    */
 
     @Override
     public boolean updatePassword(LoginModel model) {
-        return false;
+        int result = sqlSession.update("updatePassword", model);
+        return result > 0;  // 업데이트된 행이 1개 이상이면 true 반환
     }
 
-    @Override
-    public Optional<Member> findByMail(String mail) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Member> findByCondition(FindIdDto findIdDto) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Member> findByMember(String userId) {
-        return Optional.empty();
-    }
-
-    @Override
-    public long findById(String userId) {
-        return 0;
-    }
-
-    @Override
-    public long findByUserId(long id) {
-        return 0;
-    }
-
+    /*
     @Override
     public List<Member> findAll() {
-        return null;
+        return sqlSession.selectList("findAll");
     }
 
     @Override
     public List<Member> findAll(MemberSearchCond searchCond) {
         return null;
     }
+    */
 
     @Override
     public Optional<Member> memberInfoFindByUser(String userId) {
@@ -82,12 +63,16 @@ public class RepositoryMapperImpl implements RepositoryMapper{
     }
 
     @Override
-    public <T> T selectOne(String queryId, Object param) {
-        return sqlSession.selectOne(queryId, param);
+    public <T> Optional<T> selectOne(String queryId, Object param) {
+        return Optional.ofNullable(sqlSession.selectOne(queryId, param));
     }
 
     @Override   // select One, List 다 sqlSession 기능 -> DAO 인터페이스랑 상관 없음 -> 하지만 서비스에서 사용 할 때는 인터페이스를 바라보고 있기 때문에 필요
     public <T> List<T> selectList(String queryId, Object param) {
         return sqlSession.selectList(queryId, param);
+    }
+    @Override
+    public <T> List<T> selectList(String queryId) {
+        return sqlSession.selectList(queryId);
     }
 }

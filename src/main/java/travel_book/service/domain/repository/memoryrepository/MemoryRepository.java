@@ -90,6 +90,11 @@ public class MemoryRepository implements MemberRepository {
     }
 
     @Override
+    public List<Member> findAll(Object searchCond) {
+        return null;
+    }
+
+
     public List<Member> findAll(MemberSearchCond searchCond) {      // 변경하면서 바꾸긴 했는데 아직 기능 구현 안함 -> 나중에 이메일 주소, 닉네임으로 게시물 검색할 때 사용
         String mail = searchCond.getMail();
         String name = searchCond.getName();

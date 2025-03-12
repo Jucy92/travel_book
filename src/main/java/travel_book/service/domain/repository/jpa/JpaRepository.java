@@ -58,7 +58,7 @@ public class JpaRepository implements MemberRepository {
     }
 
     @Override
-    public List<Member> findAll(MemberSearchCond searchCond) {
+    public List<Member> findAll(Object searchCond) {
         return null;
     }
 

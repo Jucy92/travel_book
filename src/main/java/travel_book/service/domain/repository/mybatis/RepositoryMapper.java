@@ -17,21 +17,16 @@ public interface RepositoryMapper {
     void save(Member member);
 
     void update(@Param("updateParam") Member member);   // member->updateParam으로 변경 1개는 바로 쓰면 되지만, 2개 이상일 경우 구분 지어줘야한다
-    int update(String queryId, Object parameter);
     boolean updatePassword(LoginModel model);
 
-    Optional<Member> findByMail(String mail);                   // 받는 매개 변수를 정해야해서 오버로딩해서 사용 불가
-    Optional<Member> findByCondition(/*@Param("param") */FindIdDto findIdDto);  // 여러개 조건으로 조회    -> 이걸로 새로 만드려다 아래 findAll(MemberSearchCond searchCond) 사용해보기로
-    Optional<Member> findByMember(String userId);
-    long findById(String userId);
-    long findByUserId(long id);
-    List<Member> findAll();
-    List<Member> findAll(MemberSearchCond searchCond);
+    //List<Member> findAll();
+    //List<Member> findAll(MemberSearchCond searchCond);
     Optional<Member> memberInfoFindByUser(String userId);
 
     //@Select("${queryId}")
-    <T> T selectOne(@Param("queryId") String queryId, @Param("param") Object param);
+    <T> Optional<T> selectOne(@Param("queryId") String queryId, @Param("param") Object param);
 
     <T> List<T> selectList(@Param("queryId") String queryId, @Param("param") Object param);
+    <T> List<T> selectList(@Param("queryId") String queryId);
 
 }

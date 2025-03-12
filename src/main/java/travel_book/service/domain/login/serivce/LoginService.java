@@ -8,6 +8,8 @@ import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.web.login.model.FindIdDto;
 import travel_book.service.web.login.model.LoginModel;
+
+import java.util.List;
 //import travel_book.service.domain.member.MemberRepository;
 
 @Service
@@ -38,7 +40,10 @@ public class LoginService {
 
     public Member findByMail(FindIdDto searchModel) {
         log.info("findByMail.searchModel ={}", searchModel);
-        return memberRepository.selectOne("findByMail",searchModel);
+        //List<Member> Members = memberRepository.findAll();// 메일 찾기에서 회원 리스트 담아오나 테스트
+        List<Member> Members = memberRepository.findAll(searchModel);// 메일 찾기에서 회원 리스트 담아오나 테스트
+        log.info("MemberFindAll={}", Members);
+        return memberRepository.findByMail(searchModel.getMail()).orElse(null);
 
         //return memberRepository.findByMail(searchModel.getMail()).orElseThrow();
         // 이러면 무슨 오류가 발생할까?? 널포인터?? 이 오류를 캐치로 잡아서 일치하는 이메일 주소 없다고 알려주기  => 발생하는 예외 NoSuchElementException

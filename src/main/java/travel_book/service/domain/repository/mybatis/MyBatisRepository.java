@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Primary    // 기본 빈으로 지정
+@Primary    // 기본 빈으로 지정(Repository 종류 중)
 @RequiredArgsConstructor
 public class MyBatisRepository implements MemberRepository {
 
@@ -37,38 +37,41 @@ public class MyBatisRepository implements MemberRepository {
 
     @Override
     public Optional<Member> findByMail(String mail) {
-        return repositoryMapper.findByMail(mail);
+        return repositoryMapper.selectOne("findByMail", mail);
     }
 
     public Optional<Member> findByCondition(FindIdDto findIdDto) {
-        return repositoryMapper.findByCondition(findIdDto);
+        //return repositoryMapper.findByCondition(findIdDto);
+        return repositoryMapper.selectOne("findByCondition", findIdDto);
     }
 
     @Override
     public Optional<Member> findByMember(String userId) {
-        return repositoryMapper.findByMember(userId);
+        return repositoryMapper.selectOne("findByMember", userId);
     }
 
     @Override
     public long findById(String userId) {
-        return repositoryMapper.findById(userId);
+        return (long) repositoryMapper.selectOne("findById", userId).orElse(0L);
+//        return 0;
     }
 
 
     @Override
     public long findByUserId(long id) {
-        return repositoryMapper.findByUserId(id);
+        return (long) repositoryMapper.selectOne("findByUserId", id).orElse(0L);
     }
 
 
     @Override
     public List<Member> findAll() {     // 테스트에서 사용으로 로직 변경
-        return repositoryMapper.findAll();
+        //return repositoryMapper.findAll();
+        return repositoryMapper.selectList("findAll");
     }
 
     @Override
-    public List<Member> findAll(MemberSearchCond searchCond) {
-        return repositoryMapper.findAll(searchCond);
+    public List<Member> findAll(Object searchCond) {
+        return repositoryMapper.selectList("findAll", searchCond);
     }
 
     public Optional<Member> memberInfoFindByUser(String userId) {      // 넘겨 받은 userId or name 가지고 id 값 찾기
