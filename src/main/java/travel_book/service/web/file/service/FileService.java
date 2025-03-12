@@ -10,7 +10,16 @@ import java.util.List;
 
 @Service
 public class FileService {
-    private static final String UPLOAD_DIR = "C:/uploads"; // 저장 경로 설정
+    private static final String UPLOAD_DIR; // = "C:/uploads"; // 저장 경로 설정
+    static {
+    String os = System.getProperty("os.name").toLowerCase();
+    if (os.contains("win")) {
+        UPLOAD_DIR = "C:/uploads"; // Windows 경로
+    } else {
+        UPLOAD_DIR = "/home/username/uploads"; // 리눅스 경로
+    }
+}
+
 
     public List<String> saveFiles(MultipartFile[] files) {
         List<String> fileNames = new ArrayList<>();
