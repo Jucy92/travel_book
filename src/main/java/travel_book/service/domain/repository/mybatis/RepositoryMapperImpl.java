@@ -45,18 +45,6 @@ public class RepositoryMapperImpl implements RepositoryMapper{
         return result > 0;  // 업데이트된 행이 1개 이상이면 true 반환
     }
 
-    /*
-    @Override
-    public List<Member> findAll() {
-        return sqlSession.selectList("findAll");
-    }
-
-    @Override
-    public List<Member> findAll(MemberSearchCond searchCond) {
-        return null;
-    }
-    */
-
     @Override
     public Optional<Member> memberInfoFindByUser(String userId) {
         return Optional.empty();
@@ -64,6 +52,8 @@ public class RepositoryMapperImpl implements RepositoryMapper{
 
     @Override
     public <T> Optional<T> selectOne(String queryId, Object param) {
+        // 마이바티스 xml 파일에 중복으로있는 queryId를 여기서 동적으로 호출하면 중복 오류 발생한다. (@Mapper 통해서 자동 생성되거나, 직접 생성한 거나 둘 다 한 곳에 값이 저장되어있는듯..?)
+        // ex) findById => Member(findUserIdById로 변경)에도 있고, travel 에도 있었음          ㄴ> 직접 명시하기 떄문에 상관 없는데,  ㄴ> queryId로 검색하기 때문에 중복 오류 발생하는 듯
         return Optional.ofNullable(sqlSession.selectOne(queryId, param));
     }
 

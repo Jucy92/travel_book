@@ -16,16 +16,12 @@ public interface RepositoryMapper {
 
     void save(Member member);
 
-    void update(@Param("updateParam") Member member);   // member->updateParam으로 변경 1개는 바로 쓰면 되지만, 2개 이상일 경우 구분 지어줘야한다
+    void update(@Param("updateParam") Member member);   // member->updateParam으로 변경 / 1개는 바로 쓰면 되지만, 2개 이상일 경우 구분 지어줘야한다
     boolean updatePassword(LoginModel model);
-
-    //List<Member> findAll();
-    //List<Member> findAll(MemberSearchCond searchCond);
     Optional<Member> memberInfoFindByUser(String userId);
 
     //@Select("${queryId}")
     <T> Optional<T> selectOne(@Param("queryId") String queryId, @Param("param") Object param);
-
     <T> List<T> selectList(@Param("queryId") String queryId, @Param("param") Object param);
     <T> List<T> selectList(@Param("queryId") String queryId);
 

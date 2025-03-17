@@ -25,8 +25,4 @@ public interface MemberRepository {
     public List<Member> findAll();                                      // 메모리에서 이메일로 저장 데이터 찾을 때 필요...
     public List<Member> findAll(Object searchCond);
     public Optional<Member> memberInfoFindByUser(String paramId);       // 넘겨 받은 userId or name 가지고 id 값 찾기
-
-    <T> T selectOne(String queryId, Object param);
-
-
 }

@@ -49,7 +49,7 @@
         </where>
     </select>
 
-    <select id="findById" resultType="long">  <!-- 자료형(int,long), 래퍼 클래스(java.lang.Integer), 문자열(java.lang.String), Map(java.util.Map) 받을 수 있음-->
+    <select id="findIdByUserId" resultType="long">  <!-- 자료형(int,long), 래퍼 클래스(java.lang.Integer), 문자열(java.lang.String), Map(java.util.Map) 받을 수 있음-->
         SELECT ID
             FROM MEMBER
          WHERE USER_ID = #{userId}

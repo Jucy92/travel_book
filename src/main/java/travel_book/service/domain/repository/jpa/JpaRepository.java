@@ -67,8 +67,4 @@ public class JpaRepository implements MemberRepository {
         return Optional.empty();
     }
 
-    @Override
-    public <T> T selectOne(String queryId, Object param) {
-        return null;
-    }
 }
