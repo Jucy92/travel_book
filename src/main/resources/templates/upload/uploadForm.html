@@ -22,6 +22,16 @@
             .then(data => {
                 alert("업로드 성공: " + data.uploadedFiles.join(", "));
                 //document.getElementById('uploadStatus').innerText = data.message; // 이게 uploadStatus 화면을 따로 만들어서 성공/실패 상태 값 처리한다는데.. 굳이 이렇게 할 필요가 있나
+                console.log("데이터:", data);
+                // 업로드된 파일 리스트를 받아서 이미지 태그 추가
+                const imageContainer = document.getElementById("imageContainer");
+                data.imageList.forEach(fileName => {
+                    const imgElement = document.createElement("img");
+                    imgElement.src = `/images/${fileName}`; // 서버에서 제공하는 이미지 URL
+                    imgElement.alt = "업로드된 이미지";
+                    imgElement.width = 300;
+                    imageContainer.appendChild(imgElement);
+                });
             })
             .catch(error => {
                 console.log("Error:", error);
@@ -37,6 +47,9 @@
     <input type="file" id="files" multiple>
     <button onclick="uploadFiles()">업로드</button>
     <div id="uploadStatus"></div>
+
+    <!-- 동적으로 이미지 추가될 영역 -->
+    <div id="imageContainer"></div>
 
 </div>
 </body>
