@@ -33,7 +33,7 @@ public class LoginService {
         String encrypt = encryptionService.encrypt(password);
         String decrypt = encryptionService.decrypt(encrypt);
         log.info("login.loginService 암호화={}, 복호화={}", encrypt, decrypt);  // 적용은 안하고 기능만 만들어놓음
-        return memberRepository.findByMember(userId)
+        return memberRepository.findMemberByUserId(userId)
                 .filter(m -> m.getPassword().equals(password))
                 .orElse(null);
     }

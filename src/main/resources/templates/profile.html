@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Instagram Profile</title>
+    <style>
+        /* Tailwind CSS 스타일을 여기에 직접 추가하거나, CSS 파일로 분리할 수 있습니다. */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fafafa;
+        }
+        .container {
+            width: 100%;
+            max-width: 975px; /* Instagram 컨테이너 최대 너비 */
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #dbdbdb;
+        }
+        .profile-image {
+            width: 77px;
+            height: 77px;
+            border-radius: 50%;
+            border: 1px solid #dbdbdb;
+            margin-right: 30px;
+        }
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .username {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            /* Username 링크 추가 */
+        }
+        .profile-stats {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .profile-stats span {
+            margin-right: 20px;
+        }
+        .profile-name {
+            font-weight: bold;
+        }
+        .profile-bio {
+            margin-top: 5px;
+        }
+        .profile-navigation {
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid #dbdbdb;
+            margin-top: 20px;
+        }
+        .profile-navigation button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #999;
+        }
+        .profile-navigation button.active {
+            color: #262626;
+        }
+        .posts-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            margin-top: 20px;
+        }
+        .posts-section img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+        }
+        .no-posts {
+            text-align: center;
+        }
+    </style>
+    <script>
+        const profileData = /*[[${profileData}]]*/{};
+        let userId = profileData.userId;
+        console.log(profileData);
+
+        function loadPosts() {
+            fetch('/api/posts', {method: 'POST', body: userId})
+                .then(response => response.json())
+                .then(data => {
+                    displayPosts(data);
+                });
+        }
+
+        function loadReels() {
+            fetch('/api/reels')
+                .then(response => response.json())
+                .then(data => {
+                    displayPosts(data);
+                });
+        }
+
+        function loadTagged() {
+            fetch('/api/tagged')
+                .then(response => response.json())
+                .then(data => {
+                    displayPosts(data);
+                });
+        }
+
+        function displayPosts(posts) {
+            const postsSection = document.querySelector('.posts-section');
+            postsSection.innerHTML = ''; // Clear existing posts
+
+            if (posts.length === 0) {
+                postsSection.innerHTML = '<div class="no-posts">게시물이 없습니다.</div>';
+                return;
+            }
+
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'grid grid-cols-3 gap-1';
+
+            posts.forEach(post => {
+                const img = document.createElement('img');
+                img.src = post.imageUrl;
+                img.alt = 'Post';
+                img.className = 'w-full aspect-square object-cover';
+
+                gridContainer.appendChild(img);
+            });
+
+            postsSection.appendChild(gridContainer);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-header">
+            <img th:src="${profileData.profileImage} ?: '/images/default-profile.png'" alt="Profile Image" class="profile-image"/>
+            <div class="profile-info">
+                <div class="username">
+                    <a href="#" th:text="${profileData.userId} ?: '아이디'"></a>
+                </div>
+                <div class="profile-stats">
+                    <span>게시물 <span th:text="${profileData.postsCount} ?: 0"></span></span>
+                    <span>팔로워 <span th:text="${profileData.followersCount} ?: 0"></span></span>
+                    <span>팔로우 <span th:text="${profileData.followingCount} ?: 0"></span></span>
+                </div>
+                <div class="profile-name" th:text="${profileData.name} ?: '이름'"></div>
+            </div>
+        </div>
+
+        <div class="profile-navigation">
+            <button onclick="loadPosts()" class="active">게시물</button>
+            <button onclick="loadReels()">릴스</button>
+            <button onclick="loadTagged()">태그됨</button>
+        </div>
+
+        <div class="posts-section">
+            <!-- 게시물이 없을 경우 -->
+            <div class="no-posts" th:if="${#lists.isEmpty(posts)}">
+                게시물이 없습니다.
+            </div>
+
+            <!-- 게시물이 있을 경우 -->
+            <div th:unless="${#lists.isEmpty(posts)}">
+                <div class="grid grid-cols-3 gap-1">
+                    <th:block th:each="post : ${posts}">
+                        <img th:src="${post.imageUrl}" alt="Post" class="w-full aspect-square object-cover"/>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

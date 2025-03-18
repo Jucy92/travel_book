@@ -8,6 +8,7 @@ import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.MemberSearchCond;
 import travel_book.service.web.login.model.FindIdDto;
 import travel_book.service.web.login.model.LoginModel;
+import travel_book.service.web.profile.dto.ProfileData;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,12 +47,12 @@ public class MyBatisRepository implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findByMember(String userId) {
-        return repositoryMapper.selectOne("findByMember", userId);
+    public Optional<Member> findMemberByUserId(String userId) {
+        return repositoryMapper.selectOne("findMemberByUserId", userId);
     }
 
     @Override
-    public long findById(String userId) {
+    public long findIdByUserId(String userId) {
         long findById = (long) repositoryMapper.selectOne("findIdByUserId", userId).orElse(0L);
         System.out.println("findIdByUserId = " + findById);
         return findById;
@@ -78,6 +79,11 @@ public class MyBatisRepository implements MemberRepository {
 
     public Optional<Member> memberInfoFindByUser(String userId) {      // 넘겨 받은 userId or name 가지고 id 값 찾기
         return repositoryMapper.memberInfoFindByUser(userId);
+    }
+
+    @Override
+    public ProfileData findProfileDataByUserId(String userId) {
+        return (ProfileData) repositoryMapper.selectOne("findProfileDataByUserId", userId).orElse(null);
     }
     
     /*

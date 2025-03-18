@@ -29,7 +29,7 @@
          WHERE MAIL = #{mail}
     </select>
     <!-- Like를 안쓰는 조건문일 경우 합쳐도 될 거 같은데 findByMail, findByMember 같은 경우.. -->
-    <select id="findByMember" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
+    <select id="findMemberByUserId" resultType="Member"> <!-- 원래대로라면 패키지 풀(travel_book.service.domain.member) 경로를 적어줘야하지만, application.properties 설정 파일에서 기본 경로를 지정해줌-->
         SELECT ID, USER_ID, MAIL, NAME, PASSWORD, PHONE, CDT
             FROM MEMBER
          WHERE USER_ID = #{userId}
@@ -88,6 +88,14 @@
         SELECT ID, USER_ID, NAME
             FROM MEMBER
          WHERE USER_ID = #{userId}
+    </select>
+    <select id="findProfileDataByUserId" resultType="ProfileData">
+        SELECT USER_ID, NAME //, AS PROFILE_IMAGE
+             , (SELECT COUNT(*) FROM TRAVEL WHERE CID = A.ID) AS POSTS_COUNT
+             , 0 AS FOLLOWERS_COUNT
+             , 0 AS FOLLOWING_COUNT
+            FROM MEMBER A
+        WHERE A.USER_ID = #{userId}
     </select>
 
 

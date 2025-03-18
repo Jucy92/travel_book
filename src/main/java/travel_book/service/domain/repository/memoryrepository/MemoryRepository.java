@@ -8,6 +8,7 @@ import travel_book.service.domain.repository.MemberRepository;
 import travel_book.service.domain.repository.MemberSearchCond;
 import travel_book.service.web.login.model.FindIdDto;
 import travel_book.service.web.login.model.LoginModel;
+import travel_book.service.web.profile.dto.ProfileData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class MemoryRepository implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findByMember(String userId) {
+    public Optional<Member> findMemberByUserId(String userId) {
         return Optional.empty();
     }
 
@@ -74,7 +75,7 @@ public class MemoryRepository implements MemberRepository {
     }
 
     @Override
-    public long findById(String userId) {
+    public long findIdByUserId(String userId) {
         return 0;
     }
 
@@ -118,6 +119,11 @@ public class MemoryRepository implements MemberRepository {
     @Override
     public Optional<Member> memberInfoFindByUser(String paramId) {
         return Optional.empty();
+    }
+
+    @Override
+    public ProfileData findProfileDataByUserId(String userId) {
+        return null;
     }
 
     public void clearStore() {

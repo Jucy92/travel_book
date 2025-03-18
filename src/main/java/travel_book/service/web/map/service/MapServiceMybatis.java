@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Transactional
+//@Transactional    // 마이바티스는 그냥 쿼리 실행해오고 ORM이 아니다보니.. 크게 필요 없을듯..?
 @Service
 public class MapServiceMybatis implements MapService {
 

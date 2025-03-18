@@ -47,7 +47,7 @@ public class MapController {
     public ResponseEntity<String> addItinerary(@RequestBody Map<String, Object> data, @SessionAttribute(value = SessionConst.SESSION_NAME, required = false) Member member) {
         // 데이터를 각 테이블로 쪼개서 받냐, 아니면 TravelData에 한번에 담아서 여러번 받냐......... 화면 만들 때 다시 고민
         if (member == null) {
-            Member tempMember = memberRepository.findByMember("test9").orElse(null);
+            Member tempMember = memberRepository.findMemberByUserId("test9").orElse(null);
             member = tempMember;
         }
 
@@ -65,12 +65,13 @@ public class MapController {
 
     @GetMapping("/travel/{userId}")
     public String travelList(@PathVariable(value = "userId") String userId, Model model/*, ModelAndView mv*/) {
-        List<TravelList> list = mapServiceMybatis.findByTravel(memberRepository.findById(userId));
+        List<TravelList> list = mapServiceMybatis.findByTravel(memberRepository.findIdByUserId(userId));
         model.addAttribute("travelList", list);  // 이렇게 한다고 데이터를 가지고 list 화면으로 넘어가나?
         //mv.getModel().put("travelList", travelList);  // -> 필요 없음 model + return String 으로 전달됨
         //mv.setViewName("/travel/travel-list");
         return "/travel/travel-list";
     }
+
 
 
     @PostMapping("/travel/{travelId}")
@@ -103,7 +104,7 @@ public class MapController {
                                                           @RequestBody Map<String, String> requestMessage,
                                                           @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member member) {
         if (member == null) {
-            Member tempMember = memberRepository.findByMember("juchje1").orElse(null);
+            Member tempMember = memberRepository.findMemberByUserId("juchje1").orElse(null);
             member = tempMember;
         }
 
