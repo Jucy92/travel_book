@@ -83,12 +83,25 @@ create table MODIFY_TABLE         -- 사용자 관게 테이블
 DROP TABLE IF EXISTS UPLOADED_FILE CASCADE;
 CREATE TABLE UPLOADED_FILE
 (
- ID                     BIGINT AUTO_INCREMENT PRIMARY KEY,      -- 테이블 고유 ID
+ FILE_ID                BIGINT AUTO_INCREMENT PRIMARY KEY,      -- 테이블 고유 ID
  USER_ID                BIGINT NOT NULL,                        -- 사용자 생성 ID
  TRAVEL_ID              BIGINT NOT NULL,                        -- 여행 생성 ID
  LOCATION_ID            BIGINT,                                 -- 마커별 ID
  ORIGINAL_FILE_NAME     VARCHAR(MAX) NOT NULL,                  -- 파일 이름
  SAVED_FILE_NAME        VARCHAR(MAX) NOT NULL,                  -- 파일 이름
  FILE_PATH              VARCHAR(MAX) NOT NULL                   -- 파일 저장 경로
+);
+
+DROP TABLE IF EXISTS POST CASCADE;
+CREATE TABLE POST
+(
+ POST_ID                BIGINT AUTO_INCREMENT PRIMARY KEY,      -- 테이블 고유 ID
+ CONTENT                VARCHAR(MAX),                           -- 게시글 내용
+ CREATE_DATE            DATETIME NOT NULL,                        -- 여행 생성 ID
+ UPDATE_DATE            DATETIME NOT NULL,                        -- 여행 생성 ID
+ STATUS                 VARCHAR(30),                                 -- 마커별 ID
+ VIEWS                  DOUBLE NOT NULL,                  -- 파일 이름
+ LIKES                  DOUBLE NOT NULL,                  -- 파일 이름
+ MEMBER_ID              BIGINT NOT NULL                   -- 파일 저장 경로
 );
 
