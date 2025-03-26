@@ -63,14 +63,16 @@ public class MapController {
      */
 
 
+    /*  기존에는 사용자 ID 입력하면 사용자 여행 리스트로 이동하는 방식 => 사용자 profile로 이동 후 거기서 여행리스트 조회해서 단건으로 이동 
     @GetMapping("/travel/{userId}")
-    public String travelList(@PathVariable(value = "userId") String userId, Model model/*, ModelAndView mv*/) {
+    public String travelList(@PathVariable(value = "userId") String userId, Model model/*, ModelAndView mv* /) {
         List<TravelList> list = mapServiceMybatis.findByTravel(memberRepository.findIdByUserId(userId));
         model.addAttribute("travelList", list);  // 이렇게 한다고 데이터를 가지고 list 화면으로 넘어가나?
         //mv.getModel().put("travelList", travelList);  // -> 필요 없음 model + return String 으로 전달됨
         //mv.setViewName("/travel/travel-list");
         return "/travel/travel-list";
     }
+    */
 
 
 
