@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Instagram Profile</title>
+    <title>사용자 정보</title>
     <style>
         /* Tailwind CSS 스타일을 여기에 직접 추가하거나, CSS 파일로 분리할 수 있습니다. */
         body {
@@ -86,13 +86,33 @@
             text-align: center;
         }
     </style>
-    <script>
+    <script th:inline="javascript">
         const profileData = /*[[${profileData}]]*/{};
         let userId = profileData.userId;
         console.log(profileData);
 
+        function loadTravelList() {
+            fetch('/api/travel', {  // 올바른 엔드포인트 확인
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ "userId": userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayTravelList(data);
+            })
+            .catch(error => {
+                console.error("Error loading travel list:", error);
+                document.querySelector('.posts-section').innerHTML = '<p>데이터를 불러오지 못했습니다.</p>';
+            });
+        }
+
         function loadPosts() {
-            fetch('/api/posts', {method: 'POST', body: userId})
+            fetch('/api/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json'}, // JSON 데이터를 보낼 때는 Content-Type 설정
+                body: JSON.stringify({"userId": userId})
+            })
                 .then(response => response.json())
                 .then(data => {
                     displayPosts(data);
@@ -113,6 +133,78 @@
                 .then(data => {
                     displayPosts(data);
                 });
+        }
+
+        function loadTravelDetails(travelId) {
+            closeTravelPopup(); // 기존 팝업 닫기
+            fetch(`/api/travel/${travelId}`)
+            .then(response => response.json())
+            .then(data => {
+                showTravelPopup(data);
+            })
+            .catch(error => {
+                console.error("Error loading travel details:", error);
+            });
+        }
+
+        function showTravelPopup(travelData) {
+            const popup = document.createElement('div');
+            popup.className = 'travel-popup';
+            popup.style.position = 'fixed';
+            popup.style.top = '50%';
+            popup.style.left = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.backgroundColor = 'white';
+            popup.style.padding = '20px';
+            popup.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            popup.style.borderRadius = '10px';
+            popup.style.zIndex = '1000';
+
+            popup.innerHTML = `
+                <h2>여행 상세 정보</h2>
+                <p><strong>여행 ID:</strong> ${travelData.travelId}</p>
+                <p><strong>제목:</strong> ${travelData.title}</p>
+                <p><strong>사용자 ID:</strong> ${travelData.userId}</p>
+                <p><strong>생성일:</strong> ${travelData.cdt}</p>
+                <button onclick="closeTravelPopup()" style="margin-top: 10px; padding: 5px 10px; background-color: red; color: white; border: none; cursor: pointer;">닫기</button>
+                <button onclick="window.location.href='/travel/${travelData.travelId}'" style="margin-top: 10px; margin-left: 10px; padding: 5px 10px; background-color: blue; color: white; border: none; cursor: pointer;">이동하기</button>
+            `;
+
+            document.body.appendChild(popup);
+        }
+
+        function closeTravelPopup() {
+            const popup = document.querySelector('.travel-popup');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        function displayTravelList(travelList) {
+            const travelSection = document.querySelector('.posts-section');
+            travelSection.innerHTML = '';
+
+            if (travelList.length === 0) {
+                travelSection.innerHTML = '<p>여행 기록이 없습니다.</p>';
+                return;
+            }
+
+            travelList.forEach(travel => {
+                const travelItem = document.createElement('div');
+                travelItem.className = 'travel-item';
+                travelItem.style.cursor = 'pointer';
+                travelItem.onclick = () => loadTravelDetails(travel.travelId);
+
+                travelItem.innerHTML = `
+                    <p><strong>여행 ID:</strong> ${travel.travelId}</p>
+                    <p><strong>제목:</strong> ${travel.title}</p>
+                    <p><strong>사용자 ID:</strong> ${travel.userId}</p>
+                    <p><strong>생성일:</strong> ${travel.cdt}</p>
+                    <hr>
+                `;
+
+                travelSection.appendChild(travelItem);
+            });
         }
 
         function displayPosts(posts) {
@@ -138,6 +230,11 @@
 
             postsSection.appendChild(gridContainer);
         }
+
+        // 페이지 로드 시 자동으로 loadPosts 실행
+        document.addEventListener("DOMContentLoaded", function () {
+            loadTravelList();
+        });
     </script>
 </head>
 <body>
@@ -158,7 +255,8 @@
         </div>
 
         <div class="profile-navigation">
-            <button onclick="loadPosts()" class="active">게시물</button>
+            <button onclick="loadTravelList()" class="active">여행 리스트</button>
+            <button onclick="loadPosts()">게시물</button>
             <button onclick="loadReels()">릴스</button>
             <button onclick="loadTagged()">태그됨</button>
         </div>

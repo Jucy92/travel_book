@@ -61,7 +61,7 @@ public class MapServiceMybatis implements MapService {
         return mapMapper.findByTravelId(travelId);
     }
 
-    public void addItinerary(Map<String, Object> data, long id) {
+    public void addItinerary(Map<String, Object> data, long id) {   // 여행 추가
         log.info("RequestBody={}", data);
 
         //Map<String, Object> travel = (Map<String, Object>) data.get("travel");
@@ -115,7 +115,7 @@ public class MapServiceMybatis implements MapService {
     }
 
 
-    public void copyOfAllItinerary(Long travelId, Long userId, String title) {
+    public void copyOfAllItinerary(Long travelId, Long userId, String title) {      // 여행 그대로 복사
         TravelModel originalTravel = findById(travelId);
         Long originalTravelId = originalTravel.getTravelId();   // 원본 travelId -> 기존 데이터 조회용
         TravelModel newTravel = new TravelModel();
@@ -151,5 +151,10 @@ public class MapServiceMybatis implements MapService {
                 log.info("savedLocationDetail={}",savedLocationDetail);
             }
         }
+    }
+
+    public List<TravelInformation> findTravelInfoByTravelId(Long travelId) {
+        // 여기서 근데 travelId에 userId로 접근 할 수 있는지 한번 체크해주긴 해야할듯..? -> 남의 정보가 보이면 안되니깐
+        return mapMapper.findTravelInfoByTravelId(travelId);
     }
 }

@@ -6,5 +6,7 @@ import java.util.List;
 
 public interface ProfileService {
     ProfileData getProfile(String userId);
-    List<String> getPosts(String userId);
+    List<?> getPosts(String userId);
+    List<?> getTravelList(String userId);
+    List<?> getTravelInformation(Long travelId);
 }

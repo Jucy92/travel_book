@@ -2,6 +2,8 @@ package travel_book.service.web.profile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,5 +33,9 @@ public class ProfileController {
         model.addAttribute("profileData", profileData);
         return "profile";
         //return "/travel/travel-list";
+    }
+    @GetMapping("/favicon.ico")
+    public ResponseEntity<Void> favicon() {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content 응답
     }
 }

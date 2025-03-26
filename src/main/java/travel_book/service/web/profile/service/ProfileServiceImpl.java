@@ -31,9 +31,24 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<String> getPosts(String userId) {
+    public List<TravelList> getPosts(String userId) {
         List<TravelList> posts = mapServiceMybatis.findByTravel(memberRepository.findIdByUserId(userId));
+        log.info("posts={}",posts);
 
+        return posts;
+    }
+
+    @Override
+    public List<?> getTravelList(String userId) {
+        List<TravelList> travelList = mapServiceMybatis.findByTravel(memberRepository.findIdByUserId(userId));
+        log.info("travelList={}",travelList);
+
+        return travelList;
+    }
+
+    @Override
+    public List<?> getTravelInformation(Long travelId) {
+        mapServiceMybatis.findTravelInfoByTravelId(travelId);
         return null;
     }
 
