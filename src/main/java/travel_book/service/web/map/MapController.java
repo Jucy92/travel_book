@@ -63,7 +63,7 @@ public class MapController {
      */
 
 
-    /*  기존에는 사용자 ID 입력하면 사용자 여행 리스트로 이동하는 방식 => 사용자 profile로 이동 후 거기서 여행리스트 조회해서 단건으로 이동 
+    /*  기존에는 사용자 ID 입력하면 사용자 여행 리스트로 이동하는 방식 => 사용자 profile로 이동 후 거기서 여행리스트 조회해서 단건으로 이동
     @GetMapping("/travel/{userId}")
     public String travelList(@PathVariable(value = "userId") String userId, Model model/*, ModelAndView mv* /) {
         List<TravelList> list = mapServiceMybatis.findByTravel(memberRepository.findIdByUserId(userId));
@@ -73,15 +73,20 @@ public class MapController {
         return "/travel/travel-list";
     }
     */
-
+    @GetMapping("/travel/{travelId}")
+    public String travelView(@PathVariable(value = "travelId") Long travelId, Model model) {
+        model.addAttribute("travelId", travelId);
+        return "/travel/travel-item";
+    }
 
 
     @PostMapping("/travel/{travelId}")
     // travel/파라미터 하나 날아오는걸로 userId인지 travelId인지 구별 못함, 순서 바꿔도 안돼서 아래 주석 sonsumers = JSON이라 우선으로 잡혔나..?
     @ResponseBody
     public ResponseEntity<List<TravelDetail>> travelList(@PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
+
         List<TravelDetail> detail = mapServiceMybatis.findByTravelId(travelId);
-        log.info("travelId={}", detail);
+        log.info("detail={}", detail);
 
         return ResponseEntity.status(HttpStatus.OK).body(detail);
     }
