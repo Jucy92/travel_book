@@ -48,8 +48,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<?> getTravelInformation(Long travelId) {
-        mapServiceMybatis.findTravelInfoByTravelId(travelId);
-        return null;
+        return mapServiceMybatis.findTravelInfoByTravelId(travelId);
+
     }
 
 

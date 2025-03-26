@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import travel_book.service.domain.member.Member;
 import travel_book.service.web.session.SessionConst;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,10 +37,15 @@ public class ProfileApiController {
                                               @SessionAttribute(name = SessionConst.SESSION_NAME, required = false) Member sessionMember) {
         log.info("travelId={}",travelId);
         log.info("Member={}", sessionMember);
-        profileService.getTravelInformation(travelId);
-        // TravelInformation
+        List<?> travelInformation = profileService.getTravelInformation(travelId);
+        log.info("travelInformationList={}",travelInformation);
 
-        return ResponseEntity.ok().body(travelId);
+        //Map<String, Object> responseMap = new HashMap<>();
+        //responseMap.put("travelInformation", travelInformation);
+
+        return ResponseEntity.ok().body(travelInformation); // 이렇게 바로 넘기면 화면단에서 data[n]로 바로 호출해서 List 안에 데이터 접근
+        //return ResponseEntity.ok().body(responseMap);     // 맵으로 담아서 넘기면 data.travelInformation[n] 으로 호출해야함
+
     }
 
 }

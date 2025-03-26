@@ -89,7 +89,7 @@
     <script th:inline="javascript">
         const profileData = /*[[${profileData}]]*/{};
         let userId = profileData.userId;
-        console.log(profileData);
+        console.log("맨처음 넘어오는 사용자 값 :", profileData);
 
         function loadTravelList() {
             fetch('/api/travel', {  // 올바른 엔드포인트 확인
@@ -136,7 +136,6 @@
         }
 
         function loadTravelDetails(travelId) {
-            closeTravelPopup(); // 기존 팝업 닫기
             fetch(`/api/travel/${travelId}`)
             .then(response => response.json())
             .then(data => {
@@ -147,7 +146,9 @@
             });
         }
 
-        function showTravelPopup(travelData) {
+        function showTravelPopup(travelInformation) {
+            closeTravelPopup(); // 기존 팝업 닫기
+
             const popup = document.createElement('div');
             popup.className = 'travel-popup';
             popup.style.position = 'fixed';
@@ -159,19 +160,39 @@
             popup.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
             popup.style.borderRadius = '10px';
             popup.style.zIndex = '1000';
+            popup.style.width = '400px';
+            popup.style.maxHeight = '400px';
+            popup.style.overflowY = 'auto';
 
-            popup.innerHTML = `
-                <h2>여행 상세 정보</h2>
-                <p><strong>여행 ID:</strong> ${travelData.travelId}</p>
-                <p><strong>제목:</strong> ${travelData.title}</p>
-                <p><strong>사용자 ID:</strong> ${travelData.userId}</p>
-                <p><strong>생성일:</strong> ${travelData.cdt}</p>
+            let contentHtml = '<h2>여행 상세 정보</h2>';
+
+            if (travelInformation.length > 0) {
+                travelInformation.forEach(info => {
+                    contentHtml += `
+                        <div style="margin-bottom: 10px;">
+                            <div><strong>${info.locationId} 번째 장소</strong></div>
+                            <div><strong>일정:</strong> Plan ${info.locationSq}</div>
+                            <div><strong>내용:</strong> ${info.content}</div>
+                        </div>
+                        <hr>
+                    `;
+                });
+            } else {
+                contentHtml += '<p>여행 데이터가 없습니다.</p>';
+            }
+
+            const travelId = travelInformation.length > 0 ? travelInformation[0].travelId : '';
+            const disabledAttr = travelId ? '' : 'disabled';
+
+            contentHtml += `
                 <button onclick="closeTravelPopup()" style="margin-top: 10px; padding: 5px 10px; background-color: red; color: white; border: none; cursor: pointer;">닫기</button>
-                <button onclick="window.location.href='/travel/${travelData.travelId}'" style="margin-top: 10px; margin-left: 10px; padding: 5px 10px; background-color: blue; color: white; border: none; cursor: pointer;">이동하기</button>
+                <button onclick="window.location.href='/travel/${travelId}'" ${disabledAttr} style="margin-top: 10px; margin-left: 10px; padding: 5px 10px; background-color: blue; color: white; border: none; cursor: pointer;">이동하기</button>
             `;
 
+            popup.innerHTML = contentHtml;
             document.body.appendChild(popup);
         }
+
 
         function closeTravelPopup() {
             const popup = document.querySelector('.travel-popup');
