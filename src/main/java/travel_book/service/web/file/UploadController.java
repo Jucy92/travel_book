@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import travel_book.service.web.file.service.FileService;
+import travel_book.service.web.map.dto.TravelBasicData;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -57,6 +58,17 @@ public class UploadController { // 이것도 그냥 FileController로 변경하�
             log.info("MalformedURLException={}",e);
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @ResponseBody
+    @PostMapping("/fileUpload/travelImage")
+    public ResponseEntity<?> travelImageUpload(@RequestParam("file") MultipartFile file, TravelBasicData travelBasicData/*@RequestParam Map<String, Object> requestMap*/) {
+        log.info("file={}", file);
+        log.info("travelDetail={}", travelBasicData);
+        fileService.saveFile(file, travelBasicData);
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("message", "데이터는 정상으로 받았어요~");
+        return ResponseEntity.ok().body(responseMap);
     }
 
 }

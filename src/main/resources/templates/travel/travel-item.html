@@ -62,7 +62,7 @@
 <body>
     <div id="location"></div>
     <div id="location-detail">
-        <div id="detail-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div id="detail-header">
             <h3>여행 상세 정보</h3>
             <div>
                 <button id="editTravelBtn">여행 수정</button>
@@ -70,10 +70,14 @@
             </div>
         </div>
         <ul id="location-list">
-            <li th:each="location : ${locations}" th:id="'location-' + ${location.locationId}" class="location-item">
+            <li th:each="location : ${locations}"
+                th:id="'location-' + ${location.locationId}"
+                th:data-location-id="${location.locationId}"
+                th:data-location-sq="${location.locationSq}"
+                class="location-item">
                 <span th:text="${location.locationSq} + '. ' + ${location.content}"></span>
-                <button class="uploadBtn" th:data-location-detail-id="${location.locationDetailId}">첨부파일 추가</button>
-                <input type="file" class="fileInput" style="display: none;" th:data-location-detail-id="${location.locationDetailId}"/>
+                <button class="uploadBtn" th:data-location-file-id="${location.locationFileId}">사진 등록</button>
+                <input type="file" class="fileInput" style="display: none;" />
             </li>
         </ul>
     </div>
@@ -81,47 +85,43 @@
     <script th:inline="javascript">
         let travelId = [[${travelId}]];
         let map;
-        let locationData = {}; // 여행 위치 데이터를 저장할 변수
+        let locationData = {};
 
-        function loadTravelItem() {     // travel item 가져오기
+        function loadTravelItem() {
             fetch(`/travel/${travelId}`, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     locationData = data;
                     initMap();
-                    showLocationDetails(data); // 상세 정보 표시
+                    showLocationDetails(data);
                 })
                 .catch(error => console.error('데이터 로드 오류:', error));
         }
 
-        function initMap() {        // 맵 초기화
-            // IP 기반 위치 정보 가져오기
+        function initMap() {
             fetch('https://ipapi.co/json/')
             .then(response => response.json())
             .then(data => {
-                console.log('IP 기반 주소 데이터 ', data);
                 const userLocation = {
                     lat: parseFloat(data.latitude),
                     lng: parseFloat(data.longitude)
                 };
-
                 map = new google.maps.Map(document.getElementById('location'), {
                     center: userLocation,
                     zoom: 10
                 });
-                if (locationData) { // 데이터가 로드되었으면 지도에 표시
+                if (locationData) {
                     showLocationOnMap(locationData);
                 }
             })
             .catch(error => {
                 console.error('위치 정보를 가져오는 데 실패했습니다:', error);
-                // 오류 발생 시 기본 위치 사용
                 map = new google.maps.Map(document.getElementById('location'), {
-                    center: {lat: 25.0330, lng: 121.5654}, // 타이페이 중심 좌표
+                    center: {lat: 25.0330, lng: 121.5654},
                     zoom: 10
                 });
                 document.getElementById('location').style.display = 'none';
-                if (locationData) { // 데이터가 로드되었으면 지도에 표시
+                if (locationData) {
                     showLocationOnMap(locationData);
                 }
             });
@@ -129,22 +129,11 @@
             document.getElementById('location-detail').style.display = 'block';
         }
 
-
-        function showLocationOnMap(locations) {     // 맵 위에 정보 그려주기
-            if (!map) { // map 객체가 초기화되지 않았으면 리턴
-                console.log('지도 객체가 아직 초기화되지 않았습니다.');
-                return;
-            }
-            if (!locations || locations.length === 0) {
-                console.log('여행 데이터가 없습니다.');
-                return;
-            }
-
-            const locationElement = document.getElementById('location');
-            locationElement.style.display = 'block';
+        function showLocationOnMap(locations) {
+            if (!map) return;
+            if (!locations || locations.length === 0) return;
 
             const bounds = new google.maps.LatLngBounds();
-
             locations.forEach((location) => {
                 const latLng = new google.maps.LatLng(parseFloat(location.latitude), parseFloat(location.longitude));
                 const marker = new google.maps.Marker({
@@ -163,31 +152,29 @@
             map.fitBounds(bounds);
         }
 
-        function showLocationDetails(locations) {       // 상세정보 그려주기
+        function showLocationDetails(locations) {
             const locationList = document.getElementById('location-list');
-            locationList.innerHTML = ''; // 기존 내용 초기화
-
-            locations.sort((a, b) => {         // locationId로 먼저 정렬 후 같다면 locationSq로 정렬
-                if (a.locationId !== b.locationId) {
-                    return a.locationId - b.locationId;
-                }
-                return a.locationSq - b.locationSq;
-            });
+            locationList.innerHTML = ''; // 기존 목록 초기화
 
             locations.forEach(location => {
                 const listItem = document.createElement('li');
+                listItem.id = `location-${location.locationId}`;
+                listItem.dataset.locationId = location.locationId;
+                listItem.dataset.locationSq = location.locationSq;
                 listItem.className = 'location-item';
+
                 listItem.innerHTML = `
                     <span>${location.locationSq}. ${location.content}</span>
-                    <button class="uploadBtn" data-location-detail-id="${location.locationDetailId}">첨부파일 추가</button>
-                    <input type="file" class="fileInput" style="display: none;" data-location-detail-id="${location.locationDetailId}"/>
+                    <button class="uploadBtn" data-location-file-id="${location.locationFileId}">사진 등록</button>
+                    <input type="file" class="fileInput" style="display: none;">
                 `;
+
                 locationList.appendChild(listItem);
             });
 
-            // 이벤트 리스너 다시 등록 (동적으로 생성된 요소에 대해)
+            // 파일 업로드 버튼 이벤트 다시 바인딩
             document.querySelectorAll('.uploadBtn').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const fileInput = this.nextElementSibling;
                     fileInput.click();
                 });
@@ -198,58 +185,34 @@
             });
         }
 
-        document.getElementById('editTravelBtn').addEventListener('click', function() {
-            window.location.href = `/travel/edit/${travelId}`;
-        });
-
-        document.getElementById('copyTravelBtn').addEventListener('click', function() {
-            copyTravel(travelId);
-        });
-
-        function copyTravel(travelId) {
-            const url = '/travel/copy/' + travelId;
-            const title = prompt("새로운 여행 제목을 입력해주세요.");
-            if (!title && title !== null) { // 제목이 없고, 취소를 누르지 않았을 때 (빈 문자열 입력 시)
-                alert("여행 제목을 입력해야 합니다.");
-                return;
-            } else if (title === null) { // 취소 버튼을 눌렀을 경우
-                return; // 아무런 동작 없이 함수 종료
-            }
-            const requestMessage = {title: title};
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestMessage)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('여행 복사 성공:', data);
-                alert('여행이 성공적으로 복사되었습니다.');
-                // 복사 후 처리 (예: 목록 새로고침)
-            })
-            .catch(error => {
-                console.error('여행 복사 중 오류 발생:', error);
-                alert('여행 복사 중 오류가 발생했습니다.');
-            });
-        }
 
         function handleFileUpload(event) {
             const fileInput = event.target;
-            const locationDetailId = fileInput.dataset.locationDetailId;
+            const listItem = fileInput.closest('.location-item');
+            const locationId = listItem.dataset.locationId;
+            const locationSq = listItem.dataset.locationSq;
+            const locationFileId = listItem.querySelector('.uploadBtn').dataset.locationFileId;
             const file = fileInput.files[0];
 
+
+
             if (file) {
-                console.log(`locationDetailId: ${locationDetailId}, 선택된 파일:`, file);
-                // 여기에 파일 업로드 로직 구현 (예: FormData 사용)
+                console.log(`travelId: ${travelId}, locationId: ${locationId}, locationSq: ${locationSq}, locationFileId: ${locationFileId}, 선택된 파일:`, file);
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('locationDetailId', locationDetailId);
+                formData.append('travelId', travelId);
+                formData.append('locationId', locationId);
+                formData.append('locationSq', locationSq);
+                formData.append('locationFileId', locationFileId);
 
-                // 파일 업로드 API 호출 (예시)
-                fetch('/uploadFile', {
+                /*
+                // FormData key-value 값 확인하기
+                for (let [key, value] of formData.entries()) {
+                    console.log(`Key: ${key}, Value:`, value);
+                }
+                */
+
+                fetch('/fileUpload/travelImage', {
                     method: 'POST',
                     body: formData
                 })
@@ -257,7 +220,6 @@
                 .then(data => {
                     console.log('파일 업로드 성공:', data);
                     alert('파일이 성공적으로 업로드되었습니다.');
-                    // 업로드 성공 후 UI 업데이트 (예: 첨부된 파일 목록 표시)
                 })
                 .catch(error => {
                     console.error('파일 업로드 실패:', error);
@@ -265,6 +227,25 @@
                 });
             }
         }
+
+        document.querySelectorAll('.uploadBtn').forEach(button => {
+            button.addEventListener('click', function() {
+                const fileInput = this.nextElementSibling;
+                fileInput.click();
+            });
+        });
+
+        document.querySelectorAll('.fileInput').forEach(input => {
+            input.addEventListener('change', handleFileUpload);
+        });
+
+        document.getElementById('editTravelBtn').addEventListener('click', function() {
+            window.location.href = `/travel/edit/${travelId}`;
+        });
+
+        document.getElementById('copyTravelBtn').addEventListener('click', function() {
+            copyTravel(travelId);
+        });
 
         window.onload = loadTravelItem;
     </script>

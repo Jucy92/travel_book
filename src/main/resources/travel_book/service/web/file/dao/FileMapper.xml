@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="travel_book.service.web.file.dao.FileMapper">
+
+    <insert id="fileDataSave" useGeneratedKeys="true" keyProperty="travelFileId">
+        INSERT INTO TRAVEL_FILE (TRAVEL_ID, LOCATION_ID, LOCATION_DETAIL_ID,
+                                 ORIGINAL_FILE_NAME, FILE_NAME, FILE_PATH, FILE_SIZE, MIME_TYPE, DESCRIPTION)
+            VALUES (#{travelId}, #{locationId}, #{locationDetailId},
+                    #{originalFileName}, #{fileName}, #{filePath}, #{fileSize}, #{mimeType}, #{description})
+    </insert>
+
+
+</mapper>

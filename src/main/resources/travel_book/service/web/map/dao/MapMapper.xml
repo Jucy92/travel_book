@@ -48,7 +48,7 @@
         ORDER BY CDT DESC
     </select>
 
-    <select id="findByTravelId" resultType="TravelDetail">  <!-- travelId 받아서 단건 조회 -->
+    <select id="findByTravelId" resultType="TravelBasicData">  <!-- travelId 받아서 단건 조회 -->
         SELECT /* A.TRAVEL_ID, A.TITLE, A.OID, A.CID, A.CDT, */
                B.TRAVEL_ID, B.LOCATION_ID, B.LATITUDE, B.LONGITUDE,
                C.LOCATION_SQ, C.CONTENT

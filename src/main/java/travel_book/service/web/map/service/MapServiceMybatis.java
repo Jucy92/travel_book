@@ -2,8 +2,6 @@ package travel_book.service.web.map.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import travel_book.service.domain.repository.mybatis.MyBatisRepository;
 import travel_book.service.web.map.MapService;
 import travel_book.service.web.map.dao.MapMapper;
 import travel_book.service.web.map.dto.*;
@@ -57,7 +55,7 @@ public class MapServiceMybatis implements MapService {
         return mapMapper.findByTravel(id);
     }
 
-    public List<TravelDetail> findByTravelId(long travelId) {    // travelId로 여행 한 건에 대한 모든 정보 가져오기
+    public List<TravelBasicData> findByTravelId(long travelId) {    // travelId로 여행 한 건에 대한 모든 정보 가져오기
         return mapMapper.findByTravelId(travelId);
     }
 

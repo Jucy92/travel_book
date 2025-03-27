@@ -80,8 +80,8 @@ create table MODIFY_TABLE         -- 사용자 관게 테이블
  mdt            datetime               -- 수정일자
 );
 
-DROP TABLE IF EXISTS UPLOADED_FILE CASCADE;
-CREATE TABLE UPLOADED_FILE
+DROP TABLE IF EXISTS TRAVEL_FILE CASCADE;
+CREATE TABLE TRAVEL_FILE
 (
  FILE_ID                BIGINT AUTO_INCREMENT PRIMARY KEY,      -- 테이블 고유 ID
  USER_ID                BIGINT NOT NULL,                        -- 사용자 생성 ID

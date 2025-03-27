@@ -9,7 +9,7 @@
             const files = document.getElementById('files').files;
             const formData = new FormData();
 
-            for (let i = 0; i < files.length; i++){
+            for (let i = 0; i < files.length; i++){ // 다중으로 받았을 때 폼데이터에 하나씩 담는다
                 formData.append("files", files[i]);
             }
 

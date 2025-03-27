@@ -10,8 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import travel_book.service.domain.member.Member;
 import travel_book.service.domain.repository.MemberRepository;
-import travel_book.service.web.map.dto.TravelDetail;
-import travel_book.service.web.map.dto.TravelList;
+import travel_book.service.web.map.dto.TravelBasicData;
 import travel_book.service.web.map.service.MapServiceJpa;
 import travel_book.service.web.map.service.MapServiceMybatis;
 import travel_book.service.web.session.SessionConst;
@@ -83,9 +82,9 @@ public class MapController {
     @PostMapping("/travel/{travelId}")
     // travel/파라미터 하나 날아오는걸로 userId인지 travelId인지 구별 못함, 순서 바꿔도 안돼서 아래 주석 sonsumers = JSON이라 우선으로 잡혔나..?
     @ResponseBody
-    public ResponseEntity<List<TravelDetail>> travelList(@PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
+    public ResponseEntity<List<TravelBasicData>> travelList(@PathVariable(value = "travelId") long travelId) {   //  @RequestParam으로 받으면 문자열로만 받았던거 같은데 여기는 다른 타입 가능
 
-        List<TravelDetail> detail = mapServiceMybatis.findByTravelId(travelId);
+        List<TravelBasicData> detail = mapServiceMybatis.findByTravelId(travelId);
         log.info("detail={}", detail);
 
         return ResponseEntity.status(HttpStatus.OK).body(detail);
