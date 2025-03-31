@@ -120,9 +120,11 @@ public class FileService {
         }
     }
 
-    public Resource loadImage(String fileName) throws MalformedURLException {   // URL이 잘못된 형식 예외
+    public Resource loadImage(String fileName, String path) throws MalformedURLException {   // URL이 잘못된 형식 예외
 
-        Path filePath = Paths.get(UPLOAD_DIR + fileName);
+        log.info("path={}, fileName={}",path, fileName);
+        Path filePath = Paths.get(UPLOAD_DIR + path + "/"+ fileName);
+        log.info("filePath={}",filePath);
         Resource resource = new UrlResource(filePath.toUri());
 
         if (resource.exists() || resource.isReadable()) {   // resource 가 존재하거나, 읽을 수 있는 상태 일 때

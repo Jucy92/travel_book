@@ -49,12 +49,17 @@
     </select>
 
     <select id="findByTravelId" resultType="TravelBasicData">  <!-- travelId 받아서 단건 조회 -->
-        SELECT /* A.TRAVEL_ID, A.TITLE, A.OID, A.CID, A.CDT, */
-               B.TRAVEL_ID, B.LOCATION_ID, B.LATITUDE, B.LONGITUDE,
-               C.LOCATION_SQ, C.CONTENT
+        SELECT A.TRAVEL_ID,
+               B.LOCATION_ID, B.LATITUDE, B.LONGITUDE,
+               C.LOCATION_SQ, C.CONTENT,
+               D.FILE_NAME
             FROM TRAVEL               A
             LEFT JOIN LOCATION        B ON A.TRAVEL_ID = B.TRAVEL_ID
-            LEFT JOIN LOCATION_DETAIL C ON B.TRAVEL_ID = C.TRAVEL_ID AND B.LOCATION_ID = C.LOCATION_ID
+            LEFT JOIN LOCATION_DETAIL C ON B.TRAVEL_ID = C.TRAVEL_ID
+                                       AND B.LOCATION_ID = C.LOCATION_ID
+            LEFT JOIN TRAVEL_FILE D ON C.TRAVEL_ID = D.TRAVEL_ID
+                                   AND C.LOCATION_ID = D.LOCATION_ID
+                                   AND C.LOCATION_SQ = D.LOCATION_DETAIL_ID
          WHERE A.TRAVEL_ID = #{travelId}
     </select>
 

@@ -48,7 +48,7 @@ public class UploadController { // 이것도 그냥 FileController로 변경하�
     public ResponseEntity<Resource> getImage(@PathVariable("imageName") String imageName) {
         try {
             // 이미지 반환 요청
-            Resource resource = fileService.loadImage(imageName);
+            Resource resource = fileService.loadImage(imageName, null);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, "image/jpeg") // 미디어(MIME) 타입 설정
@@ -59,6 +59,26 @@ public class UploadController { // 이것도 그냥 FileController로 변경하�
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/file/{path}/{fileName}")
+    @ResponseBody
+    public ResponseEntity<Resource> getTravelImage(@PathVariable("fileName") String imageName, @PathVariable("path") String path) {
+        log.info("path={}",path);
+
+        try {
+            // 이미지 반환 요청
+            Resource resource = fileService.loadImage(imageName, path);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "image/jpeg") // 미디어(MIME) 타입 설정
+                    .body(resource);
+
+        } catch (MalformedURLException e) {
+            log.info("MalformedURLException={}",e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     @ResponseBody
     @PostMapping("/fileUpload/travelImage")

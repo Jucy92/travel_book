@@ -17,4 +17,5 @@ public class TravelBasicData {
     // LOCATION_DETAIL 테이블 정보
     private Long locationSq;        // 장소 디테일 번호
     private String content;         // 디테일 내용
+    private String fileName;
 }

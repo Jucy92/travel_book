@@ -76,7 +76,7 @@
                 th:data-location-sq="${location.locationSq}"
                 class="location-item">
                 <span th:text="${location.locationSq} + '. ' + ${location.content}"></span>
-                <button class="uploadBtn" th:data-location-file-id="${location.locationFileId}">사진 등록</button>
+                <button class="uploadBtn" th:data-location-file-id="${location.fileName}">사진 등록</button>
                 <input type="file" class="fileInput" style="display: none;" />
             </li>
         </ul>
@@ -84,8 +84,12 @@
 
     <script th:inline="javascript">
         let travelId = [[${travelId}]];
+        let travelData = [[${TravelBasicData}]];
         let map;
         let locationData = {};
+
+        console.log("responseData:", travelData);
+        console.log("locationData:", locationData);
 
         function loadTravelItem() {
             fetch(`/travel/${travelId}`, { method: 'POST' })
@@ -132,6 +136,7 @@
         function showLocationOnMap(locations) {
             if (!map) return;
             if (!locations || locations.length === 0) return;
+            console.log("responseData=", locations);
 
             const bounds = new google.maps.LatLngBounds();
             locations.forEach((location) => {
@@ -146,6 +151,28 @@
                         fontSize: '14px'
                     }
                 });
+
+                // 이미지 URL을 생성
+                const imageUrl = location.fileName ? `/file/travel/${location.fileName}` : null;
+
+                // InfoWindow 내용 구성
+                const infoWindowContent = `
+                    <div style="text-align: center;">
+                        <p><b>${location.content}</b></p>
+                        ${imageUrl ? `<img src="${imageUrl}" alt="이미지" style="width:150px;height:auto;border-radius:8px;">` : ""}
+                    </div>
+                `;
+
+                // InfoWindow 생성
+                const infoWindow = new google.maps.InfoWindow({
+                    content: infoWindowContent
+                });
+
+                // 마커 클릭 시 InfoWindow 표시
+                marker.addListener("click", () => {
+                    infoWindow.open(map, marker);
+                });
+
                 bounds.extend(latLng);
             });
 
@@ -165,7 +192,7 @@
 
                 listItem.innerHTML = `
                     <span>${location.locationSq}. ${location.content}</span>
-                    <button class="uploadBtn" data-location-file-id="${location.locationFileId}">사진 등록</button>
+                    <button class="uploadBtn" data-location-file-id="${location.fileName}">사진 등록</button>
                     <input type="file" class="fileInput" style="display: none;">
                 `;
 
@@ -191,19 +218,19 @@
             const listItem = fileInput.closest('.location-item');
             const locationId = listItem.dataset.locationId;
             const locationSq = listItem.dataset.locationSq;
-            const locationFileId = listItem.querySelector('.uploadBtn').dataset.locationFileId;
+            const fileName = listItem.querySelector('.uploadBtn').dataset.fileName;
             const file = fileInput.files[0];
 
 
 
             if (file) {
-                console.log(`travelId: ${travelId}, locationId: ${locationId}, locationSq: ${locationSq}, locationFileId: ${locationFileId}, 선택된 파일:`, file);
+                console.log(`travelId: ${travelId}, locationId: ${locationId}, locationSq: ${locationSq}, fileName: ${fileName}, 선택된 파일:`, file);
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('travelId', travelId);
                 formData.append('locationId', locationId);
                 formData.append('locationSq', locationSq);
-                formData.append('locationFileId', locationFileId);
+                formData.append('fileName', fileName);
 
                 /*
                 // FormData key-value 값 확인하기

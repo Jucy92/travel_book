@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {    // 스프링 인터셉�
         registry.addInterceptor(new LoginCheckInterceptor())        // LoginCheckInterceptor 설정 파일 읽어와서 적용
                 .order(2)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/css/**", "/*.ico", "/error", "/login/**", "/", "/members/add", "/logout", "/mail/**");
+                .excludePathPatterns("/css/**", "/*.ico", "/error", "/login/**", "/", "/members/add", "/logout", "/mail/**", "/file/**");
         /*
         */
     }
