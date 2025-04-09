@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>여행 상세 정보</title>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA53tcYEG1Lr9raR98hxk-8BEBecqPYJbE"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA53tcYEG1Lr9raR98hxk-8BEBecqPYJbE&callback=initMap"></script>
     <style>
         #location {
             width: 100%;
@@ -88,13 +88,57 @@
         let map;
         let locationData = {};
 
-        console.log("responseData:", travelData);
-        console.log("locationData:", locationData);
+
+        /* 2. 이거 통해서 사진좀 지도 마커 옆에 유연하게 뿌려 줄랬는데 CustomOverlay 호출 오류 계속 발생해서 주석
+        class CustomOverlay extends google.maps.OverlayView {       // 이미지 마커 위에 얹기 위해 이미지 위치 설정
+            constructor(position, imageUrl, map) {
+                super();
+                this.position = position;
+                this.imageUrl = imageUrl;
+                this.map = map;
+
+                this.div = document.createElement("div");
+                this.div.style.position = "absolute";
+                this.div.style.width = "80px";
+                this.div.style.height = "80px";
+                this.div.style.backgroundImage = `url(${imageUrl})`;
+                this.div.style.backgroundSize = "cover";
+                this.div.style.borderRadius = "8px";
+                this.div.style.boxShadow = "0px 2px 5px rgba(0,0,0,0.2)";
+
+                this.setMap(map);
+            }
+
+            onAdd() {
+                const panes = this.getPanes();
+                panes.overlayImage.appendChild(this.div);
+            }
+
+            draw() {    // 마커의 위치를 가져와 조정
+                const overlayProjection = this.getProjection();
+                const position = overlayProjection.fromLatLngToDivPixel(this.position);
+
+                if (position) {
+                    this.div.style.left = position.x - 40 + "px";  // 중앙 정렬
+                    this.div.style.top = position.y - 90 + "px";   // 마커 위로 이동
+                }
+            }
+
+            onRemove() {    // 오버레이 삭제
+                if (this.div) {
+                    this.div.parentNode.removeChild(this.div);
+                    this.div = null;
+                }
+            }
+        }
+        */
+
 
         function loadTravelItem() {
             fetch(`/travel/${travelId}`, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
+                    console.log("data:", data);
                     locationData = data;
                     initMap();
                     showLocationDetails(data);
@@ -102,7 +146,9 @@
                 .catch(error => console.error('데이터 로드 오류:', error));
         }
 
+
         function initMap() {
+
             fetch('https://ipapi.co/json/')
             .then(response => response.json())
             .then(data => {
@@ -136,6 +182,10 @@
         function showLocationOnMap(locations) {
             if (!map) return;
             if (!locations || locations.length === 0) return;
+            if (!Array.isArray(locations)) {
+                console.error("올바르지 않은 데이터 형식: locations는 배열이어야 합니다.", locations);
+                return;
+            }
             console.log("responseData=", locations);
 
             const bounds = new google.maps.LatLngBounds();
@@ -151,7 +201,12 @@
                         fontSize: '14px'
                     }
                 });
+                // 📌 마커 위에 이미지를 표시할 오버레이 추가
+                //const imageUrl = `/file/travel/${location.fileName}`;   // 이미지 URL
+                //const overlay = new CustomOverlay(latLng, imageUrl, map);     // CustomOverlay 호출 오류로 그냥 주석
 
+                /* 1. 맨처음에 사용 이미지 호출하고 영역 만들어뒀다가 마커 클릭 시 보여주기
+                */
                 // 이미지 URL을 생성
                 const imageUrl = location.fileName ? `/file/travel/${location.fileName}` : null;
 
@@ -172,6 +227,7 @@
                 marker.addListener("click", () => {
                     infoWindow.open(map, marker);
                 });
+
 
                 bounds.extend(latLng);
             });
@@ -274,7 +330,11 @@
             copyTravel(travelId);
         });
 
+
         window.onload = loadTravelItem;
+
+
+
     </script>
 </body>
 </html>

@@ -48,7 +48,7 @@ public class UploadController { // 이것도 그냥 FileController로 변경하�
     public ResponseEntity<Resource> getImage(@PathVariable("imageName") String imageName) {
         try {
             // 이미지 반환 요청
-            Resource resource = fileService.loadImage(imageName, null);
+            Resource resource = fileService.loadImage(imageName, "profile");
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, "image/jpeg") // 미디어(MIME) 타입 설정
