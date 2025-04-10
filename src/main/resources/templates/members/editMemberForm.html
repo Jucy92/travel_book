@@ -1,77 +1,68 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>회원 정보 수정</title>
-    <style>
-        .form-container {
-            width: 300px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .form-group button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .form-group button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Book - 회원 정보 수정</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script>
-    function encryptPassword(event) {
-    event.preventDefault(); <!--  메소드는 브라우저의 기본 동작을 막는 중요한 기능 -->
-    let password = document.getElementById("password").value;
-    password = CryptoJS.SHA256(password).toString();
-    document.getElementById("password").value = password;
-    document.getElementById("loginForm").submit();
-}
-</script>
-    <div class="form-container">
-        <h2>회원 정보 수정</h2>
+<div class="container">
+    <button class="back-button" onclick="goBack()">←</button>
+
+    <div class="form-container fade-in">
+        <div class="text-center mb-4">
+            <h2>회원 정보 수정</h2>
+            <p class="text-muted">회원 정보를 수정할 수 있습니다</p>
+        </div>
+
         <form id="loginForm" th:action="@{/members/edit}" method="post" th:object="${member}" onsubmit="encryptPassword(event)">
             <div class="form-group">
                 <label for="mail">이메일</label>
-                <input type="email" id="mail" th:field="*{mail}" required />
-            </div>
-            <div class="form-group">
-                <label for="name">이름</label>
-                <input type="text" id="name" th:field="*{name}" />
-            </div>
-            <div class="form-group">
-                <label for="password">패스워드</label>
-                <input type="password" id="password" th:field="*{password}" />
-            </div>
-            <div class="form-group">
-                <label for="phone">핸드폰 번호</label>
-                <input type="text" id="phone" th:field="*{phone}" />
-            </div>
-            <div class="form-group">
-                <button type="submit">수정</button>
-                <button th:onclick="|location.href='@{/}'|" type="button">취소</button>
+                <input type="email" id="mail" th:field="*{mail}" class="form-control" placeholder="이메일을 입력하세요" required>
             </div>
 
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="이름을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력하세요">
+                <small class="text-muted">비밀번호는 8자 이상이며, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">핸드폰 번호</label>
+                <input type="text" id="phone" th:field="*{phone}" class="form-control" placeholder="핸드폰 번호를 입력하세요">
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">수정하기</button>
+                <button type="button" class="btn btn-outline" onclick="location.href='/'">취소</button>
+            </div>
         </form>
     </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+    function encryptPassword(event) {
+        event.preventDefault();
+        let password = document.getElementById("password").value;
+        if (password) {
+            password = CryptoJS.SHA256(password).toString();
+            document.getElementById("password").value = password;
+        }
+        document.getElementById("loginForm").submit();
+    }
+
+    function goBack() {
+        window.history.back();
+    }
+</script>
 </body>
 </html>

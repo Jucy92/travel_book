@@ -1,128 +1,221 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <link th:href="@{/css/bootstrap.min.css}"
-          href="../css/bootstrap.min.css" rel="stylesheet">
-    <style>
-.container {
-max-width: 560px;
-}
-.field-error {
-border-color: #dc3545;
-color: #dc3545;
-}
-.disable-div {
-    pointer-events: none;
-}
-
-    </style>
+<head th:replace="~{common/header :: common-header}">
+    <title>Travel Book - 회원가입</title>
 </head>
 <body>
-<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
-<script>
-  function fn_sendNum(){
-    $.ajax({
-        url: "/mail",
-        type: "post",
-        dataType: "json",
-        data: {"mail": $("#mail").val()},
-        success: function(data) {
-            if (data.message) {
-                alert(data.message);
-                $("#crtf").attr("value", data.num);
-            }
-
-        },
-        error: function(xhr, status, error) {
-            alert("오류가 발생했습니다: " + error);
-        }
-    });
-  }
-  function fn_confirmNum(){
-    const num1 = $("#crtf_num").val();
-    const num2 = $("#crtf").val();
-
-    if(num1 == num2){
-      alert("인증되었습니다.");
-
-      document.getElementById("crtf_chk").style.display="none";
-      document.getElementById("revBtn").style.disable="true";
-    }else{
-      alert("인증번호가 다릅니다.");
-    }
-  }
-  function encryptPassword(event) {
-        event.preventDefault(); // 기본 제출 동작을 막습니다.
-        let password = document.getElementById("password").value;
-        password = CryptoJS.SHA256(password).toString();
-        document.getElementById("password").value = password;
-        document.getElementById("loginForm").submit();
-  }
-
-</script>
+<div th:replace="~{common/header :: header}" th:with="pageTitle='회원가입',showBack=true"></div>
 
 <div class="container">
-    <div class="py-5 text-center">
-        <h2>회원 가입</h2>
+    <div class="form-container fade-in">
+        <form role="form" action="/members/new" th:object="${memberForm}" method="post">
+            <div class="form-group">
+                <label for="userId">아이디</label>
+                <div class="input-group">
+                    <input type="text" th:field="*{userId}" class="form-control" placeholder="아이디를 입력하세요"
+                           th:class="${#fields.hasErrors('userId')}? 'form-control fieldError' : 'form-control'">
+                    <button type="button" class="btn btn-outline" onclick="checkDuplicateId()">중복확인</button>
+                </div>
+                <p class="error-message" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">아이디 오류</p>
+            </div>
+
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" th:field="*{name}" class="form-control" placeholder="이름을 입력하세요"
+                       th:class="${#fields.hasErrors('name')}? 'form-control fieldError' : 'form-control'">
+                <p class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">이름 오류</p>
+            </div>
+
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력하세요"
+                       th:class="${#fields.hasErrors('password')}? 'form-control fieldError' : 'form-control'">
+                <p class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">비밀번호 오류</p>
+            </div>
+
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <div class="input-group">
+                    <input type="email" th:field="*{email}" class="form-control" placeholder="이메일을 입력하세요"
+                           th:class="${#fields.hasErrors('email')}? 'form-control fieldError' : 'form-control'">
+                    <button type="button" class="btn btn-outline" onclick="sendVerificationEmail()">인증번호 전송</button>
+                </div>
+                <p class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">이메일 오류</p>
+            </div>
+
+            <div class="form-group verification-code" style="display: none;">
+                <label for="verificationCode">인증번호</label>
+                <div class="input-group">
+                    <input type="text" id="verificationCode" class="form-control" placeholder="인증번호를 입력하세요">
+                    <button type="button" class="btn btn-outline" onclick="verifyCode()">확인</button>
+                </div>
+                <p class="timer">03:00</p>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">회원가입</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='/'">취소</button>
+            </div>
+        </form>
     </div>
-    <h4 class="mb-3">회원 정보 입력</h4>
-    <form id="loginForm" action="" th:action th:object="${member}" method="post" onsubmit="encryptPassword(event)">
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p class="field-error" th:each="err : ${#fields.globalErrors()}"
-               th:text="${err}">전체 오류 메시지</p>
-        </div>
-        <div>
-            <label for="mail">이메일 주소</label>
-            <input type="text" id="mail" th:field="*{mail}" class="form-control"
-                   th:errorclass="field-error">
-            <div class="field-error" th:errors="*{mail}"/>
-            <button type="button" id="revBtn" name="revBtn" onclick="fn_sendNum()">인증번호</button>
-        </div>
-        <div id="crtf_chk">
-            <input type="text" id="crtf_num" placeholder="인증번호 입력">
-            <!-- th:field="*{crtfNum}" th:errorclass="field-error"> -->
-            <!-- <div class="field-error" th:errors="*{crtfNum}" /> -->
-            <button type="button" id="confBtn" name="confBtn" onclick="fn_confirmNum()">이메일 인증</button>
-            <p>
-                <input type="text" id="crtf" placeholder="생성된 인증번호" readonly="true">
-            </p>
-        </div>
-        <div>
-            <label for="name">이름</label>
-            <input type="text" id="name" th:field="*{name}" class="form-control"
-                   th:errorclass="field-error">
-            <div class="field-error" th:errors="*{name}"/>
-        </div>
-        <div>
-            <label for="userId">아이디</label>
-            <input type="text" id="userId" th:field="*{userId}" class="form-control"
-                   th:errorclass="field-error">
-            <div class="field-error" th:errors="*{name}"/>
-        </div>
-        <div>
-            <label for="password">비밀번호</label>
-            <input type="password" id="password" th:field="*{password}"
-                   class="form-control"
-                   th:errorclass="field-error">
-            <div class="field-error" th:errors="*{password}"/>
-        </div>
-        <hr class="my-4">
-        <div class="row">
-            <div class="col">
-                <button class="w-100 btn btn-primary btn-lg" type="submit">회원 가입</button>
-            </div>
-            <div class="col">
-                <button class="w-100 btn btn-secondary btn-lg"
-                        onclick="location.href='items.html'"
-                        th:onclick="|location.href='@{/}'|"
-                        type="button">취소
-                </button>
-            </div>
-        </div>
-    </form>
-</div> <!-- /container -->
+</div>
+
+<style>
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.input-group .form-control {
+    flex: 1;
+}
+
+.input-group .btn {
+    white-space: nowrap;
+}
+
+.verification-code {
+    position: relative;
+}
+
+.timer {
+    position: absolute;
+    right: 100px;
+    top: 40px;
+    color: #dc3545;
+    font-size: 0.9rem;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.button-group .btn {
+    flex: 1;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.fieldError {
+    border-color: #dc3545;
+}
+</style>
+
+<script th:inline="javascript">
+let timer;
+let isEmailVerified = false;
+
+function checkDuplicateId() {
+    const userId = document.getElementById('userId').value;
+    if (!userId) {
+        alert('아이디를 입력해주세요.');
+        return;
+    }
+
+    fetch(`/members/check-id/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.available) {
+                alert('사용 가능한 아이디입니다.');
+            } else {
+                alert('이미 사용중인 아이디입니다.');
+            }
+        });
+}
+
+function sendVerificationEmail() {
+    const email = document.getElementById('email').value;
+    if (!email) {
+        alert('이메일을 입력해주세요.');
+        return;
+    }
+
+    fetch('/members/send-verification', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('인증번호가 전송되었습니다.');
+            document.querySelector('.verification-code').style.display = 'block';
+            startTimer();
+        } else {
+            alert('인증번호 전송에 실패했습니다.');
+        }
+    });
+}
+
+function startTimer() {
+    let time = 180; // 3분
+    clearInterval(timer);
+    
+    timer = setInterval(() => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        document.querySelector('.timer').textContent = 
+            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
+        if (time === 0) {
+            clearInterval(timer);
+            alert('인증 시간이 만료되었습니다. 다시 시도해주세요.');
+        }
+        time--;
+    }, 1000);
+}
+
+function verifyCode() {
+    const code = document.getElementById('verificationCode').value;
+    const email = document.getElementById('email').value;
+
+    fetch('/members/verify-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            email: email,
+            code: code
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('이메일이 인증되었습니다.');
+            clearInterval(timer);
+            document.querySelector('.timer').style.display = 'none';
+            isEmailVerified = true;
+        } else {
+            alert('잘못된 인증번호입니다.');
+        }
+    });
+}
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    if (!isEmailVerified) {
+        e.preventDefault();
+        alert('이메일 인증이 필요합니다.');
+    }
+});
+</script>
 </body>
 </html>

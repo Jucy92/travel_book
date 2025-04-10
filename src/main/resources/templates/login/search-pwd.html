@@ -1,12 +1,78 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{common/header :: common-header}">
+<head>
     <meta charset="utf-8">
-    <title>회원정보 입력</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Book - 비밀번호 찾기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
+<body>
+<div class="container">
+    <button class="back-button" onclick="goBack()">←</button>
+
+    <div class="form-container fade-in">
+        <div class="text-center mb-4">
+            <h2>비밀번호 찾기</h2>
+            <p class="text-muted">가입 시 입력한 본인정보를 입력해 주세요</p>
+        </div>
+
+        <form id="findPassword" th:action="@{/login/search-pwd}" method="post" th:object="${loginModel}" th:onsubmit="checkedSubmit(event)">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
+            </div>
+
+            <div class="form-group">
+                <label class="mb-3">인증 방법</label>
+                <div class="d-flex gap-4 mb-3">
+                    <div class="form-check">
+                        <input type="radio" id="individual" name="memberType" value="individual" checked class="form-check-input">
+                        <label for="individual" class="form-check-label">이메일 인증</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="corporate" name="memberType" value="corporate" disabled class="form-check-input">
+                        <label for="corporate" class="form-check-label">휴대폰 인증</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id">아이디</label>
+                <input type="text" id="id" th:field="*{userId}" class="form-control" placeholder="아이디를 입력하세요">
+                <div class="field-error" th:errors="*{userId}"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">이메일 주소</label>
+                <div class="d-flex gap-2">
+                    <input type="email" id="email" th:field="*{mail}" class="form-control" placeholder="이메일을 입력하세요">
+                    <button type="button" id="emailVerifyBtn" class="btn btn-outline" th:style="${showEmailVerifyBtn} ? 'display:inline-block' : 'display:none'">인증번호 요청</button>
+                </div>
+                <div class="field-error" th:errors="*{mail}"></div>
+            </div>
+
+            <div id="verificationSection" class="form-group" th:style="${showVerifyCodeBtn} ? 'display:block' : 'display:none'">
+                <label for="verificationCode">인증번호</label>
+                <div class="d-flex gap-2">
+                    <input type="text" id="verificationCode" class="form-control" placeholder="인증번호를 입력하세요">
+                    <button type="button" id="verifyCodeBtn" class="btn btn-outline">확인</button>
+                </div>
+            </div>
+
+            <input type="hidden" id="checkedVerify"/>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">비밀번호 찾기</button>
+                <button type="button" class="btn btn-outline" onclick="location.href='/login'">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script th:inline="javascript">
-    function checkedSubmit(event){
-        event.preventDefault(); // 기본 제출 동작을 막습니다.
+    function checkedSubmit(event) {
+        event.preventDefault();
 
         const submitCheck = document.getElementById("checkedVerify").value;
         const emailValue = document.getElementById('email').value.trim();
@@ -17,21 +83,15 @@
                 alert('인증 완료 후 클릭해 주세요.');
                 return;
             }
-
         }
         document.getElementById("findPassword").submit();
     }
+
     document.addEventListener('DOMContentLoaded', function() {
         const emailInput = document.getElementById('email');
         const emailVerifyBtn = document.getElementById('emailVerifyBtn');
         const verificationSection = document.getElementById('verificationSection');
         const verifyCodeBtn = document.getElementById('verifyCodeBtn');
-
-
-        if (emailInput.dataset.showVerify === 'true') {     // 이거 없어도 그냥 값이 th:style에 적용되서 보이는거 같은데..?
-            emailVerifyBtn.style.display = 'inline-block';
-        }
-
 
         emailInput.addEventListener('input', function() {
             if (emailInput.value.trim() !== '') {
@@ -77,7 +137,7 @@
             .then(data => {
                 if (data.message) {
                     alert(data.message);
-                    if (data.checkedVerify === "true"){
+                    if (data.checkedVerify === "true") {
                         emailVerifyBtn.style.display = 'none';
                         verificationSection.style.display = 'none';
                         document.getElementById("checkedVerify").value = data.checkedVerify;
@@ -90,54 +150,10 @@
             });
         });
     });
+
+    function goBack() {
+        window.history.back();
+    }
 </script>
-<body>
-
-    <div th:replace="~{common/header :: header}"></div>
-    <h2>회원정보 입력</h2>
-    <p>회원구분별로 가입 시 입력한 본인정보를 입력해 주세요.</p>
-
-    <form th:id="findPassword" th:action="@{/login/search-pwd}" method="post" th:object="${loginModel}" th:onsubmit="checkedSubmit(event)">
-        <div>
-            <h3>개인회원(비밀번호 찾기)</h3>
-            <div>
-                <input type="radio" id="individual" name="memberType" value="individual" checked>
-                <label for="individual">이메일 인증</label>
-
-                <input type="radio" id="corporate" name="memberType" value="corporate" disabled="true">
-                <label for="corporate">휴대폰 인증</label>
-            </div>
-
-            <div>
-                <label for="id">아이디</label>
-                <input type="text" id="id" th:field="*{userId}" placeholder="아이디를 입력해주세요">
-                <div class="field-error" th:errors="*{userId}"/>
-            </div>
-            <div>
-                <label for="email">이메일 주소</label>
-                <input type="email" id="email" th:field="*{mail}" placeholder="이메일을 입력해주세요">
-                <select id="emailDomain" disabled="true">
-                    <option value="" disabled selected>선택하세요</option>
-                    <option value="gmail.com">gmail.com</option>
-                    <option value="naver.com">naver.com</option>
-                    <option value="daum.net">daum.net</option>
-                </select>
-                <button type="button" id="emailVerifyBtn" th:style="${showEmailVerifyBtn} ? 'display:inline-block' : 'display:none'">인증번호 요청</button>
-            </div>
-            <div id="verificationSection" th:style="${showVerifyCodeBtn} ? 'display:inline-block' : 'display:none'">
-                <input type="text" id="verificationCode" placeholder="인증번호 입력">
-                <button type="button" id="verifyCodeBtn">이메일 인증</button>
-            </div>
-            <div class="field-error" th:errors="*{mail}"/>
-
-            </div>
-        </div>
-        <input type="hidden" id="checkedVerify"/>
-        <button type="submit">비밀번호 찾기</button>
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p class="field-error" th:each="err : ${#fields.globalErrors()}"
-               th:text="${err}">전체 오류 메시지</p>
-        </div>
-    </form>
 </body>
 </html>

@@ -1,89 +1,92 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <link th:href="@{/css/bootstrap.min.css}"
-          href="../css/bootstrap.min.css" rel="stylesheet">
-    <style>
-     .container {
-     max-width: 560px;
-     }
-     .field-error {
-     border-color: #dc3545;
-     color: #dc3545;
-     }
-     .find-buttons {
-        margin-top: 20px;
-        text-align: center;
-     }
-     .find-buttons a {
-        margin: 0 10px;
-     }
-    </style>
+<head th:replace="~{common/header :: common-header}">
+    <title>Travel Book - 로그인</title>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script>
-    function encryptPassword(event) {
-        event.preventDefault(); <!--  메소드는 브라우저의 기본 동작을 막는 중요한 기능 -->
-        let password = document.getElementById("password").value;
-        password = CryptoJS.SHA256(password).toString();
-        document.getElementById("password").value = password;
-        document.getElementById("loginForm").submit();
-    }
-</script>
-<div class="container">
-    <div class="py-5 text-center">
-        <h2>로그인</h2>
-    </div>
-    <form id="loginForm" action="home.html" th:action th:object="${loginModel}" method="post" onsubmit="encryptPassword(event)">
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p class="field-error" th:each="err : ${#fields.globalErrors()}"
-               th:text="${err}">전체 오류 메시지</p>
-        </div>
-        <div>
-            <label for="loginId">아이디</label>
-            <input type="text" id="loginId" th:field="*{userId}" class="form-control" placeholder="아이디를 입력하세요"
-                   th:errorclass="field-error">
-            <div class="field-error" th:errors="*{userId}"/>
-            <input type="hidden" id="encryptedPassword" name="encryptedPassword">
-        </div>
-        <!--<div>       이메일 로그인에서 아이디로 변경
-            <label for="loginId">이메일 주소</label>
-            <input type="text" id="loginId" th:field="*{mail}" class="form-control" placeholder="xxx@gmail.com"
-                   th:errorclass="field-error">
-            <div class="field-error" th:errors="*{mail}" />
-        </div>-->
-        <div>
-            <label for="password">비밀번호</label>
-            <input type="password" id="password" th:field="*{password}"
-                   class="form-control"
-                   th:errorclass="field-error">
-            <div class="field-error" th:errors="*{password}"/>
-        </div>
+<div th:replace="~{common/header :: header}" th:with="pageTitle='로그인',showBack=true"></div>
 
-        <hr class="my-4">
-        <div class="row">
-            <div class="col">
-                <button class="w-100 btn btn-primary btn-lg" type="submit">
-                    로그인
-                </button>
+<div class="container">
+    <div class="login-container fade-in">
+        <form action="/login" method="post">
+            <div th:if="${param.error}" class="alert alert-danger">
+                <p>아이디 또는 비밀번호가 맞지 않습니다.</p>
             </div>
-            <div class="col">
-                <button class="w-100 btn btn-secondary btn-lg"
-                        onclick="location.href='items.html'"
-                        th:onclick="|location.href='@{/}'|"
-                        type="button">취소
-                </button>
+            <div class="form-group">
+                <label for="userId">아이디</label>
+                <input type="text" id="userId" name="userId" class="form-control" placeholder="아이디를 입력하세요">
             </div>
-        </div>
-    </form>
-    <!-- ID 찾기 / 비밀번호 찾기 버튼 추가 -->
-    <div class="find-buttons">
-        <a th:href="@{login/search-id}" class="btn btn-link">ID 찾기</a>
-        <a th:href="@{login/search-pwd}" class="btn btn-link">비밀번호 찾기</a>
-        <a th:href="@{/members/add}" class="btn btn-link">회원가입</a>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력하세요">
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember-me">
+                <label class="form-check-label" for="rememberMe">자동 로그인</label>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">로그인</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='/members/new'">회원가입</button>
+            </div>
+            <div class="text-center mt-3">
+                <a href="/find-password" class="text-muted">비밀번호를 잊으셨나요?</a>
+            </div>
+        </form>
     </div>
-</div> <!-- /container -->
+</div>
+
+<style>
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.button-group .btn {
+    flex: 1;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.form-check-label {
+    user-select: none;
+}
+</style>
+
+<script th:inline="javascript">
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const password = document.getElementById('password').value;
+    const hashedPassword = CryptoJS.SHA256(password).toString();
+    document.getElementById('password').value = hashedPassword;
+    this.submit();
+});
+</script>
 </body>
 </html>

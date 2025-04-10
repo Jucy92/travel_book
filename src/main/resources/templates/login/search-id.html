@@ -1,40 +1,60 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{common/header :: common-header}">
+<head>
     <meta charset="utf-8">
-    <title>회원정보 입력</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Book - 아이디 찾기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
 </head>
 <body>
-    <div th:replace="~{common/header :: header}"></div>
-    <h2>회원정보 입력</h2>
-    <p>회원구분별로 가입 시 입력한 본인정보를 입력해 주세요.</p>
+<div class="container">
+    <button class="back-button" onclick="goBack()">←</button>
 
-    <form th:action="@{/login/search-id}" method="post" th:object="${loginModel}">
-        <div>
-            <h3>개인회원(아이디 찾기)</h3>
-            <div>
-                <input type="radio" id="individual" name="memberType" value="individual" checked>
-                <label for="individual">이메일 인증</label>
+    <div class="form-container fade-in">
+        <div class="text-center mb-4">
+            <h2>아이디 찾기</h2>
+            <p class="text-muted">가입 시 입력한 본인정보를 입력해 주세요</p>
+        </div>
 
-                <input type="radio" id="corporate" name="memberType" value="corporate" disabled="true">
-                <label for="corporate">휴대폰 인증</label>
+        <form th:action="@{/login/search-id}" method="post" th:object="${loginModel}">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
             </div>
 
-            <div>
+            <div class="form-group">
+                <label class="mb-3">인증 방법</label>
+                <div class="d-flex gap-4 mb-3">
+                    <div class="form-check">
+                        <input type="radio" id="individual" name="memberType" value="individual" checked class="form-check-input">
+                        <label for="individual" class="form-check-label">이메일 인증</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="corporate" name="memberType" value="corporate" disabled class="form-check-input">
+                        <label for="corporate" class="form-check-label">휴대폰 인증</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="email">이메일 주소</label>
-                <input type="email" id="email" th:field="*{mail}">
-                <select>
-                    <option disabled="true">선택하세요</option>
-                </select>
-                <div class="field-error" th:errors="*{mail}"/>
+                <input type="email" id="email" th:field="*{mail}" class="form-control" placeholder="이메일을 입력하세요">
+                <div class="field-error" th:errors="*{mail}"></div>
             </div>
-        </div>
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p class="field-error" th:each="err : ${#fields.globalErrors()}"
-               th:text="${err}">전체 오류 메시지</p>
-        </div>
-        <button type="submit">아이디 찾기</button>
 
-    </form>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">아이디 찾기</button>
+                <button type="button" class="btn btn-outline" onclick="location.href='/login'">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
 </body>
 </html>
