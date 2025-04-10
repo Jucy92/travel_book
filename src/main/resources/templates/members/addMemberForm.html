@@ -14,7 +14,7 @@
                 <div class="input-group">
                     <input type="text" th:field="*{userId}" class="form-control" placeholder="아이디를 입력하세요"
                            th:class="${#fields.hasErrors('userId')}? 'form-control fieldError' : 'form-control'">
-                    <button type="button" class="btn btn-outline" onclick="checkDuplicateId()">중복확인</button>
+                    <button type="button" id="idCheckBtn" class="btn btn-outline" onclick="checkDuplicateId()">중복확인</button>
                 </div>
                 <p class="error-message" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">아이디 오류</p>
             </div>
@@ -38,7 +38,7 @@
                 <div class="input-group">
                     <input type="email" th:field="*{email}" class="form-control" placeholder="이메일을 입력하세요"
                            th:class="${#fields.hasErrors('email')}? 'form-control fieldError' : 'form-control'">
-                    <button type="button" class="btn btn-outline" onclick="sendVerificationEmail()">인증번호 전송</button>
+                    <button type="button" id="emailVerifyBtn" class="btn btn-outline" onclick="sendVerificationEmail()">인증번호 전송</button>
                 </div>
                 <p class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">이메일 오류</p>
             </div>
@@ -183,7 +183,7 @@ function checkDuplicateId() {
                 isIdChecked = true;
                 checkedId = userId;
                 // 중복확인 버튼 스타일 변경
-                const checkButton = document.querySelector('.input-group .btn-outline');
+                const checkButton = document.getElementById('idCheckBtn');
                 checkButton.textContent = '확인완료';
                 checkButton.classList.add('btn-success');
                 checkButton.classList.remove('btn-outline');
@@ -284,7 +284,7 @@ function verifyCode() {
             alert('이메일이 인증되었습니다.');
             clearInterval(timer);
             document.querySelector('.verification-code').style.display = 'none';
-            const verifyButton = document.querySelector('.input-group .btn-outline');
+            const verifyButton = document.getElementById('emailVerifyBtn');
             verifyButton.textContent = '인증완료';
             verifyButton.disabled = true;
             verifyButton.classList.add('btn-success');
@@ -298,45 +298,65 @@ function verifyCode() {
 }
 
 /**
- * 폼 제출 전 유효성 검사
- * - 이메일 인증 확인
- * - 아이디 중복체크 확인
- * - 아이디 변경 여부 확인
+ * Document 객체 메서드 설명
+ * 
+ * 1. getElementById('아이디명')
+ *    - HTML 문서에서 특정 id 속성을 가진 요소를 찾아 반환
+ *    - 반환타입: Element 객체 (input, button 등 HTML 요소)
+ *    - 예시: document.getElementById('userId') => id="userId"인 요소를 찾음
+ * 
+ * 2. querySelector('CSS선택자')
+ *    - CSS 선택자로 요소를 찾아 반환 (클래스, id, 태그 등 모두 사용 가능)
+ *    - 여러 요소가 있을 경우 첫 번째 요소만 반환
+ *    - 반환타입: Element 객체
+ *    - 예시: document.querySelector('.verification-code') => class="verification-code"인 첫 번째 요소를 찾음
+ * 
+ * 3. addEventListener('이벤트타입', 콜백함수)
+ *    - 특정 요소에 이벤트 리스너를 추가
+ *    - 매개변수:
+ *      첫 번째: 이벤트 타입 (예: 'input', 'click', 'submit' 등)
+ *      두 번째: 이벤트 발생 시 실행될 콜백 함수
+ *    - 예시: element.addEventListener('input', function() { ... })
+ *           => input 값이 변경될 때마다 콜백 함수 실행
  */
+
+// 폼 제출 이벤트 리스너
+// submit 이벤트 발생 시 (폼이 제출될 때) 유효성 검사 실행
 document.querySelector('form').addEventListener('submit', function(e) {
-    const currentId = document.getElementById('userId').value;
+    const currentId = document.getElementById('userId').value;  // userId input의 현재 값 가져오기
     
     if (!isIdChecked) {
-        e.preventDefault();
+        e.preventDefault();  // 폼 제출 중단
         alert('아이디 중복확인이 필요합니다.');
         return;
     }
     
     if (currentId !== checkedId) {
-        e.preventDefault();
+        e.preventDefault();  // 폼 제출 중단
         alert('중복확인된 아이디가 변경되었습니다. 다시 중복확인을 해주세요.');
         return;
     }
     
     if (!isEmailVerified) {
-        e.preventDefault();
+        e.preventDefault();  // 폼 제출 중단
         alert('이메일 인증이 필요합니다.');
         return;
     }
 });
 
-// 아이디 입력창 이벤트 리스너
+// 아이디 입력창 변경 감지 이벤트 리스너
+// input 이벤트 발생 시 (사용자가 입력할 때마다) 중복확인 상태 초기화
 document.getElementById('userId').addEventListener('input', function() {
-    const currentId = this.value;
-    const checkButton = document.querySelector('.input-group .btn-outline');
+    const currentId = this.value;  // 현재 입력된 아이디 값 (this는 이벤트가 발생한 input 요소를 가리킴)
+    const checkButton = document.getElementById('idCheckBtn');  // 중복확인 버튼 요소 가져오기
     
     // 중복체크된 아이디와 다른 경우 상태 초기화
     if (isIdChecked && currentId !== checkedId) {
         isIdChecked = false;
         checkedId = '';
         checkButton.textContent = '중복확인';
-        checkButton.classList.remove('btn-success');
-        checkButton.classList.add('btn-outline');
+        checkButton.classList.remove('btn-success');  // 버튼에서 성공 스타일 제거
+        checkButton.classList.add('btn-outline');     // 버튼에 기본 스타일 추가
     }
 });
 </script>
