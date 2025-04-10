@@ -44,12 +44,12 @@ public class MemberServiceTest {
 
         // Given: 테스트용 데이터를 생성하여 저장
         Member member1 = new Member();
-        member1.setMail("test100@naver.com");
+        member1.setEmail("test100@naver.com");
         member1.setName("주찬양");
         member1.setUserId("test100");
         member1.setPassword("1234");
         Member member2 = new Member();
-        member2.setMail("test200@naver.com");
+        member2.setEmail("test200@naver.com");
         member2.setName("양");
         member2.setUserId("test200");
         member2.setPassword("1234");

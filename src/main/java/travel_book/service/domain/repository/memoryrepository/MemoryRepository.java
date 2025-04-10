@@ -33,12 +33,12 @@ public class MemoryRepository implements MemberRepository {
 
     @Override
     public void update(Member updateMember) {   // 메일 주소로 -> id 가져와서 메일,이름,번호 다 변경하려고 했는데 안되네 id가 키값이라 map에서 데이터 가져올 수가 없음
-        Member findMember = findByMail(updateMember.getMail()).orElseThrow();   // orElseThrow 있으면 벨류값(객체) 없으면 노서치인셉션
+        Member findMember = findByMail(updateMember.getEmail()).orElseThrow();   // orElseThrow 있으면 벨류값(객체) 없으면 노서치인셉션
         findMember.setName(updateMember.getName());
         findMember.setPassword(updateMember.getPassword());
         findMember.setPhone(updateMember.getPhone());
         // 일단 그냥 메일주소로 이름이나 번호만 변경가능하게 하려고 했으나 아래처럼 해도 되나..?
-        findMember.setMail(updateMember.getMail()); // 이렇게 해버려도 상관 없나...? -> mail 중복 x -> findByMail로 찾아오는거기때문에 mail 값이 다르면 값 자체를 못찾음
+        findMember.setEmail(updateMember.getEmail()); // 이렇게 해버려도 상관 없나...? -> mail 중복 x -> findByMail로 찾아오는거기때문에 mail 값이 다르면 값 자체를 못찾음
 
         log.info("update 호출={}", findMember);
         log.info("List={}",findAll());
@@ -60,7 +60,7 @@ public class MemoryRepository implements MemberRepository {
                                                        .findFirst());
 */
         return findAll().stream()
-                .filter(m -> m.getMail().equals(mail))
+                .filter(m -> m.getEmail().equals(mail))
                 .findFirst();
     }
 
@@ -106,12 +106,12 @@ public class MemoryRepository implements MemberRepository {
                     if (ObjectUtils.isEmpty(mail)) {
                         return true;
                     }
-                    return member.getMail().contains(mail);
+                    return member.getEmail().contains(mail);
                 }).filter(member -> {
                     if (ObjectUtils.isEmpty(name)) {
                         return true;
                     }
-                    return member.getMail().contains(name);
+                    return member.getEmail().contains(name);
                 })
                 .collect(Collectors.toList());
     }

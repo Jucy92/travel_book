@@ -44,7 +44,7 @@ class MemberControllerTest {
     void add() {
         Member member = new Member();
         member.setName("테스트1");
-        member.setMail("test1@test.com");
+        member.setEmail("test1@test.com");
         member.setUserId("test1");
         member.setPassword("1234");
         memberRepository.save(member);
