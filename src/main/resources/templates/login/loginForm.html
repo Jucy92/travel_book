@@ -8,28 +8,39 @@
 
 <div class="container">
     <div class="login-container fade-in">
-        <form action="/login" method="post">
-            <div th:if="${param.error}" class="alert alert-danger">
-                <p>아이디 또는 비밀번호가 맞지 않습니다.</p>
+        <form id="loginForm" action="home.html" th:action th:object="${loginModel}" method="post" onsubmit="encryptPassword(event)">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
             </div>
+
             <div class="form-group">
-                <label for="userId">아이디</label>
-                <input type="text" id="userId" name="userId" class="form-control" placeholder="아이디를 입력하세요">
+                <label for="loginId">아이디</label>
+                <input type="text" id="loginId" th:field="*{userId}" class="form-control" 
+                       placeholder="아이디를 입력하세요" th:errorclass="field-error">
+                <div class="field-error" th:errors="*{userId}"></div>
             </div>
+
             <div class="form-group">
                 <label for="password">비밀번호</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호를 입력하세요">
+                <input type="password" id="password" th:field="*{password}"
+                       class="form-control" placeholder="비밀번호를 입력하세요"
+                       th:errorclass="field-error">
+                <div class="field-error" th:errors="*{password}"></div>
             </div>
-            <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember-me">
-                <label class="form-check-label" for="rememberMe">자동 로그인</label>
-            </div>
+
             <div class="button-group">
-                <button type="submit" class="btn btn-primary">로그인</button>
-                <button type="button" class="btn btn-secondary" onclick="location.href='/members/new'">회원가입</button>
+                <button class="btn btn-primary" type="submit">로그인</button>
+                <button class="btn btn-secondary" type="button" onclick="location.href='/'">취소</button>
             </div>
+
             <div class="text-center mt-3">
-                <a href="/find-password" class="text-muted">비밀번호를 잊으셨나요?</a>
+                <div class="btn-group">
+                    <a th:href="@{/login/search-id}" class="btn btn-link">아이디 찾기</a>
+                    <span class="text-muted">|</span>
+                    <a th:href="@{/login/search-pwd}" class="btn btn-link">비밀번호 찾기</a>
+                    <span class="text-muted">|</span>
+                    <a th:href="@{/members/add}" class="btn btn-link">회원가입</a>
+                </div>
             </div>
         </form>
     </div>
@@ -38,7 +49,7 @@
 <style>
 .login-container {
     max-width: 400px;
-    margin: 0 auto;
+    margin: 2rem auto;
     padding: 20px;
 }
 
@@ -49,44 +60,52 @@
 .form-group label {
     display: block;
     margin-bottom: 5px;
+    font-weight: 500;
 }
 
 .button-group {
     display: flex;
     gap: 10px;
-    margin-top: 30px;
+    margin: 30px 0;
 }
 
 .button-group .btn {
     flex: 1;
 }
 
-.alert {
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
+.field-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
 }
 
-.alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
+.btn-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
-.form-check-label {
-    user-select: none;
+.btn-link {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
 }
 </style>
 
-<script th:inline="javascript">
-document.querySelector('form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const password = document.getElementById('password').value;
-    const hashedPassword = CryptoJS.SHA256(password).toString();
-    document.getElementById('password').value = hashedPassword;
-    this.submit();
-});
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+    function encryptPassword(event) {
+        event.preventDefault();
+        let password = document.getElementById("password").value;
+        password = CryptoJS.SHA256(password).toString();
+        document.getElementById("password").value = password;
+        document.getElementById("loginForm").submit();
+    }
 </script>
 </body>
 </html>

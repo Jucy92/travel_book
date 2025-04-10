@@ -2,25 +2,59 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="common-header">
     <meta charset="utf-8">
-    <link th:href="@{/css/bootstrap.min.css}"
-          href="../css/bootstrap.min.css" rel="stylesheet">
-    <style>
-     .field-error {
-     border-color: #dc3545;
-     color: #dc3545;
-     }
-    </style>
-    <title>공통 헤더</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- 공통 헤더 -->
+    <header th:fragment="header" class="header">
+        <div class="header-left">
+            <button class="back-button" onclick="goBack()">←</button>
+            <div class="title-section">
+                <h2 th:text="${pageTitle}">페이지 제목</h2>
+            </div>
+        </div>
+        
+        <div class="header-center" th:if="${showSearch}">
+            <div class="search-section">
+                <input type="text" id="searchInput" class="form-control" placeholder="사용자 검색">
+                <button class="search-icon" onclick="performSearch()">🔍</button>
+            </div>
+        </div>
+        
+        <div class="header-right" th:if="${member != null}">
+            <div class="user-section" th:onclick="|location.href='@{/{id}(id=${member.userId})}'|">
+                <span th:text="${member.name}">사용자 이름</span>
+                <span class="user-icon">👤</span>
+            </div>
+        </div>
+    </header>
+
     <script>
         function goBack() {
             window.history.back();
         }
+
+        function performSearch() {
+            const searchValue = document.getElementById('searchInput').value.trim();
+            if (searchValue) {
+                window.location.href = '/travel/' + searchValue;
+            } else {
+                alert('검색어를 입력해주세요.');
+            }
+        }
+
+        // 엔터키로 검색 실행
+        if (document.getElementById('searchInput')) {
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        }
     </script>
-</head>
-<body>
-    <header th:fragment="header">
-        <button onclick="goBack()">←</button>
-        <!-- 여기에 다른 공통 헤더 요소들을 추가할 수 있습니다 -->
-    </header>
 </body>
 </html>
