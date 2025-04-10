@@ -146,7 +146,7 @@ function sendVerificationEmail() {
         return;
     }
 
-    fetch('/members/send-verification', {
+    fetch('/mail/send-verification', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ function verifyCode() {
     const code = document.getElementById('verificationCode').value;
     const email = document.getElementById('email').value;
 
-    fetch('/members/verify-code', {
+    fetch('/mail/verify-code', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
