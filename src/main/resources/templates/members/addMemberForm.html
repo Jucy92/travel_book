@@ -115,6 +115,25 @@
 .fieldError {
     border-color: #dc3545;
 }
+
+/* 이메일 인증 관련 컨테이너 스타일 */
+.verification-container {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+}
+
+/* 인증번호 입력 필드 스타일 */
+.verification-input {
+    width: 200px;
+    margin-right: 10px;
+}
+
+/* 타이머 표시 스타일 */
+.timer {
+    color: #dc3545;  /* 빨간색으로 강조 */
+    font-weight: bold;
+}
 </style>
 
 <script th:inline="javascript">
@@ -139,18 +158,28 @@ function checkDuplicateId() {
         });
 }
 
+function validateEmail(email) {
+    const emailInput = document.getElementById('email');  // MemberForm의 이메일 입력 필드
+    
+    // HTML5 validation 활용
+    if (!emailInput.checkValidity()) {
+        showError(emailInput.validationMessage);
+        return false;
+    }
+    return true;
+}
+
 function sendVerificationEmail() {
     const email = document.getElementById('email').value;
-    if (!email) {
-        alert('이메일을 입력해주세요.');
+    
+    // 이메일 인증 전에 validation 체크
+    if (!validateEmail(email)) {
         return;
     }
-
+    
     fetch('/mail/send-verification', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email })
     })
     .then(response => response.json())
