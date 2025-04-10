@@ -8,7 +8,7 @@
 
 <div class="container">
     <div class="form-container fade-in">
-        <form role="form" action="/members/new" th:object="${memberForm}" method="post">
+        <form role="form" th:action="" th:object="${memberForm}" method="post">
             <div class="form-group">
                 <label for="userId">아이디</label>
                 <div class="input-group">
@@ -143,7 +143,7 @@ let isEmailVerified = false;
 function checkDuplicateId() {
     const userId = document.getElementById('userId').value;
     if (!userId) {
-        showError("아이디를 입력해주세요.");
+        alert('아이디를 입력해주세요.');
         return;
     }
 
@@ -158,22 +158,11 @@ function checkDuplicateId() {
         });
 }
 
-function validateEmail(email) {
-    const emailInput = document.getElementById('email');  // MemberForm의 이메일 입력 필드
-    
-    // HTML5 validation 활용
-    if (!emailInput.checkValidity()) {
-        showError(emailInput.validationMessage);
-        return false;
-    }
-    return true;
-}
 
 function sendVerificationEmail() {
     const email = document.getElementById('email').value;
-    
-    // 이메일 인증 전에 validation 체크
-    if (!validateEmail(email)) {
+    if (!email) {
+        alert('이메일을 입력해주세요.');
         return;
     }
     
@@ -187,29 +176,18 @@ function sendVerificationEmail() {
         if (data.success) {
             alert('인증번호가 전송되었습니다.');
             document.querySelector('.verification-code').style.display = 'block';
+            document.getElementById('verificationCode').value = '';
             startTimer();
         } else {
-            alert('사용 중인 이메일 주소입니다. 인증번호 전송에 실패했습니다.');
+            alert('인증번호 전송에 실패했습니다.');
+            document.querySelector('.verification-code').style.display = 'none';
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('서버 오류가 발생했습니다.');
+        document.querySelector('.verification-code').style.display = 'none';
     });
-}
-
-function startTimer() {
-    let time = 300; // 5분
-    clearInterval(timer);
-    
-    timer = setInterval(() => {
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60;
-        document.querySelector('.timer').textContent = 
-            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        if (time === 0) {
-            clearInterval(timer);
-            alert('인증 시간이 만료되었습니다. 다시 시도해주세요.');
-        }
-        time--;
-    }, 1000);
 }
 
 function verifyCode() {
@@ -237,6 +215,27 @@ function verifyCode() {
             alert('잘못된 인증번호입니다.');
         }
     });
+}
+function startTimer() {
+    let time = 300; // 5분
+    clearInterval(timer);
+    
+    const timerDisplay = document.querySelector('.timer');
+    const verificationDiv = document.querySelector('.verification-code');
+    
+    timer = setInterval(() => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        
+        timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
+        if (--time < 0) {
+            clearInterval(timer);
+            alert('인증 시간이 만료되었습니다. 다시 시도해주세요.');
+            verificationDiv.style.display = 'none';  // 인증번호 입력창 숨김
+            document.getElementById('verificationCode').value = '';  // 입력값 초기화
+        }
+    }, 1000);
 }
 
 document.querySelector('form').addEventListener('submit', function(e) {
