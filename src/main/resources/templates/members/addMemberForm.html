@@ -166,7 +166,7 @@ let checkedId = '';  // 중복체크 완료된 아이디 저장
  * 아이디 중복 확인 함수
  * - 입력된 아이디 유효성 검사
  * - 서버에 중복 확인 요청
- * - 중복체크 완료 시 아이디 변경 방지
+ * - 중복체크 상태 관리
  */
 function checkDuplicateId() {
     const userId = document.getElementById('userId').value;
@@ -182,12 +182,9 @@ function checkDuplicateId() {
                 alert('사용 가능한 아이디입니다.');
                 isIdChecked = true;
                 checkedId = userId;
-                // 아이디 입력창 읽기전용으로 변경
-                document.getElementById('userId').readOnly = true;
-                // 중복확인 버튼 비활성화 및 스타일 변경
+                // 중복확인 버튼 스타일 변경
                 const checkButton = document.querySelector('.input-group .btn-outline');
                 checkButton.textContent = '확인완료';
-                checkButton.disabled = true;
                 checkButton.classList.add('btn-success');
                 checkButton.classList.remove('btn-outline');
             } else {
@@ -330,18 +327,16 @@ document.querySelector('form').addEventListener('submit', function(e) {
 
 // 아이디 입력창 이벤트 리스너
 document.getElementById('userId').addEventListener('input', function() {
-    if (isIdChecked) {
-        // 중복확인 후 아이디 변경 시도 시 상태 초기화
+    const currentId = this.value;
+    const checkButton = document.querySelector('.input-group .btn-outline');
+    
+    // 중복체크된 아이디와 다른 경우 상태 초기화
+    if (isIdChecked && currentId !== checkedId) {
         isIdChecked = false;
         checkedId = '';
-        this.readOnly = false;
-        const checkButton = document.querySelector('.input-group .btn-outline');
-        if (checkButton) {
-            checkButton.textContent = '중복확인';
-            checkButton.disabled = false;
-            checkButton.classList.remove('btn-success');
-            checkButton.classList.add('btn-outline');
-        }
+        checkButton.textContent = '중복확인';
+        checkButton.classList.remove('btn-success');
+        checkButton.classList.add('btn-outline');
     }
 });
 </script>
