@@ -124,14 +124,14 @@ let isEmailVerified = false;
 function checkDuplicateId() {
     const userId = document.getElementById('userId').value;
     if (!userId) {
-        alert('아이디를 입력해주세요.');
+        showError("아이디를 입력해주세요.");
         return;
     }
 
-    fetch(`/members/check-id/${userId}`)
+    fetch(`/members/check-id?userId=${userId}`)
         .then(response => response.json())
         .then(data => {
-            if (data.available) {
+            if (!data.available) {
                 alert('사용 가능한 아이디입니다.');
             } else {
                 alert('이미 사용중인 아이디입니다.');
