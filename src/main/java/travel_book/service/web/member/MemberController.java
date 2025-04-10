@@ -24,7 +24,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/add")
-    public String addForm(@ModelAttribute("member") Member member) {
+    public String addForm(@ModelAttribute("memberForm") Member member) {
         return "members/addMemberForm";
     }
 
